@@ -1,0 +1,97 @@
+/* El CSS se mantiene igual que en la respuesta anterior. */
+/* Asegúrate de que las reglas para .profile-photo y .rounded-circle estén presentes. */
+
+body {
+    background-color: #3FD4A4;
+    font-family: 'Nunito', sans-serif;
+}
+
+.card {
+    border: none;
+    border-radius: 1rem;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+}
+
+.form-control:focus {
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    border-color: #0d6efd;
+}
+
+.form-control{
+    padding: 10px;
+}
+
+.btn-primary {
+    background-color: black;
+    border-color: black;
+    padding: 10px;
+}
+
+.btn-outline-secondary{
+    padding: 10px;
+}
+
+.btn-primary:hover {
+    background-color: #3FD4A4;
+    border-color: #3FD4A4;
+}
+
+.vh-100 {
+    height: 100vh;
+}
+
+.profile-photo-container {
+  position: relative;
+  width: 150px;
+  height: 150px;
+  border: solid 3px;
+  border-color: #3FD4A4;
+  border-radius: 50%;
+}
+
+.profile-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.upload-btn {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background-color: black;
+  color: white;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  border: 2px solid white;
+}
+
+.border-end {
+  border-right: 1px solid #dee2e6 !important;
+}
+
+/* Estilos para el footer de la tarjeta */
+.card-footer-custom {
+    border-bottom-left-radius: 1rem;
+    border-bottom-right-radius: 1rem;
+}
+
+.input-group-text {
+    background-color: black;
+    color: white;
+    border-color: black;
+}
+
+@media (max-width: 767.98px) {
+  .border-end {
+    border-right: none !important;
+    border-bottom: 1px solid #dee2e6 !important;
+    padding-right: 0 !important;
+    margin-bottom: 1rem;
+  }
+}

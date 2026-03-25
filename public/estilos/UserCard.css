@@ -1,0 +1,64 @@
+.perfil-dropdown {
+  display: none;
+  position: absolute;
+  top: 60px;
+  right: 15px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  width: 240px;
+  text-align: center;
+  overflow: hidden;
+  z-index: 999;
+}
+
+.perfil-header {
+  background: #4CE6BF;
+  padding: 8px;
+  color: white;
+}
+
+.perfil-foto {
+  margin: 15px 0;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 2px solid #333;
+  transition: 0.2s;
+  margin-right: 5px;
+}
+
+.perfil-foto:hover {
+    border-color: #4CE6BF;
+    cursor: pointer; /* aquí hacemos que aparezca la manita */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.4); /* Sombra suave */
+}
+
+.perfil-dropdown a {
+  display: block;
+  padding: 12px;
+  text-decoration: none;
+  color: black;
+  border-top: 1px solid #ddd;
+}
+
+.perfil-dropdown a:hover {
+  background: #f0f0f0;
+}
+
+.cerrar-btn {
+  background: #F0F3F5;
+  color: #80868b;
+  padding: 10px;
+  margin: 10px auto;
+  border-radius: 8px;
+  width: 85%;
+  cursor: pointer;
+  border: none;
+  display: block;
+}
+
+.cerrar-btn:hover {
+  color: red;
+  box-shadow: 0 1px 6px rgba(32, 33, 36, 0.28);
+}

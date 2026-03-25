@@ -1,0 +1,136 @@
+/* Menú lateral */
+.menu-lateral {
+    height: 100%;
+    width: 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: white;
+    overflow-x: hidden;
+    transition: 0.3s;
+    padding-top: 3px;
+    z-index: 1000;
+    box-shadow: 4px 0 8px rgba(0,0,0,0.5);
+    background-image: radial-gradient(
+        circle at bottom left,
+        #e6ffef 0%,                 
+        #e6ffef 50px,             /* Círculo central oscuro */
+        transparent 50px,         
+        transparent 65px,         /* Anillo transparente (deja ver el fondo blanco) */
+        #e6ffef 65px,             
+        #e6ffef 180px,            /* Borde exterior oscuro (más grueso) */
+        transparent 180px         /* A partir de aquí, todo es transparente */
+    );
+    background-repeat: no-repeat;
+    background-position: bottom left;
+}
+
+.img_menu{
+    width: 20px;
+    height: 20px;
+}
+
+.menu-lateral a {
+    padding: 12px 24px;
+    text-decoration: none;
+    color: black;
+    display: block;
+    transition: 0.2s;
+    border-radius: 100px;
+}
+
+.menu-lateral a:hover {
+    background-color: #e6ffef;
+}
+
+/* Contenedor de X y título */
+.menu-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* título a la izquierda, X a la derecha */
+} 
+
+/* Botón cerrar */
+.menu-header .close-btn {
+    text-decoration: none;
+}
+
+.menu-header .close-btn i {
+    color: black;
+}
+
+/* Título */
+.menu-header .menu-title {
+    padding-left: 24px;
+    color: black;
+}
+
+/* Secciones con subsecciones */
+.menu-seccion .subseccion {
+    display: none; /* Oculta por defecto */
+    padding-left: 15px;
+}
+
+.menu-seccion.active .subseccion {
+    display: block; /* Muestra cuando se activa */
+}
+
+.menu-seccion .menu-principal {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+}
+
+/* Contenido responsivo (desplazamiento de nav y contenido)*/
+
+/* El contenedor principal se comporta como un body interno */
+.main-content {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    transition: margin-left 0.3s;
+    margin-left: 0;
+}
+
+/* El section se expande para empujar al footer hacia abajo */
+.main-content section {
+    flex: 1;
+    padding: 10px;
+}
+
+/* Cuando el menú está abierto */
+.main-content.shifted {
+    margin-left: 250px;
+}
+
+/* En móviles el menú lateral se superpone al contenido */
+@media (max-width: 768px) {
+  .main-content.shifted {
+    margin-left: 0; /* Anula el empuje */
+  }
+  .overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    z-index: 1000; /* menor que el menú lateral */
+  }
+  /* Menú lateral encima del overlay */
+  #menu-lateral {
+    z-index: 1500; /* mayor que el overlay */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 100%;
+    transition: width 0.3s ease;
+  }
+}
+
+
+
+
