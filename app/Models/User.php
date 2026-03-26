@@ -58,6 +58,7 @@ class User extends Authenticatable
     const ROL_USUARIO = 'usuario';
     const ROL_ALUMNO = 'alumno';
     const ROL_TUTOR = 'tutor';
+    const ROL_DOCENTE = 'docente';
 
     // Métodos helper
     public function esAdmin()
