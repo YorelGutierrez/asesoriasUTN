@@ -31,7 +31,7 @@
             <ul>
                 <!-- Icono del menú dentro del nav -->
                 <li class="menu-icon">
-                    <a href="javascript:void(0)" onclick="toggleMenu()"><i class="bi bi-list"></i></a>
+                    <a href="javascript:void(0)" onclick="toggleMenu()"><i class="bi bi-list"></i> <span class="menu-title"></span></a>
                 </li>
 
                 <!-- Opciones posicionadas de lado izquierdo -->
@@ -86,7 +86,6 @@
         <div class="perfil-header"></div>
         <img src="{{ Auth::user()->foto_url }}" alt="Perfil" class="perfil-foto">
         <b>{{ Auth::user()->nombres }}</b>
-        <a href="#"><i class="bi bi-gear-fill"></i>Configuración</a>
         <a href="{{ route('lang.switch', $switchToLang) }}">
             <i class="bi bi-translate"></i> {{ __('Cambiar idioma') }}
         </a>
@@ -102,23 +101,24 @@
     <aside id="menu-lateral" class="menu-lateral">
         <!-- Encabezado del menú -->
         <div class="menu-header">
-            <span class="menu-title"><img class="img_menu" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSKLc3LGB1aSLdgvmI7TwAd0-rJLeTNqExKUw&s"> Opciones</span>
+            <!-- Ícono hamburguesa ahora aquí -->
             <a href="javascript:void(0)" class="close-btn" onclick="toggleMenu()">
-                <i class="bi bi-x"></i>
+                <i class="bi bi-list"></i>
             </a>
+            <span class="menu-title"></span>
         </div>
         <!-- Links del menú -->
-        <a href="#"><i class="bi bi-house-fill"></i> Inicio</a>
-        <a href="#"><i class="bi bi-collection-fill"></i> Grupos</a>
-        <a href="#"><i class="bi bi-person-vcard-fill"></i> Alumnos</a>
-        <a href="#"><i class="bi bi-calendar-plus-fill"></i> Agendar</a>
-        <a href="#"><i class="bi bi-clipboard2-check-fill"></i> Roles y permisos</a>
+        <a href="{{ route('dashboard') }}"><i class="bi bi-house-fill" style="font-size: 18px;"></i> Inicio</a>
+        <a href="{{ route('grupos') }}"><i class="bi bi-collection-fill" style="font-size: 18px;"></i> Grupos</a>
+        <a href="{{ route('alumnos') }}"><i class="bi bi-person-vcard-fill" style="font-size: 18px;"></i> Alumnos</a>
+        <a href="{{ route('agenda') }}"><i class="bi bi-calendar-plus-fill" style="font-size: 18px;"></i> Agendar</a>
+        <a href="{{ route('roles_permisos') }}"><i class="bi bi-clipboard2-check-fill" style="font-size: 18px;"></i> Roles y permisos</a>
         <!-- Sección con subsección -->
         <div class="menu-seccion">
-            <a href="#" class="menu-principal">Sección 1 <i class="bi bi-chevron-compact-down"></i></a>
+            <a href="#" class="menu-principal">Registro<i class="bi bi-chevron-compact-down"></i></a>
             <div class="subseccion">
-                <a href="#">Subsección 1.1</a>
-                <a href="#">Subsección 1.2</a>
+                <a href="{{ route('registro_alumnos') }}"><i class="bi bi-person-fill-add" style="font-size: 18px;"></i> Registro Alumnos</a>
+                <a href="{{ route('registro_docente') }}"><i class="bi bi-person-fill-add" style="font-size: 18px;"></i> Registro Docentes</a>
             </div>
         </div>
     </aside>

@@ -37,21 +37,19 @@ document.querySelector(".overlay").addEventListener("click", () => {
     content.classList.remove("shifted");
     overlay.style.display = "none";
     if (isMobile) {
-        menuIcon.style.display = "block"; // solo en móvil
+        menuIcon.style.display = "block"; 
     }
 });
 
 // Para mostrar/ocultar subsecciones y cambiar el ícono
 document.querySelectorAll('.menu-principal').forEach(item => {
     item.addEventListener('click', (e) => {
-        e.preventDefault(); // evita el salto del enlace
+        e.preventDefault(); 
         const parent = item.parentElement;
         const icono = item.querySelector('i');
 
-        // Alternar clase "active" (para abrir/cerrar subsección)
         parent.classList.toggle('active');
 
-        // Cambiar ícono segun estado
         if (parent.classList.contains('active')) {
             icono.classList.remove('bi-chevron-compact-down');
             icono.classList.add('bi-chevron-compact-up');
@@ -61,4 +59,26 @@ document.querySelectorAll('.menu-principal').forEach(item => {
         }
     });
 });
+
+// Inicializar estado del menú según el tamaño de pantalla
+document.addEventListener('DOMContentLoaded', function() {
+    const menu = document.getElementById('menu-lateral');
+    const content = document.getElementById('main-content');
+    const menuIcon = document.querySelector('.menu-icon');   
+    const overlay = document.querySelector('.overlay');
+    const isMobile = window.innerWidth <= 768;
+
+    if (isMobile) {
+        menu.style.width = '0';
+        content.classList.remove('shifted');
+        if (menuIcon) menuIcon.style.display = 'block';
+        overlay.style.display = 'none';
+    } else {
+        menu.style.width = '250px';
+        content.classList.add('shifted');
+        if (menuIcon) menuIcon.style.display = 'none';
+        overlay.style.display = 'none';   
+    }
+});
+
 

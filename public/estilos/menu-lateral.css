@@ -10,16 +10,16 @@
     transition: 0.3s;
     padding-top: 3px;
     z-index: 1000;
-    box-shadow: 4px 0 8px rgba(0,0,0,0.5);
+    box-shadow: 2px 0 8px rgba(0,0,0,0.1);
     background-image: radial-gradient(
         circle at bottom left,
         #e6ffef 0%,                 
-        #e6ffef 50px,             /* Círculo central oscuro */
+        #e6ffef 50px,            
         transparent 50px,         
-        transparent 65px,         /* Anillo transparente (deja ver el fondo blanco) */
+        transparent 65px,         
         #e6ffef 65px,             
-        #e6ffef 180px,            /* Borde exterior oscuro (más grueso) */
-        transparent 180px         /* A partir de aquí, todo es transparente */
+        #e6ffef 180px,           
+        transparent 180px        
     );
     background-repeat: no-repeat;
     background-position: bottom left;
@@ -43,16 +43,25 @@
     background-color: #e6ffef;
 }
 
-/* Contenedor de X y título */
+/* Contenedor de título */
 .menu-header {
     display: flex;
     align-items: center;
-    justify-content: space-between; /* título a la izquierda, X a la derecha */
+    justify-content: space-between;
 } 
+
+.menu-header .menu-icon {
+    display: inline-flex;
+    text-decoration: none;
+    color: black;
+    margin-right: 10px;
+}
 
 /* Botón cerrar */
 .menu-header .close-btn {
+    display: inline-flex;
     text-decoration: none;
+    font-size: 18px;
 }
 
 .menu-header .close-btn i {
@@ -61,7 +70,11 @@
 
 /* Título */
 .menu-header .menu-title {
-    padding-left: 24px;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-left: 0;
     color: black;
 }
 
@@ -72,7 +85,7 @@
 }
 
 .menu-seccion.active .subseccion {
-    display: block; /* Muestra cuando se activa */
+    display: block; 
 }
 
 .menu-seccion .menu-principal {
@@ -81,6 +94,7 @@
     align-items: center;
     cursor: pointer;
 }
+
 
 /* Contenido responsivo (desplazamiento de nav y contenido)*/
 
@@ -104,6 +118,7 @@
     margin-left: 250px;
 }
 
+
 /* En móviles el menú lateral se superpone al contenido */
 @media (max-width: 768px) {
   .main-content.shifted {
@@ -117,11 +132,12 @@
     width: 100%;
     height: 100%;
     background-color: rgba(0,0,0,0.5);
-    z-index: 1000; /* menor que el menú lateral */
+    z-index: 1000; 
   }
+
   /* Menú lateral encima del overlay */
   #menu-lateral {
-    z-index: 1500; /* mayor que el overlay */
+    z-index: 1500;
     position: fixed;
     top: 0;
     left: 0;

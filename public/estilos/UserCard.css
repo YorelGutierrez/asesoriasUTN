@@ -13,7 +13,7 @@
 }
 
 .perfil-header {
-  background: #4CE6BF;
+  background: linear-gradient(to left, #00937f, #2c9f49);
   padding: 8px;
   color: white;
 }

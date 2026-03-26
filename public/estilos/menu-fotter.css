@@ -50,6 +50,9 @@ body {
             overflow: hidden;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             margin-bottom: 15px;
+            position: sticky;
+            top: 0;
+            z-index: 500;
         }
 
         nav ul {
@@ -90,7 +93,7 @@ body {
             padding-left: 25px;
         }
 
-/* Barra de busqueda en el menu */
+/* Barra de busqueda*/
 
         /* contenedor*/
         .barra-busqueda form {
@@ -179,22 +182,6 @@ body {
 .contacto {
     font-size: 14px;
     margin-top: 10px;
-}
-
-
-@media (max-width: 768px) {
-  /* Oculta todos los li excepto lo que esta dentro del parentesis */
-  nav ul li:not(.menu-icon, .barra-busqueda, .perfil) {
-    display: none;
-}
-nav ul li.perfil a {
-    display: none; 
-    
-}
-.barra-busqueda{
-    padding-right: 20px;
-}
-
 }
 
 section{
