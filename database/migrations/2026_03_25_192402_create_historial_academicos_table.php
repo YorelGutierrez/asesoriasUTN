@@ -17,7 +17,7 @@ return new class extends Migration
             $table->boolean('extraordinario')->default(false);
             $table->text('temas_no_dominados')->nullable();
             $table->timestamps();
-
+            
             $table->unique(['alumno_id', 'materia_id', 'cuatrimestre']);
         });
     }

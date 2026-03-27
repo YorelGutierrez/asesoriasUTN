@@ -8,17 +8,17 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('notificaciones', function (Blueprint $table) {
+        Schema::create('grupos', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('usuario_id')->constrained('users')->onDelete('cascade');
-            $table->string('tipo');
-            $table->text('mensaje');
+            $table->string('nombre')->unique();
+            $table->foreignId('carrera_id')->constrained('carreras')->onDelete('cascade')->unique();
+            $table->integer('cuatrimestre');
             $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('notificaciones');
+        Schema::dropIfExists('grupos');
     }
 };

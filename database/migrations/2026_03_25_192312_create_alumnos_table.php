@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('matricula')->unique();
-            $table->string('grupo')->nullable();
+            $table->foreignId('grupo_id')->nullable()->constrained('grupos')->nullOnDelete();
             $table->foreignId('carrera_id')->nullable()->constrained('carreras')->nullOnDelete();
             $table->integer('cuatrimestre')->nullable();
             $table->timestamps();
