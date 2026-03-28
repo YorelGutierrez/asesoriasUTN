@@ -26,9 +26,31 @@
     opacity: 0;
     transition: opacity 0.2s ease;
     z-index: -1;
+    color: #fff;
     border-radius: inherit; /* para que herede el borde redondeado */
 }
 
 .btn-principal:hover::before {
     opacity: 1;
+}
+
+.btn-secundario{
+    position: relative;
+    background-color: #00937f;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 50px;
+    font-size: 1.0rem;
+    font-weight: bold;
+    cursor: pointer;
+    display: block;     
+    width: 100%;         
+    text-align: center;  
+    z-index: 1;
+    overflow: hidden;
+}
+
+.btn-secundario:hover{
+    background-color: #025349;
 }

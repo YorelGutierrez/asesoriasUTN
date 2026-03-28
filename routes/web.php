@@ -42,6 +42,14 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/agenda', function () {
         return view('agendar');
     })->name('agenda');
+
+    Route::get('/alumnos/expediente', function () {
+        return view('expediente_alumnos');
+    })->name('expedienteAlumnos');
+
+    Route::get('/historial', function () {
+        return view('historial');
+    })->name('historial');
 });
 
 
@@ -62,7 +70,7 @@ Route::middleware(['auth', 'rol:admin'])->group(function () {
         return view('admin/registroAlumnos');
     })->name('registro_alumnos');
 
-        Route::get('/registro/docente', function () {
+    Route::get('/registro/docente', function () {
         return view('admin/registroDocentes');
     })->name('registro_docente');
 });

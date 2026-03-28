@@ -25,22 +25,21 @@
     background-image: radial-gradient(
         circle at bottom right,
        #e6ffef 0%,
-        #e6ffef 48px,        /* centro sólido más grande */
-        transparent 48px,     /* inicio del hueco */
-        transparent 67px,     /* fin del hueco */
-        #e6ffef 67px,        /* inicio del anillo exterior */
-        #e6ffef 115px,       /* fin del anillo exterior (radio total) */
+        #e6ffef 48px,      
+        transparent 48px,     
+        transparent 67px,   
+        #e6ffef 67px,       
+        #e6ffef 115px,       
         transparent 115px   
     );
   border-radius: 20px;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
   overflow: hidden; 
   position: relative;
   display: flex;
   flex-direction: column;
 }
 
-/* El encabezado verde con curva */
 .header-curve {
   position: relative; 
   top: 0;
@@ -54,7 +53,6 @@
   width: 100%;
 }
 
-/* El cuerpo de la tarjeta que contiene el resto del contenido */
 .card-body {
   margin-top: 15px;     
   padding: 0px 20px 20px; 
@@ -68,10 +66,10 @@
   box-sizing: border-box;
 }
 
-/* Contenedor de la foto de perfil circular con borde blanco */
+
 .profile-pic-container {
  position: absolute;
-  top: 50%;                      /* Centrado vertical dentro del header */
+  top: 50%;                     
   left: 50%;
   transform: translate(-50%, -50%);
   width: 120px;
@@ -100,19 +98,4 @@
   color: #000;
   text-align: center;
   z-index: 3;
-}
-
-/* El patrón de fondo sutil con círculos claros */
-.background-pattern {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  width: 150px;
-  height: 150px;
-  background-image: radial-gradient(circle at center, rgba(57, 181, 74, 0.1) 0%, rgba(57, 181, 74, 0) 50%); /* Círculos verdes muy claros y transparentes */
-  background-size: 80px 80px; /* Tamaño del patrón repetitivo */
-  mask-image: linear-gradient(to top left, #000, transparent); /* Se desvanece hacia la parte superior izquierda */
-  -webkit-mask-image: linear-gradient(to top left, #000, transparent); /* Para compatibilidad */
-  opacity: 0.2; /* Sutil transparencia general */
-  z-index: 0; /* Detrás de todo el contenido */
 }

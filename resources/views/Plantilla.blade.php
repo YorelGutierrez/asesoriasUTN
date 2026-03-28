@@ -89,7 +89,7 @@
         <a href="{{ route('lang.switch', $switchToLang) }}">
             <i class="bi bi-translate"></i> {{ __('Cambiar idioma') }}
         </a>
-        <a href="#">Opcion 1</a>
+        <a href="{{ route('historial') }}"><i class="bi bi-clock-history"></i> Historial</a>
         <a href="{{ route('admin.dashboard') }}">Opciones Admin</a>
         <form method="POST" action="{{ route('logout') }}">
             @csrf
