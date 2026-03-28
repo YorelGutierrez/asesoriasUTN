@@ -1,0 +1,110 @@
+.titulo{
+    display: flex;
+    width: 100%;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5); 
+    border-radius: 10px;
+    background: linear-gradient(to left, #00937f, #2c9f49);
+    color: #fff;
+    margin-bottom: 20px;
+    padding: 10px;
+}
+
+
+/* El contenedor principal de la card */
+.card-itid {
+    display: flex;
+    width: 100%;
+    height: 150px;
+    background-color: #fff;
+    border-radius: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5); 
+    overflow: hidden;
+    position: relative;
+    color: #333;
+}
+
+/* Columna izquierda: Barra lateral gris con el logo */
+.card-left {
+    flex: 0 0 100px;
+    background-color: #e6ffef;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* antes era center */
+    border-top-left-radius: 20px;
+    border-bottom-left-radius: 20px;
+    padding: 20px 10px 10px 10px; /* ejemplo: más espacio arriba */
+}
+
+.logo {
+    width: 60px; /* Tamaño del logo estimado */
+    height: 60px;
+    object-fit: contain; /* Asegura que la imagen no se deforme */
+}
+
+/* Columna derecha: Contenido blanco con texto y botón */
+.card-right {
+    flex: 1;
+    padding: 12px 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    position: relative;
+}
+
+/* Decoración de fondo verde borroso (el efecto de desenfoque) */
+.card-bg-decoration {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    background-image: radial-gradient(
+        circle at top right,           
+        transparent 42px,          
+        transparent 58px,        
+        #e6ffef 58px,             
+        #e6ffef 100px,            
+        transparent 100px           
+    );
+    pointer-events: none; /* Para que no interfiera con clics */
+}
+
+/* Un envoltorio para el contenido para asegurarse de que va por encima de la decoración */
+.card-content-wrapper {
+    position: relative;
+    z-index: 1; /* Encima de la decoración */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+}
+
+/* Texto del grupo */
+.card-right h3 {
+    font-size: 1.2rem; /* antes 1.5rem */
+    font-weight: bold;
+    margin: 0 0 8px 0; /* antes 15px */
+    color: #000;
+}
+
+.card-right h3 span {
+    font-weight: bold;
+    color: #000;
+}
+
+/* Fila de estadísticas (icono y número) */
+.stats-row {
+    display: flex;
+    align-items: center;
+    font-size: 1rem; 
+    color: #333;
+    margin-bottom: 12px; 
+}
+
+.stats-row i {
+    font-size: 1.4rem; 
+    margin-right: 12px;
+}
