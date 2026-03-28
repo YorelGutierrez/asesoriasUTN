@@ -9,6 +9,7 @@
     <h1>Alumnos del grupo IDGS-84</h1>
 </div>
 
+<!-- barra de busqueda -->
   <div class="search-card bg-white rounded-3 p-3 mb-4 shadow-sm">
     <div class="row align-items-center">
       <div class="col-auto">
@@ -25,6 +26,7 @@
     </div>
   </div>
 
+<!-- Cards alumnos -->
   <div class="row">
     <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
       <!-- Tarjeta de alumno -->
@@ -36,7 +38,7 @@
         </div>
         <div class="card-body">
           <p class="user-name">Nombre del alumno</p>
-          <button class="btn-principal">Seleccionar alumno</button>
+          <a class="btn-principal" id="btn-select-alumno" href="{{ route('expedienteAlumnos') }}">Seleccionar alumno</a>
           <div class="background-pattern"></div>
         </div>
       </div>

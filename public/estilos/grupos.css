@@ -17,7 +17,7 @@
     height: 150px;
     background-color: #fff;
     border-radius: 20px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5); 
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); 
     overflow: hidden;
     position: relative;
     color: #333;
@@ -26,7 +26,7 @@
 /* Columna izquierda: Barra lateral gris con el logo */
 .card-left {
     flex: 0 0 100px;
-    background-color: #e6ffef;
+    background-color: #f8f9fa;
     display: flex;
     justify-content: center;
     align-items: flex-start; /* antes era center */
