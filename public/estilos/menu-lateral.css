@@ -95,6 +95,9 @@
     cursor: pointer;
 }
 
+.activo {
+    background-color: #e6ffef;
+}
 
 /* Contenido responsivo (desplazamiento de nav y contenido)*/
 
@@ -146,6 +149,7 @@
     transition: width 0.3s ease;
   }
 }
+
 
 
 
