@@ -44,13 +44,29 @@ document.querySelector(".overlay").addEventListener("click", () => {
 // Para mostrar/ocultar subsecciones y cambiar el ícono
 document.querySelectorAll('.menu-principal').forEach(item => {
     item.addEventListener('click', (e) => {
-        e.preventDefault(); 
-        const parent = item.parentElement;
+        e.preventDefault();
+
+        const menuSeccion = item.parentElement;
         const icono = item.querySelector('i');
 
-        parent.classList.toggle('active');
+        // Cerrar todas
+        document.querySelectorAll('.menu-seccion').forEach(sec => {
+            if (sec !== menuSeccion) {
+                sec.classList.remove('active');
 
-        if (parent.classList.contains('active')) {
+                const i = sec.querySelector('.menu-principal i');
+                if (i) {
+                    i.classList.remove('bi-chevron-compact-up');
+                    i.classList.add('bi-chevron-compact-down');
+                }
+            }
+        });
+
+        // Toggle actual
+        menuSeccion.classList.toggle('active');
+
+        // Cambiar icono
+        if (menuSeccion.classList.contains('active')) {
             icono.classList.remove('bi-chevron-compact-down');
             icono.classList.add('bi-chevron-compact-up');
         } else {

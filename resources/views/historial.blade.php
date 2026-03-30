@@ -101,5 +101,5 @@
 </div>
 
 <!-- Botón de regreso (opcional) -->
-<a href="javascript:history.back()" class="btn-principal"><- Regresar al listado</a>
+<a href="{{ route('dashboard')}}" class="btn-principal"><- Regresar al escritorio</a>
 @endsection()

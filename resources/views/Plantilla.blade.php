@@ -65,7 +65,7 @@
             </div>
             <!-- Derechos de autor -->
             <div class="derechos-autor">
-                &copy; © 2026 Equipo Web Asesorias. Todos los derechos reservados.
+                © 2026 Equipo Web Asesorias. Todos los derechos reservados.
             </div>
             <!-- Información de contacto -->
             <div class="contacto">
@@ -108,17 +108,46 @@
             <span class="menu-title"></span>
         </div>
         <!-- Links del menú -->
-        <a href="{{ route('dashboard') }}"><i class="bi bi-house-fill" style="font-size: 18px;"></i> Inicio</a>
-        <a href="{{ route('grupos') }}"><i class="bi bi-collection-fill" style="font-size: 18px;"></i> Grupos</a>
-        <a href="{{ route('alumnos') }}"><i class="bi bi-person-vcard-fill" style="font-size: 18px;"></i> Alumnos</a>
-        <a href="{{ route('agenda') }}"><i class="bi bi-calendar-plus-fill" style="font-size: 18px;"></i> Agendar</a>
-        <a href="{{ route('roles_permisos') }}"><i class="bi bi-clipboard2-check-fill" style="font-size: 18px;"></i> Roles y permisos</a>
+        <a href="{{ route('dashboard') }}"
+            class="{{ request()->routeIs('dashboard') ? 'activo' : '' }}">
+            <i class="bi bi-house-fill"></i> Inicio
+        </a>
+        <a href="{{ route('grupos') }}"
+            class="{{ request()->routeIs('grupos') ? 'activo' : '' }}">
+            <i class="bi bi-collection-fill"></i> Grupos
+        </a>
+        <a href="{{ route('alumnos') }}"
+            class="{{ request()->routeIs('alumnos') ? 'activo' : '' }}">
+            <i class="bi bi-person-vcard-fill" style="font-size: 18px;"></i> Alumnos
+        </a>
+        <a href="{{ route('agenda') }}"
+            class="{{ request()->routeIs('agenda') ? 'activo' : '' }}">
+            <i class="bi bi-calendar-plus-fill" style="font-size: 18px;"></i> Agendar
+        </a>
+        <a href="{{ route('roles_permisos') }}"
+            class="{{ request()->routeIs('roles_permisos') ? 'activo' : '' }}">
+            <i class="bi bi-clipboard2-check-fill" style="font-size: 18px;"></i> Roles y permisos
+        </a>
         <!-- Sección con subsección -->
         <div class="menu-seccion">
-            <a href="#" class="menu-principal">Registro<i class="bi bi-chevron-compact-down"></i></a>
+            <a href="#" class="menu-principal" >Registros<i class="bi bi-chevron-compact-down"></i></a>
             <div class="subseccion">
-                <a href="{{ route('registro_alumnos') }}"><i class="bi bi-person-fill-add" style="font-size: 18px;"></i> Registro Alumnos</a>
-                <a href="{{ route('registro_docente') }}"><i class="bi bi-person-fill-add" style="font-size: 18px;"></i> Registro Docentes</a>
+                <a href="{{ route('registro_alumnos') }}"
+                    class="{{ request()->routeIs('registro_alumnos') ? 'activo' : '' }}">
+                    <i class="bi bi-person-fill-add" style="font-size: 18px;"></i> Registro Alumnos
+                </a>
+                <a href="{{ route('registro_docente') }}" 
+                class="{{ request()->routeIs('registro_docente') ? 'activo' : '' }}">
+                <i class="bi bi-person-fill-add" style="font-size: 18px;"></i> Registro Docentes
+            </a>
+            </div>
+        </div>
+        <div class="menu-seccion">
+            <a href="#" class="menu-principal">Gestion<i class="bi bi-chevron-compact-down"></i></a>
+            <div class="subseccion">
+                <a href="#" class="{{ request()->routeIs('#') ? 'activo' : '' }}"><i class="bi bi-person-fill-add" style="font-size: 18px;"></i> Getionar Alumnos</a>
+                <a href="#" class="{{ request()->routeIs('#') ? 'activo' : '' }}"><i class="bi bi-person-fill-add" style="font-size: 18px;"></i> Gesntionar Grupos</a>
+                <a href="#" class="{{ request()->routeIs('#') ? 'activo' : '' }}"><i class="bi bi-person-fill-add" style="font-size: 18px;"></i> Gestionar Docentes</a>
             </div>
         </div>
     </aside>
