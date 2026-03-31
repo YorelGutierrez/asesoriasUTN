@@ -52,7 +52,7 @@
     </div>
 </div>
 
-<!-- Tabla de asesorías recientes (opcional para mostrar el historial) -->
+<!-- Tabla de asesorías recientes -->
 <div class="card shadow-sm border-0 rounded-4 mb-4">
     <div class="card-body p-4">
         <div class="d-flex justify-content-between align-items-center mb-3">
@@ -100,6 +100,5 @@
     </div>
 </div>
 
-<!-- Botón de regreso (opcional) -->
 <a href="{{ route('dashboard')}}" class="btn-principal"><- Regresar al escritorio</a>
 @endsection()

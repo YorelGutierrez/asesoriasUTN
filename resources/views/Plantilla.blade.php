@@ -114,7 +114,7 @@
         </a>
         <a href="{{ route('grupos') }}"
             class="{{ request()->routeIs('grupos') ? 'activo' : '' }}">
-            <i class="bi bi-collection-fill"></i> Grupos
+            <i class="bi bi-people-fill"></i> Grupos
         </a>
         <a href="{{ route('alumnos') }}"
             class="{{ request()->routeIs('alumnos') ? 'activo' : '' }}">
@@ -128,26 +128,22 @@
             class="{{ request()->routeIs('roles_permisos') ? 'activo' : '' }}">
             <i class="bi bi-clipboard2-check-fill" style="font-size: 18px;"></i> Roles y permisos
         </a>
+        <a href="{{ route('gestion') }}"
+            class="{{ request()->routeIs('gestion') ? 'activo' : '' }}">
+            <i class="bi bi-person-workspace" style="font-size: 18px;"></i> Gestión administrativa
+        </a>
         <!-- Sección con subsección -->
         <div class="menu-seccion">
-            <a href="#" class="menu-principal" >Registros<i class="bi bi-chevron-compact-down"></i></a>
+            <a href="#" class="menu-principal"><i class="bi bi-person-fill-add" style="font-size: 18px;"></i>Registros<i class="bi bi-chevron-compact-down"></i></a>
             <div class="subseccion">
                 <a href="{{ route('registro_alumnos') }}"
                     class="{{ request()->routeIs('registro_alumnos') ? 'activo' : '' }}">
-                    <i class="bi bi-person-fill-add" style="font-size: 18px;"></i> Registro Alumnos
+                    Registro Alumnos
                 </a>
-                <a href="{{ route('registro_docente') }}" 
-                class="{{ request()->routeIs('registro_docente') ? 'activo' : '' }}">
-                <i class="bi bi-person-fill-add" style="font-size: 18px;"></i> Registro Docentes
-            </a>
-            </div>
-        </div>
-        <div class="menu-seccion">
-            <a href="#" class="menu-principal">Gestion<i class="bi bi-chevron-compact-down"></i></a>
-            <div class="subseccion">
-                <a href="#" class="{{ request()->routeIs('#') ? 'activo' : '' }}"><i class="bi bi-person-fill-add" style="font-size: 18px;"></i> Getionar Alumnos</a>
-                <a href="#" class="{{ request()->routeIs('#') ? 'activo' : '' }}"><i class="bi bi-person-fill-add" style="font-size: 18px;"></i> Gesntionar Grupos</a>
-                <a href="#" class="{{ request()->routeIs('#') ? 'activo' : '' }}"><i class="bi bi-person-fill-add" style="font-size: 18px;"></i> Gestionar Docentes</a>
+                <a href="{{ route('registro_docente') }}"
+                    class="{{ request()->routeIs('registro_docente') ? 'activo' : '' }}">
+                    Registro Docentes
+                </a>
             </div>
         </div>
     </aside>

@@ -93,45 +93,6 @@ body {
             padding-left: 25px;
         }
 
-/* Barra de busqueda*/
-
-        /* contenedor*/
-        .barra-busqueda form {
-            width: 350px; /* Ancho de la barra */
-        }
-
-        /* Estilo del campo de entrada de texto */
-        .barra-busqueda input {
-            width: 100%;
-            height: 36px;
-            padding-left: 50px; /* Espacio a la izquierda para el ícono */
-            border-radius: 15px; /* La mitad de la altura para que sea totalmente redondeado */
-            border: none;
-            outline: none; /* Quitamos el borde que aparece al hacer clic */
-            box-sizing: border-box; /* Asegura que el padding no afecte el ancho total */
-            transition: 0.2s; /* Transición suave para la sombra */
-            background-color: #F0F3F5;
-        }
-
-        /* Efecto de sombra al pasar el mouse o hacer clic */
-        .barra-busqueda input:hover {
-            box-shadow: 0 1px 6px rgba(32, 33, 36, 0.28);
-        }
-
-        /* Posicionamiento y estilo del ícono*/
-        .bi-search{
-            position: absolute; /* Posición absoluta respecto al formulario */
-            left: 18px;
-            top: 50%;
-            transform: translateY(-50%); /* Centrado vertical perfecto */
-            color: #9aa0a6; /* Color gris para el ícono */
-        }
-
-        /* Placeholder del input */
-        .barra-busqueda input::placeholder {
-            color: #80868b;
-        }
-
     /*Extras Menu*/
 
     .ExtrasMenu{
@@ -189,7 +150,18 @@ section{
     margin-left: 15px;
 }
 
+.input-group {
+    flex-wrap: nowrap !important;
+}
 
+.input-group .btn {
+    flex: 0 0 auto !important;
+    width: auto !important;
+}
+
+.input-group .btn:hover{
+   background: linear-gradient(to left, #00937f, #2c9f49);
+}
 
 
 

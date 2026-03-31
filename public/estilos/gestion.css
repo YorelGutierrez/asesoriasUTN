@@ -1,0 +1,38 @@
+/* Eliminar espacio inferior de las pestañas */
+.nav-tabs {
+    margin-bottom: 0 !important;
+}
+
+/* Evitar márgenes/paddings extra en el contenido */
+.tab-content {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+}
+
+/* Quitar bordes superiores redondeados a la tarjeta dentro de la pestaña */
+.tab-pane .card {
+    border-top-left-radius: 0 !important;
+    border-top-right-radius: 0 !important;
+    border-top: none !important;
+    margin-top: 0 !important;
+}
+
+/* Estilo común de todas las pestañas */
+.nav-tabs .nav-link {
+    background-color: #f8f9fa;
+    color: #2c9f49;
+    border: 1px solid #dee2e6;
+    border-bottom: none;
+    border-top-left-radius: 0.375rem;
+    border-top-right-radius: 0.375rem;
+    margin-right: 2px;
+    margin-bottom: 0;
+}
+
+/* Pestaña activa: fondo blanco, borde inferior blanco para que se una a la tarjeta */
+.nav-tabs .nav-link.active {
+    background-color: #fff;
+    border-color: #dee2e6 #dee2e6 #fff #dee2e6;
+    margin-bottom: -1px;
+    border: 1px solid #fff;
+}
