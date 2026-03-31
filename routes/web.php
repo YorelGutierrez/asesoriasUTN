@@ -62,6 +62,9 @@ Route::middleware(['auth', 'rol:alumno'])->group(function () {
         return view('/auth/alumnos/escritorioAlumno');
     })->name('alumno.dashboard');
 });
+Route::get('/solicitud', function () {
+        return view('/auth/alumnos/solicitud_asesorias');
+    })->name('solicitud');
 
 //rutas protedigas para tutor
     //aun no poner nada aqui porfavor
