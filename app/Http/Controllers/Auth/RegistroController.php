@@ -55,5 +55,23 @@ class RegistroController extends Controller
         Auth::login($user);
         // Redirigir al escritorio
         return redirect()->route('dashboard');
+
+         // Intentar autenticar
+        if (Auth::attempt($credentials, $request->filled('remember'))) {
+            $request->session()->regenerate();
+
+            // Redirigir según el rol del usuario autenticado
+            $user = Auth::user();
+            switch ($user->rol) {
+                case 'admin':
+                    return redirect()->route('admin.dashboard');
+                case 'docente':
+                    return redirect()->route('docente.dashboard');
+                case 'alumno':
+                    return redirect()->route('alumno.dashboard');
+            }
+        }
+
+
     }
 }
