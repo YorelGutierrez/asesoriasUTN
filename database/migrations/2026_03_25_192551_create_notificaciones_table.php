@@ -13,6 +13,7 @@ return new class extends Migration
             $table->foreignId('usuario_id')->constrained('users')->onDelete('cascade');
             $table->string('tipo');
             $table->text('mensaje');
+            $table->boolean('leido')->default(false);
             $table->timestamps();
         });
     }
