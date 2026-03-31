@@ -24,6 +24,7 @@ return new class extends Migration
             $table->string('telefono')->nullable();
             $table->string('foto_perfil')->nullable();
             $table->string('rol')->default('usuario');
+            $table->boolean('estado')->default(true);
             $table->timestamp('email_verified_at')->nullable();
             $table->rememberToken();
             $table->timestamps();

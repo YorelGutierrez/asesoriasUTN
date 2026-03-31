@@ -11,9 +11,11 @@ return new class extends Migration
         Schema::create('archivos_asesoria', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('id_referencia');
+            $table->enum('tipo_referencia', ['solicitud', 'sesion']);
             $table->string('nombre_archivo');
             $table->string('ruta');
             $table->foreignId('subido_por')->constrained('users')->onDelete('cascade');
+            $table->index(['tipo_referencia', 'id_referencia']);
             $table->timestamps();
         });
     }

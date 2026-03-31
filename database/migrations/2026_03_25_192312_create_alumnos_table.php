@@ -15,6 +15,7 @@ return new class extends Migration
             $table->foreignId('grupo_id')->nullable()->constrained('grupos')->nullOnDelete();
             $table->foreignId('carrera_id')->nullable()->constrained('carreras')->nullOnDelete();
             $table->integer('cuatrimestre')->nullable();
+            $table->enum('status_academico', ['bueno', 'regular', 'malo'])->nullable();
             $table->timestamps();
         });
     }

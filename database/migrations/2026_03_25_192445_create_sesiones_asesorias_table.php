@@ -12,6 +12,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('docente_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('solicitud_id')->nullable()->constrained('solicitudes_asesoria')->onDelete('set null');
+            $table->string('tema')->nullable();
             $table->dateTime('fecha_inicio');
             $table->dateTime('fecha_fin');
             $table->enum('modalidad', ['virtual', 'presencial'])->default('presencial');
