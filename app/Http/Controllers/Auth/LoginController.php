@@ -19,7 +19,7 @@ class LoginController extends Controller
     {
         // Validar credenciales
         $credentials = $request->validate([
-            'email' => 'required|email',
+            'email' => 'required|email|ends_with:@utnay.edu.mx',
             'password' => 'required',
         ]);
 
