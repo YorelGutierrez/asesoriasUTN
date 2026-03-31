@@ -193,5 +193,5 @@
     </div>
 </div>
 
-<script src="{{ asset('js/modales-gestion.js') }}"></script>
+<script src="{{ asset('js/gestion-opciones.js') }}"></script>
 @endsection

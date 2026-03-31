@@ -100,5 +100,7 @@
     </div>
 </div>
 
-<a href="{{ route('dashboard')}}" class="btn-principal"><- Regresar al escritorio</a>
+<a href="@if(auth()->user()->rol === 'admin') {{ route('admin.dashboard') }} 
+@elseif(auth()->user()->rol === 'docente') {{ route('docente.dashboard') }} 
+@else {{ route('alumno.dashboard') }} @endif" class="btn-principal"><- Regresar al escritorio</a>
 @endsection()

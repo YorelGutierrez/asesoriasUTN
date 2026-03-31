@@ -77,7 +77,7 @@
 
     <!-- Elementos emerguentes -->
 
-    <!-- Dropdown de diseño -->
+    <!-- Dropdown -->
     @php
     $currentLocale = session('locale', 'es'); // por defecto español
     $switchToLang = $currentLocale === 'es' ? 'en' : 'es';
@@ -89,8 +89,9 @@
         <a href="{{ route('lang.switch', $switchToLang) }}">
             <i class="bi bi-translate"></i> {{ __('Cambiar idioma') }}
         </a>
+        @if(in_array(auth()->user()->rol, ['admin', 'docente']))
         <a href="{{ route('historial') }}"><i class="bi bi-clock-history"></i> Historial</a>
-        <a href="{{ route('admin.dashboard') }}">Opciones Admin</a>
+        @endif
         <form method="POST" action="{{ route('logout') }}">
             @csrf
             <button class="cerrar-btn"><i class="bi bi-box-arrow-right"></i> Cerrar sesión</button>
@@ -99,54 +100,61 @@
 
     <!-- Menú lateral -->
     <aside id="menu-lateral" class="menu-lateral">
-        <!-- Encabezado del menú -->
         <div class="menu-header">
-            <!-- Ícono hamburguesa ahora aquí -->
             <a href="javascript:void(0)" class="close-btn" onclick="toggleMenu()">
                 <i class="bi bi-list"></i>
             </a>
             <span class="menu-title"></span>
         </div>
-        <!-- Links del menú -->
-        <a href="{{ route('dashboard') }}"
-            class="{{ request()->routeIs('dashboard') ? 'activo' : '' }}">
+
+        <a href="@if(auth()->user()->rol === 'admin') {{ route('admin.dashboard') }} 
+            @elseif(auth()->user()->rol === 'docente') {{ route('docente.dashboard') }} 
+            @else {{ route('alumno.dashboard') }} @endif"
+            class="{{ request()->routeIs('admin.dashboard') || request()->routeIs('docente.dashboard') || request()->routeIs('alumno.dashboard') ? 'activo' : '' }}">
             <i class="bi bi-house-fill"></i> Inicio
         </a>
-        <a href="{{ route('grupos') }}"
-            class="{{ request()->routeIs('grupos') ? 'activo' : '' }}">
+
+        <!-- Grupos y Alumnos: solo admin y docente -->
+        @if(in_array(auth()->user()->rol, ['admin', 'docente']))
+        <a href="{{ route('grupos') }}" class="{{ request()->routeIs('grupos') ? 'activo' : '' }}">
             <i class="bi bi-people-fill"></i> Grupos
         </a>
-        <a href="{{ route('alumnos') }}"
-            class="{{ request()->routeIs('alumnos') ? 'activo' : '' }}">
+        <a href="{{ route('alumnos') }}" class="{{ request()->routeIs('alumnos') ? 'activo' : '' }}">
             <i class="bi bi-person-vcard-fill" style="font-size: 18px;"></i> Alumnos
         </a>
-        <a href="{{ route('agenda') }}"
-            class="{{ request()->routeIs('agenda') ? 'activo' : '' }}">
+        <a href="{{ route('agenda') }}" class="{{ request()->routeIs('agenda') ? 'activo' : '' }}">
             <i class="bi bi-calendar-plus-fill" style="font-size: 18px;"></i> Agendar
         </a>
-        <a href="{{ route('roles_permisos') }}"
-            class="{{ request()->routeIs('roles_permisos') ? 'activo' : '' }}">
+        @endif
+
+        <!-- Roles y permisos: solo admin -->
+        @if(auth()->user()->rol === 'admin')
+        <a href="{{ route('roles_permisos') }}" class="{{ request()->routeIs('roles_permisos') ? 'activo' : '' }}">
             <i class="bi bi-clipboard2-check-fill" style="font-size: 18px;"></i> Roles y permisos
         </a>
-        <a href="{{ route('gestion') }}"
-            class="{{ request()->routeIs('gestion') ? 'activo' : '' }}">
+        <a href="{{ route('gestion') }}" class="{{ request()->routeIs('gestion') ? 'activo' : '' }}">
             <i class="bi bi-person-workspace" style="font-size: 18px;"></i> Gestión administrativa
         </a>
-        <!-- Sección con subsección -->
+        @endif
+
+        <!-- Registros: solo admin -->
+        @if(auth()->user()->rol === 'admin')
         <div class="menu-seccion">
-            <a href="#" class="menu-principal"><i class="bi bi-person-fill-add" style="font-size: 18px;"></i>Registros<i class="bi bi-chevron-compact-down"></i></a>
+            <a href="#" class="menu-principal">
+                <i class="bi bi-person-fill-add" style="font-size: 18px;"></i>Registros<i class="bi bi-chevron-compact-down"></i>
+            </a>
             <div class="subseccion">
-                <a href="{{ route('registro_alumnos') }}"
-                    class="{{ request()->routeIs('registro_alumnos') ? 'activo' : '' }}">
+                <a href="{{ route('registro_alumnos') }}" class="{{ request()->routeIs('registro_alumnos') ? 'activo' : '' }}">
                     Registro Alumnos
                 </a>
-                <a href="{{ route('registro_docente') }}"
-                    class="{{ request()->routeIs('registro_docente') ? 'activo' : '' }}">
+                <a href="{{ route('registro_docente') }}" class="{{ request()->routeIs('registro_docente') ? 'activo' : '' }}">
                     Registro Docentes
                 </a>
             </div>
         </div>
+        @endif
     </aside>
+
     <!-- Overlay -->
     <div class="overlay"></div>
 

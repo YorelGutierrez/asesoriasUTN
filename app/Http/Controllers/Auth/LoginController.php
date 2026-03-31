@@ -11,7 +11,7 @@ class LoginController extends Controller
     // Mostrar formulario de login
     public function showLoginForm()
     {
-        return view('auth.login');
+        return view('login');
     }
 
     // Procesar el login
@@ -26,7 +26,17 @@ class LoginController extends Controller
         // Intentar autenticar
         if (Auth::attempt($credentials, $request->filled('remember'))) {
             $request->session()->regenerate();
-            return redirect()->intended('Escritorio');
+
+            // Redirigir según el rol del usuario autenticado
+            $user = Auth::user();
+            switch ($user->rol) {
+                case 'admin':
+                    return redirect()->route('admin.dashboard');
+                case 'docente':
+                    return redirect()->route('docente.dashboard');
+                case 'alumno':
+                    return redirect()->route('alumno.dashboard');
+            }
         }
 
         // Si falla

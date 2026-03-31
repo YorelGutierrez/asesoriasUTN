@@ -137,9 +137,9 @@
             <div class="card-body p-4">
                 <h5 class="fw-semibold mb-4">Gestión del sistema | Acciones rapidas</h5>
                 <div class="d-grid gap-2">
-                    <a href="{{ route('alumnos') }}" class="btn-principal">Gestionar alumnos</a>
-                    <a href="{{ route('grupos') }}" class="btn-principal">Gestionar grupos</a>
-                    <a href="#" class="btn-principal"> Gestionar docentes</a>
+                    <a href="{{ route('gestion', ['tab' => 'alumnos']) }}" class="btn-principal">Gestionar alumnos</a>
+                    <a href="{{ route('gestion', ['tab' => 'grupos']) }}" class="btn-principal">Gestionar grupos</a>
+                    <a href="{{ route('gestion', ['tab' => 'docentes']) }}" class="btn-principal">Gestionar docentes</a>
                 </div>
             </div>
         </div>
