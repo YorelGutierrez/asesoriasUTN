@@ -120,6 +120,6 @@
 </div>
 
 <!-- Botón de regreso (opcional) -->
-    <a href="{{ route('alumnos') }}" class="btn-principal"><- Regresar al listado</a>
+<a href="{{ route('alumnos') }}" class="btn-principal"><- Regresar al listado</a>
 
 @endsection()
