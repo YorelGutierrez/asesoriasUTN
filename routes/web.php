@@ -50,6 +50,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/historial', function () {
         return view('historial');
     })->name('historial');
+
+    Route::get('/gestionar', function () {
+        return view('gestion');
+    })->name('gestion');
 });
 
 
