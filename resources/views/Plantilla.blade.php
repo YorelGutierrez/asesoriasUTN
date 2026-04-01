@@ -21,6 +21,8 @@
     <link rel="stylesheet" href="{{ asset('estilos/menu-fotter.css') }}">
     <link rel="stylesheet" href="{{ asset('estilos/UserCard.css') }}">
     <link rel="stylesheet" href="{{ asset('estilos/menu-lateral.css') }}">
+    <!-- DaisyUI-->
+    <script type="module" src="https://unpkg.com/cally"></script>
 </head>
 
 <body>
