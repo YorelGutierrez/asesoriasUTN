@@ -19,13 +19,12 @@ class RegistroController extends Controller
     // Procesar el registro
     public function register(Request $request)
     {
-        // Validar los datos
-        $request->validate([
+         $request->validate([
             'nombres' => 'required|string|max:255',
             'apellido_paterno' => 'required|string|max:255',
             'apellido_materno' => 'nullable|string|max:255',
             'nickname' => 'nullable|string|max:255|unique:users',
-            'email' => 'required|string|email|max:255|unique:users',
+            'email' => 'required|string|email|max:255|unique:users|ends_with:@utnay.edu.mx',
             'password' => 'required|string|min:8|confirmed',
             'fecha_nacimiento' => 'nullable|date',
             'telefono' => 'nullable|string|max:20',
@@ -51,9 +50,29 @@ class RegistroController extends Controller
             $user->save();
         }
 
-        // Iniciar sesión
-        Auth::login($user);
-        // Redirigir al escritorio
-        return redirect()->route('dashboard');
+       // Iniciar sesión
+// Iniciar sesión
+Auth::login($user);
+
+// Redirigir según rol
+$user = Auth::user();
+
+switch ($user->rol) {
+    case 'admin':
+        return redirect()->route('admin.dashboard');
+
+    case 'docente':
+        return redirect()->route('docente.dashboard');
+
+    case 'alumno':
+        return redirect()->route('alumno.dashboard');
+}
+
+// Si llegamos aquí, el rol no es válido
+Auth::logout();
+return redirect()->route('login')->withErrors([
+    'email' => 'Rol de usuario no válido',
+]);
+
     }
 }

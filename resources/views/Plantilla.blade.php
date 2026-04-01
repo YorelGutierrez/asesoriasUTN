@@ -113,7 +113,13 @@
             class="{{ request()->routeIs('admin.dashboard') || request()->routeIs('docente.dashboard') || request()->routeIs('alumno.dashboard') ? 'activo' : '' }}">
             <i class="bi bi-house-fill"></i> Inicio
         </a>
-
+        <!--Alumnos-->
+        @if(auth()->user()->rol === 'alumno')
+            <a href="{{ route('solicitud') }}" class="{{ request()->routeIs('solicitud') ? 'activo' : '' }}">
+            <i class="bi bi-calendar-plus-fill" style="font-size: 18px;"></i> Solicitud
+        </a>
+        @endif
+        @if(auth()->user()->rol === 'admin')
         <!-- Grupos y Alumnos: solo admin y docente -->
         @if(in_array(auth()->user()->rol, ['admin', 'docente']))
         <a href="{{ route('grupos') }}" class="{{ request()->routeIs('grupos') ? 'activo' : '' }}">
