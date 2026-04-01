@@ -51,13 +51,41 @@
     <div class="col-md-8">
         <div class="card shadow-sm border-0 rounded-4 h-100">
             <div class="card-body p-4">
-                <h5 class="fw-semibold mb-4">Respaldos del sistema</A></h5>
-                <p><strong>Último respaldo:</strong> 28/03/2026 - 03:00 AM</p>
+                <h5 class="fw-semibold mb-4">Respaldos del sistema</h5>
+
+                {{-- Último respaldo --}}
+                @if($ultimo)
+                <p><strong>Último respaldo:</strong> {{ $ultimo['fecha'] }}</p>
                 <p><strong>Estado:</strong> <span class="text-success">Correcto</span></p>
-                <div class="text-end">
-                    <div class="d-inline-flex gap-2 mt-3 col-12">
-                        <button class="btn-principal">Generar respaldo</button>
-                        <button class="btn-secundario">Programar</button>
+                @else
+                <p><strong>Último respaldo:</strong> No hay respaldos</p>
+                <p><strong>Estado:</strong> <span class="text-danger">Sin respaldos</span></p>
+                @endif
+
+                {{-- Programado --}}
+                @if($horaProgramada)
+                <p><strong>Programado para:</strong> {{ $horaProgramada }}</p>
+                @endif
+
+                {{-- Botones --}}
+                <div class="row g-2 mt-3">
+                    <div class="col d-flex">
+                        <form action="{{ route('respaldo.generar') }}" method="POST" class="w-100">
+                            @csrf
+                            <button class="btn-principal w-100 h-100">Generar respaldo</button>
+                        </form>
+                    </div>
+                    <div class="col d-flex">
+                        <button class="btn-secundario w-100 h-100" onclick="toggleCalendar()">Programar</button>
+                    </div>
+                </div>
+
+                {{-- Calendario oculto --}}
+                <div id="calendarBox" class="mt-3 d-none">
+                    <input type="datetime-local" id="fechaHora" class="form-control">
+                    <div class="d-flex gap-2 mt-2">
+                        <button class="btn btn-secondary w-50" onclick="cerrarCalendario()">Cancelar</button>
+                        <button class="btn btn-success w-50" onclick="guardarProgramacion()">Confirmar</button>
                     </div>
                 </div>
             </div>
@@ -189,4 +217,9 @@
     </div>
 </div>
 
+<script>
+    window.respaldoAutomaticoUrl = "{{ route('respaldo.automatico.store') }}";
+    window.csrfToken = "{{ csrf_token() }}";
+</script>
+<script src="{{ asset('js/ajax-respaldos.js') }}"></script>
 @endsection()
