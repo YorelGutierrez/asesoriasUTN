@@ -18,7 +18,7 @@ class materias extends Model
     // Relación muchos a muchos con grupos
     public function grupos()
     {
-        return $this->belongsToMany(grupos::class, 'materia_grupos');
+        return $this->belongsToMany(grupos::class, 'materia_grupos', 'materia_id', 'grupo_id');
     }
 
 }
