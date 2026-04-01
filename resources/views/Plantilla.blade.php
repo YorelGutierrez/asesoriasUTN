@@ -119,7 +119,6 @@
             <i class="bi bi-calendar-plus-fill" style="font-size: 18px;"></i> Solicitud
         </a>
         @endif
-        @if(auth()->user()->rol === 'admin')
         <!-- Grupos y Alumnos: solo admin y docente -->
         @if(in_array(auth()->user()->rol, ['admin', 'docente']))
         <a href="{{ route('grupos') }}" class="{{ request()->routeIs('grupos') ? 'activo' : '' }}">
