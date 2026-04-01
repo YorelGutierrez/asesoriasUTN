@@ -19,7 +19,7 @@ class RegistroController extends Controller
     // Procesar el registro
     public function register(Request $request)
     {
-         $request->validate([
+        $request->validate([
             'nombres' => 'required|string|max:255',
             'apellido_paterno' => 'required|string|max:255',
             'apellido_materno' => 'nullable|string|max:255',
@@ -50,29 +50,27 @@ class RegistroController extends Controller
             $user->save();
         }
 
-       // Iniciar sesión
-// Iniciar sesión
-Auth::login($user);
+        // Iniciar sesión
+        Auth::login($user);
 
-// Redirigir según rol
-$user = Auth::user();
+        // Redirigir según rol
+        $user = Auth::user();
 
-switch ($user->rol) {
-    case 'admin':
-        return redirect()->route('admin.dashboard');
+        switch ($user->rol) {
+            case 'admin':
+                return redirect()->route('admin.dashboard');
 
-    case 'docente':
-        return redirect()->route('docente.dashboard');
+            case 'docente':
+                return redirect()->route('docente.dashboard');
 
-    case 'alumno':
-        return redirect()->route('alumno.dashboard');
-}
+            case 'alumno':
+                return redirect()->route('alumno.dashboard');
+        }
 
-// Si llegamos aquí, el rol no es válido
-Auth::logout();
-return redirect()->route('login')->withErrors([
-    'email' => 'Rol de usuario no válido',
-]);
-
+        // Si llegamos aquí, el rol no es válido
+        Auth::logout();
+        return redirect()->route('login')->withErrors([
+            'email' => 'Rol de usuario no válido',
+        ]);
     }
 }
