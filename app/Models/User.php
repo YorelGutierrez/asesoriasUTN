@@ -7,8 +7,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class User extends Authenticatable
+class User extends Authenticatable implements JWTSubject
 {
     use HasApiTokens, HasFactory, Notifiable;
 
@@ -77,5 +78,16 @@ class User extends Authenticatable
             return asset('storage/' . $this->foto_perfil);
         }
         return asset('img/default-avatar.png'); // Imagen por defecto (crea una en public/img)
+    }
+
+    // TOKEN PARA CONSULTAS Y APIS
+    public function getJWTIdentifier() //JSON WEN TOKEN
+    {
+        return $this->getKey();
+    }
+
+    public function getJWTCustomClaims()
+    {
+        return [];
     }
 }

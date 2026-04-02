@@ -5,9 +5,8 @@
 <link rel="stylesheet" href="{{ asset('estilos/titulos.css') }}">
 
 <div class="titulo">
-    <h1>Bienvenido administrador!</h1>
+    <h1>Bienvenido <span id="nombreUsuario">...</span></h1>
 </div>
-
 
 <div class="row mb-4 align-items-stretch">
     <div class="col-md-4">
@@ -84,8 +83,8 @@
                 <div id="calendarBox" class="mt-3 d-none">
                     <input type="datetime-local" id="fechaHora" class="form-control">
                     <div class="d-flex gap-2 mt-2">
-                        <button class="btn btn-secondary w-50" onclick="cerrarCalendario()">Cancelar</button>
-                        <button class="btn btn-success w-50" onclick="guardarProgramacion()">Confirmar</button>
+                        <button class="btn btn-danger w-50 rounded-pill" onclick="cerrarCalendario()">Cancelar</button>
+                        <button class="btn-principal w-50" onclick="guardarProgramacion()">Confirmar</button>
                     </div>
                 </div>
             </div>
@@ -97,64 +96,12 @@
     <div class="col-md-6">
         <div class="card shadow-sm border-0 rounded-4 h-100">
             <div class="card-body p-4 d-flex flex-column">
-
-                <h5 class="fw-semibold mb-4">Bitácora de actividad</h5>
-
-                <div class="flex-grow-1 pe-2" style="max-height: 350px; overflow-y: auto;">
-
-                    <div class="d-flex align-items-start mb-3 border-bottom pb-2">
-                        <img src="https://ui-avatars.com/api/?name=Juan+Tovar&background=e9ecef&color=343a40" alt="Juan Tovar" class="rounded-circle me-3 mt-1" width="36" height="36">
-
-                        <div class="flex-grow-1">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="fw-semibold" style="font-size: 0.9rem;">Juan Tovar</span>
-                                <small class="text-black-50" style="font-size: 0.75rem;">Hace 2 hrs</small>
-                            </div>
-                            <p class="mb-0 text-muted lh-sm" style="font-size: 0.85rem;">
-                                Realizó una asesoría al grupo <span class="fw-medium text-dark">IDGS-84</span>.
-                            </p>
-                        </div>
-
-                        <button class="btn btn-sm text-danger p-0 ms-2 mt-1 border-0" title="Eliminar registro">
-                            <i class="bi bi-trash3"></i>
-                        </button>
-                    </div>
-
-                    <div class="d-flex align-items-start mb-3 border-bottom pb-2">
-                        <img src="https://ui-avatars.com/api/?name=Maria+Gomez&background=e9ecef&color=343a40" alt="María Gómez" class="rounded-circle me-3 mt-1" width="36" height="36">
-
-                        <div class="flex-grow-1">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="fw-semibold" style="font-size: 0.9rem;">María Gómez</span>
-                                <small class="text-black-50" style="font-size: 0.75rem;">Ayer</small>
-                            </div>
-                            <p class="mb-0 text-muted lh-sm" style="font-size: 0.85rem;">
-                                Actualizó las calificaciones de la materia <span class="fw-medium text-dark">Bases de Datos</span>.
-                            </p>
-                        </div>
-
-                        <button class="btn btn-sm text-danger p-0 ms-2 mt-1 border-0" title="Eliminar registro">
-                            <i class="bi bi-trash3"></i>
-                        </button>
-                    </div>
-
-                    <div class="d-flex align-items-start mb-3 border-bottom pb-2">
-                        <img src="https://ui-avatars.com/api/?name=Carlos+Ruiz&background=e9ecef&color=343a40" alt="Carlos Ruiz" class="rounded-circle me-3 mt-1" width="36" height="36">
-
-                        <div class="flex-grow-1">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="fw-semibold" style="font-size: 0.9rem;">Carlos Ruiz</span>
-                                <small class="text-black-50" style="font-size: 0.75rem;">28 Mar</small>
-                            </div>
-                            <p class="mb-0 text-muted lh-sm" style="font-size: 0.85rem;">
-                                Registró a un nuevo alumno en el sistema.
-                            </p>
-                        </div>
-
-                        <button class="btn btn-sm text-danger p-0 ms-2 mt-1 border-0" title="Eliminar registro">
-                            <i class="bi bi-trash3"></i>
-                        </button>
-                    </div>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-semibold mb-0">Bitácora de actividad</h5>
+                    <button id="btnLimpiarLogs" class="btn btn-danger btn-sm rounded-pill">Limpiar todo</button>
+                </div>
+                <div id="bitacora" class="flex-grow-1 pe-2" style="max-height: 220px; overflow-y: auto;">
+                    <!-- Los logs se cargarán dinámicamente aquí -->
                 </div>
             </div>
         </div>
@@ -222,4 +169,32 @@
     window.csrfToken = "{{ csrf_token() }}";
 </script>
 <script src="{{ asset('js/ajax-respaldos.js') }}"></script>
+<script>
+    function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+    }
+
+    // Consumir API con JWT
+    fetch('/api/me', {
+            headers: {
+                'Authorization': 'Bearer ' + getCookie('jwt_token')
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            console.log('JWT funcionando:', data);
+
+            // Mostrar nombre real
+            document.getElementById('nombreUsuario').innerText = data.nombres;
+        })
+        .catch(err => {
+            console.error('Error JWT:', err);
+
+            // fallback
+            document.getElementById('nombreUsuario').innerText = 'Administrador jejej';
+        });
+</script>
+<script src="{{ asset('js/logs.js') }}"></script>
 @endsection()

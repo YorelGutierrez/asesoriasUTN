@@ -1,6 +1,6 @@
 .perfil-dropdown {
   display: none;
-  position: absolute;
+  position: fixed;
   top: 60px;
   right: 15px;
   background: white;

@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('modulo')->nullable();
             $table->ipAddress('ip')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
