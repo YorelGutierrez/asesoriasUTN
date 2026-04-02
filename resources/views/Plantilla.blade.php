@@ -113,7 +113,7 @@
             @elseif(auth()->user()->rol === 'docente') {{ route('docente.dashboard') }} 
             @else {{ route('alumno.dashboard') }} @endif"
             class="{{ request()->routeIs('admin.dashboard') || request()->routeIs('docente.dashboard') || request()->routeIs('alumno.dashboard') ? 'activo' : '' }}">
-            <i class="bi bi-house-fill"></i> Inicio
+            <i class="bi bi-house-fill"></i> {{ __('Inicio') }}
         </a>
         <!-- Alumnos -->
         @if(auth()->user()->rol === 'alumno')
