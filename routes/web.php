@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\RegistroController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\LocalizationController;
 use App\Http\Controllers\DocenteController;
+use App\Http\Controllers\AlumnosController;
 
 /*
 |--------------------------------------------------------------------------
