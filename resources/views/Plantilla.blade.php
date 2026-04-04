@@ -134,6 +134,9 @@
         <a href="{{ route('agenda') }}" class="{{ request()->routeIs('agenda') ? 'activo' : '' }}">
             <i class="bi bi-calendar-plus-fill" style="font-size: 18px;"></i> Agendar
         </a>
+        <a href="{{ route('registro') }}" class="{{ request()->routeIs('registro') ? 'activo' : '' }}">
+            <i class="bi bi-calendar-plus-fill" style="font-size: 18px;"></i> Registro de asesorias
+        </a>
         @endif
 
         <!-- Roles y permisos: solo admin -->

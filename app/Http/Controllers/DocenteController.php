@@ -33,7 +33,6 @@ public function store(Request $request)
         'telefono' => 'required|string|regex:/^[0-9]{10}$/',
         'numero_empleado' => 'required|string|unique:docentes,numero_empleado',
         'carrera_id' => 'required|exists:carreras,id',
-        'materia' => 'required|exists:materias,id',
     ], [
         'nombres.required' => 'El campo nombres es obligatorio.',
         'apellido_paterno.required' => 'El campo apellido paterno es obligatorio.',
@@ -52,8 +51,6 @@ public function store(Request $request)
         'fecha_nacimiento.before' => 'La fecha de nacimiento no puede ser futura.',
         'telefono.required' => 'El teléfono es obligatorio.',
         'telefono.regex' => 'El teléfono debe tener exactamente 10 dígitos.',
-        'materia.required' => 'Debes seleccionar una materia.',
-        'materia.exists' => 'La materia seleccionada no existe.',
     ]);
 
     try {
@@ -67,7 +64,7 @@ public function store(Request $request)
             'password' => Hash::make($request->password),
             'fecha_nacimiento' => $request->fecha_nacimiento,
             'telefono' => $request->telefono,
-            'rol' => 'docente',
+            'rol' => User::ROL_DOCENTE,
         ]);
 
         $docente = docentes::create([
@@ -76,13 +73,8 @@ public function store(Request $request)
             'carrera_id' => $request->carrera_id,
         ]);
 
-        if ($request->has('materia') && $request->materia) {
-            $docente->materias()->attach($request->materia);
-        }
-
         DB::commit();
 
-        // 👇 CAMBIO IMPORTANTE: Redirige a la misma ruta pero sin datos
         return redirect()->route('registro_docente')->with('success', 'Docente registrado correctamente');
 
     } catch (\Exception $e) {

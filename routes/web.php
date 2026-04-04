@@ -5,7 +5,7 @@ use App\Http\Controllers\Auth\RegistroController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\LocalizationController;
 use App\Http\Controllers\DocenteController;
-use App\Http\Controllers\AlumnosController;
+use App\Http\Controllers\AlumnoController;
 
 /*
 |--------------------------------------------------------------------------
@@ -27,7 +27,7 @@ Route::get('/registro', [RegistroController::class, 'showRegistrationForm'])->na
 Route::post('/login', [LoginController::class, 'login'])->name('login.procesar');
 Route::post('/registro', [RegistroController::class, 'register'])->name('registro.procesar');
 
-//modificacion del 01/04/2026
+//modificacion del 03/04/2026
 // Rutas protegidas para el admin
 Route::middleware(['auth', 'rol:admin'])->group(function () {
     Route::get('/admin/dashboard', function () {
@@ -38,41 +38,34 @@ Route::middleware(['auth', 'rol:admin'])->group(function () {
         return view('/admin/rolesPermisos');
     })->name('roles_permisos');
 
-    Route::get('/registro/alumno', function () {
-        return view('/admin/registroAlumnos');
-    })->name('registro_alumnos');
+    // ========== RUTAS DE ALUMNOS ==========
+    // Ruta para mostrar el formulario (usa el controlador)
+    Route::get('/registro/alumno', [AlumnoController::class, 'create'])->name('registro_alumnos');
+    // Ruta para guardar los datos
+    Route::post('/alumnos', [AlumnoController::class, 'store'])->name('alumnos.store');
 
-    // Ruta para mostrar la vista de registro de docentes
+    // ========== RUTAS DE DOCENTES ==========
     Route::get('/registro/docente', [DocenteController::class, 'create'])->name('registro_docente');
-    
-    // Ruta para guardar el docente
     Route::post('/docentes', [DocenteController::class, 'store'])->name('docentes.store');
-    
-    // Ruta para listar docentes
     Route::get('/docentes', [DocenteController::class, 'index'])->name('docentes.index');
-    
-    // Ruta para ver detalles de un docente
     Route::get('/docentes/{id}', [DocenteController::class, 'show'])->name('docentes.show');
-    
-    // Ruta para editar docente
     Route::get('/docentes/{id}/edit', [DocenteController::class, 'edit'])->name('docentes.edit');
-    
-    // Ruta para actualizar docente
     Route::put('/docentes/{id}', [DocenteController::class, 'update'])->name('docentes.update');
-    
-    // Ruta para eliminar docente
     Route::delete('/docentes/{id}', [DocenteController::class, 'destroy'])->name('docentes.destroy');
 
     Route::get('/gestionar', function () {
         return view('/admin/gestion');
     })->name('gestion');
 });
-
 // Rutas protegidas para docentes
 Route::middleware(['auth', 'rol:docente'])->group(function () {
     Route::get('/docente/dashboard', function () {
         return view('/auth/docentes/escritorioDocente');
     })->name('docente.dashboard');
+
+    Route::get('/registro', function () {
+        return view('/auth/docentes/registro_asesorias');
+    })->name('registro');
 });
 
 //rutas protegidas para alumnos

@@ -13,44 +13,140 @@
     <div class="card shadow-sm border-0 rounded-4 mb-4">
         <div class="card-body p-4">
 
-            <form>
+            <form action="{{ route('alumnos.store') }}" method="POST" enctype="multipart/form-data">
+                @csrf
 
-                <div class="row g-3 mb-3">
-                    <div class="col-12 col-md-3">
-                        <label>Matrícula:</label>
-                        <input type="text" class="form-control">
-                    </div>
-
-                    <div class="col-12 col-md-5">
-                        <label>Nombre completo:</label>
-                        <input type="text" class="form-control">
-                    </div>
-
-                    <div class="col-12 col-md-2">
-                        <label>Grupo:</label>
-                        <input type="text" class="form-control">
-                    </div>
-
-                    <div class="col-12 col-md-2">
-                        <label>Carrera:</label>
-                        <input type="text" class="form-control">
-                    </div>
-                </div>
-
+                {{-- Foto de perfil --}}
                 <div class="mb-3">
-                    <label>Correo:</label>
-                    <input type="email" class="form-control">
+                    <label class="form-label">Foto de perfil</label>
+                    <input type="file" class="form-control" name="foto_perfil" accept="image/*">
                 </div>
 
-                <div class="row mt-3 g-2">
-                    <div class="col-12 col-md-6">
+                {{-- Fila 1: Nombres y Apellido paterno --}}
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Nombres <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control @error('nombres') is-invalid @enderror" name="nombres" placeholder="Nombres" value="{{ old('nombres') }}">
+                        @error('nombres')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Apellido paterno <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control @error('apellido_paterno') is-invalid @enderror" name="apellido_paterno" placeholder="Apellido paterno" value="{{ old('apellido_paterno') }}">
+                        @error('apellido_paterno')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+
+                {{-- Fila 2: Apellido materno y Matrícula --}}
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Apellido materno</label>
+                        <input type="text" class="form-control" name="apellido_materno" placeholder="Apellido materno" value="{{ old('apellido_materno') }}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Matrícula <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control @error('matricula') is-invalid @enderror" name="matricula" placeholder="Matrícula" value="{{ old('matricula') }}">
+                        @error('matricula')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+
+                {{-- Fila 3: Carrera y Grupo --}}
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Carrera <span class="text-danger">*</span></label>
+                        <select class="form-control @error('carrera_id') is-invalid @enderror" name="carrera_id">
+                            <option value="">Seleccionar carrera</option>
+                            @foreach($carreras as $carrera)
+                                <option value="{{ $carrera->id }}" {{ old('carrera_id') == $carrera->id ? 'selected' : '' }}>
+                                    {{ $carrera->nombre }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('carrera_id')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Grupo</label>
+                        <select class="form-control @error('grupo_id') is-invalid @enderror" name="grupo_id">
+                            <option value="">Seleccionar grupo</option>
+                            @foreach($grupos as $grupo)
+                                <option value="{{ $grupo->id }}" {{ old('grupo_id') == $grupo->id ? 'selected' : '' }}>
+                                    {{ $grupo->nombre }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('grupo_id')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+
+                {{-- Fila 4: Correo electrónico y Teléfono --}}
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Correo electrónico <span class="text-danger">*</span></label>
+                        <input type="email" class="form-control @error('email') is-invalid @enderror" name="email" placeholder="Correo electrónico" value="{{ old('email') }}">
+                        @error('email')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Teléfono <span class="text-danger">*</span></label>
+                        <input type="tel" class="form-control @error('telefono') is-invalid @enderror" name="telefono" placeholder="Teléfono (10 dígitos)" value="{{ old('telefono') }}" maxlength="10">
+                        @error('telefono')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+
+                {{-- Fila 5: Fecha de nacimiento y Cuatrimestre --}}
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Fecha de nacimiento <span class="text-danger">*</span></label>
+                        <input type="date" class="form-control @error('fecha_nacimiento') is-invalid @enderror" name="fecha_nacimiento" value="{{ old('fecha_nacimiento') }}" max="{{ date('Y-m-d') }}">
+                        @error('fecha_nacimiento')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Cuatrimestre</label>
+                        <input type="number" class="form-control @error('cuatrimestre') is-invalid @enderror" name="cuatrimestre" placeholder="Ej: 1, 2, 3..." value="{{ old('cuatrimestre') }}" min="1" max="12">
+                        @error('cuatrimestre')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+
+                {{-- Fila 6: Contraseña y Confirmar contraseña --}}
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Contraseña <span class="text-danger">*</span></label>
+                        <input type="password" class="form-control @error('password') is-invalid @enderror" name="password" placeholder="Contraseña">
+                        @error('password')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Confirmar contraseña <span class="text-danger">*</span></label>
+                        <input type="password" class="form-control" name="password_confirmation" placeholder="Confirmar contraseña">
+                    </div>
+                </div>
+
+                {{-- Botones --}}
+                <div class="row mt-4">
+                    <div class="col-md-6 mb-2 mb-md-0">
                         <button type="submit" class="btn-principal">Registrar</button>
                     </div>
-                    <div class="col-12 col-md-6">
-                        <button type="button" class="btn-secundario">Cancelar</button>
+                    <div class="col-md-6">
+                        <button type="button" class="btn-secundario" onclick="window.history.back();">Cancelar</button>
                     </div>
                 </div>
-
             </form>
 
         </div>
