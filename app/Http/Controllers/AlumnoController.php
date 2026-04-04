@@ -27,7 +27,7 @@ class AlumnoController extends Controller
             'nombres' => 'required|string|max:255',
             'apellido_paterno' => 'required|string|max:255',
             'apellido_materno' => 'nullable|string|max:255',
-            'email' => 'required|email|unique:users,email',
+            'email' => 'required|email|ends_with:@utnay.edu.mx|unique:users,email',,
             'password' => 'required|string|min:6|confirmed',
             'fecha_nacimiento' => 'required|date|before:today',
             'telefono' => 'required|string|regex:/^[0-9]{10}$/',
