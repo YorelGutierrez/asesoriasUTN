@@ -136,11 +136,13 @@
         <a href="{{ route('agenda') }}" class="{{ request()->routeIs('agenda') ? 'activo' : '' }}">
             <i class="bi bi-calendar-plus-fill" style="font-size: 18px;"></i> Agendar
         </a>
+        @endif
+        <!-- Solo Docente -->
+        @if(auth()->user()->rol === 'docente')
         <a href="{{ route('registro') }}" class="{{ request()->routeIs('registro') ? 'activo' : '' }}">
             <i class="bi bi-calendar-plus-fill" style="font-size: 18px;"></i> Registro de asesorias
         </a>
-        @endif
-
+        @endif()
         <!-- Roles y permisos: solo admin -->
         @if(auth()->user()->rol === 'admin')
         <a href="{{ route('roles_permisos') }}" class="{{ request()->routeIs('roles_permisos') ? 'activo' : '' }}">
