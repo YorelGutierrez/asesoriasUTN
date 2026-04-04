@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\admin\RespaldoController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\RegistroController;
 use App\Http\Controllers\Auth\LoginController;
@@ -32,9 +33,8 @@ Route::post('/registro', [RegistroController::class, 'register'])->name('registr
 //modificacion del 03/04/2026
 // Rutas protegidas para el admin
 Route::middleware(['auth', 'rol:admin'])->group(function () {
-    Route::get('/admin/dashboard', function () {
-        return view('/admin/dashboard');
-    })->name('admin.dashboard');
+    
+    Route::get('/admin/dashboard', [RespaldoController::class, 'dashboard'])->name('admin.dashboard');
 
     Route::get('/roles_permisos', function () {
         return view('/admin/rolesPermisos');
@@ -58,6 +58,12 @@ Route::middleware(['auth', 'rol:admin'])->group(function () {
     Route::get('/gestionar', function () {
         return view('/admin/gestion');
     })->name('gestion');
+
+    // Rutas de respaldos
+    Route::post('/respaldo/generar', [RespaldoController::class, 'generate'])->name('respaldo.generar');
+    Route::get('/respaldo/automatico', [RespaldoController::class, 'automaticoForm'])->name('respaldo.automatico.form');
+    Route::post('/respaldo/automatico', [RespaldoController::class, 'automatico'])->name('respaldo.automatico.store');
+    Route::get('/respaldo/descargar/{archivo}', [RespaldoController::class, 'download'])->name('respaldo.descargar');
 });
 // Rutas protegidas para docentes
 Route::middleware(['auth', 'rol:docente'])->group(function () {
@@ -82,9 +88,8 @@ Route::middleware(['auth', 'rol:alumno'])->group(function () {
     })->name('solicitud');
 });
 
-
 //rutas protedigas para tutor
-    //aun no poner nada aqui porfavor
+//aun no poner nada aqui porfavor
 
 //rutas compartidas (docentes y admin)
 Route::middleware(['auth', 'rol:admin,docente'])->group(function () {

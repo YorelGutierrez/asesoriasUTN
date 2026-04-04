@@ -25,6 +25,8 @@
     <link rel="stylesheet" href="{{ asset('estilos/menu-fotter.css') }}">
     <link rel="stylesheet" href="{{ asset('estilos/UserCard.css') }}">
     <link rel="stylesheet" href="{{ asset('estilos/menu-lateral.css') }}">
+    <!-- DaisyUI-->
+    <script type="module" src="https://unpkg.com/cally"></script>
 </head>
 
 <body>
@@ -115,11 +117,11 @@
             @elseif(auth()->user()->rol === 'docente') {{ route('docente.dashboard') }} 
             @else {{ route('alumno.dashboard') }} @endif"
             class="{{ request()->routeIs('admin.dashboard') || request()->routeIs('docente.dashboard') || request()->routeIs('alumno.dashboard') ? 'activo' : '' }}">
-            <i class="bi bi-house-fill"></i> Inicio
+            <i class="bi bi-house-fill"></i> {{ __('Inicio') }}
         </a>
-        <!--Alumnos-->
+        <!-- Alumnos -->
         @if(auth()->user()->rol === 'alumno')
-            <a href="{{ route('solicitud') }}" class="{{ request()->routeIs('solicitud') ? 'activo' : '' }}">
+        <a href="{{ route('solicitud') }}" class="{{ request()->routeIs('solicitud') ? 'activo' : '' }}">
             <i class="bi bi-calendar-plus-fill" style="font-size: 18px;"></i> Solicitud
         </a>
         @endif
