@@ -6,6 +6,8 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\LocalizationController;
 use App\Http\Controllers\DocenteController;
 use App\Http\Controllers\AlumnoController;
+use App\Http\Controllers\CarreraController;
+use App\Http\Controllers\AsesoriaController;
 
 /*
 |--------------------------------------------------------------------------
@@ -63,9 +65,10 @@ Route::middleware(['auth', 'rol:docente'])->group(function () {
         return view('/auth/docentes/escritorioDocente');
     })->name('docente.dashboard');
 
-    Route::get('/registro', function () {
-        return view('/auth/docentes/registro_asesorias');
-    })->name('registro');
+ // RUTAS DE ASESORÍAS
+    Route::get('/docente/asesoria', [AsesoriaController::class, 'create'])->name('registro');
+    Route::post('/docente/asesoria', [AsesoriaController::class, 'store'])->name('asesoria.store');
+    Route::post('/docente/asesoria/pdf', [AsesoriaController::class, 'generarPDF'])->name('asesoria.pdf');
 });
 
 //rutas protegidas para alumnos
