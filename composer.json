@@ -11,7 +11,7 @@
         "laravel/framework": "^10.10",
         "laravel/sanctum": "^3.3",
         "laravel/tinker": "^2.8",
-        "phpoffice/phpword": "^1.4"
+        "phpoffice/phpword": "^1.4",
         "tymon/jwt-auth": "^2.3"
     },
     "require-dev": {
