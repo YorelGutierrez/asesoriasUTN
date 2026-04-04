@@ -22,7 +22,6 @@ class User extends Authenticatable implements JWTSubject
         'nombres',
         'apellido_paterno',
         'apellido_materno',
-        'nickname',
         'email',
         'password',
         'fecha_nacimiento',
@@ -51,10 +50,7 @@ class User extends Authenticatable implements JWTSubject
         'fecha_nacimiento' => 'date',
     ];
 
-
     // ROLES
-
-    // Definir constantes de roles
     const ROL_ADMIN = 'admin';
     const ROL_USUARIO = 'usuario';
     const ROL_ALUMNO = 'alumno';
@@ -77,7 +73,13 @@ class User extends Authenticatable implements JWTSubject
         if ($this->foto_perfil) {
             return asset('storage/' . $this->foto_perfil);
         }
-        return asset('img/default-avatar.png'); // Imagen por defecto (crea una en public/img)
+        return asset('img/default-avatar.png');
+    }
+
+    // Relación con docente (un usuario puede ser docente)
+    public function docente()
+    {
+        return $this->hasOne(docentes::class);
     }
 
     // TOKEN PARA CONSULTAS Y APIS

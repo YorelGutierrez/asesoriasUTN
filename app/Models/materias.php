@@ -14,7 +14,13 @@ class materias extends Model
         'nombre',
         'clave',
     ];
-
+  
+    // Relación con docentes (muchos a muchos)
+    public function docentes()
+    {
+        return $this->belongsToMany(docentes::class, 'docente_materias', 'materia_id', 'docente_id');
+    }
+  
     // Relación muchos a muchos con grupos
     public function grupos()
     {

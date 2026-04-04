@@ -2,6 +2,10 @@
 <html lang="es">
 
 <head>
+    <!-- Sweet alerts -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="{{ asset('js/sweetalert.js') }}"></script>
+    <link rel="stylesheet" href="{{ asset('estilos/sweetalert.css') }}">
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
@@ -11,7 +15,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="description del sitio.">
     <meta name="keywords" content="palabras claves para busqueda del sitio">
-    <meta name="author" content="Corona Alain, Bernal Brandon, Gonzales Rubi, Gutierrez Yorel, Rivera Vanessa, Samaniego Andy">
+    <meta name="author" content="Corona Alain, Bernal Brandon, Gonzalez Rubi, Gutierrez Yorel, Rivera Vanessa, Samaniego Andy">
     <!-- Titulos de la pagina -->
     <title>@yield('titulo', 'Asesorias-UTN')</title>
     <!-- Link del icono en el navegador -->
@@ -131,6 +135,9 @@
         </a>
         <a href="{{ route('agenda') }}" class="{{ request()->routeIs('agenda') ? 'activo' : '' }}">
             <i class="bi bi-calendar-plus-fill" style="font-size: 18px;"></i> Agendar
+        </a>
+        <a href="{{ route('registro') }}" class="{{ request()->routeIs('registro') ? 'activo' : '' }}">
+            <i class="bi bi-calendar-plus-fill" style="font-size: 18px;"></i> Registro de asesorias
         </a>
         @endif
 

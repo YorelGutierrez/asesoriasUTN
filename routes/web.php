@@ -5,6 +5,10 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\RegistroController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\LocalizationController;
+use App\Http\Controllers\DocenteController;
+use App\Http\Controllers\AlumnoController;
+use App\Http\Controllers\CarreraController;
+use App\Http\Controllers\AsesoriaController;
 
 /*
 |--------------------------------------------------------------------------
@@ -26,7 +30,7 @@ Route::get('/registro', [RegistroController::class, 'showRegistrationForm'])->na
 Route::post('/login', [LoginController::class, 'login'])->name('login.procesar');
 Route::post('/registro', [RegistroController::class, 'register'])->name('registro.procesar');
 
-
+//modificacion del 03/04/2026
 // Rutas protegidas para el admin
 Route::middleware(['auth', 'rol:admin'])->group(function () {
     
@@ -36,13 +40,20 @@ Route::middleware(['auth', 'rol:admin'])->group(function () {
         return view('/admin/rolesPermisos');
     })->name('roles_permisos');
 
-    Route::get('/registro/alumno', function () {
-        return view('/admin/registroAlumnos');
-    })->name('registro_alumnos');
+    // ========== RUTAS DE ALUMNOS ==========
+    // Ruta para mostrar el formulario (usa el controlador)
+    Route::get('/registro/alumno', [AlumnoController::class, 'create'])->name('registro_alumnos');
+    // Ruta para guardar los datos
+    Route::post('/alumnos', [AlumnoController::class, 'store'])->name('alumnos.store');
 
-    Route::get('/registro/docente', function () {
-        return view('/admin/registroDocentes');
-    })->name('registro_docente');
+    // ========== RUTAS DE DOCENTES ==========
+    Route::get('/registro/docente', [DocenteController::class, 'create'])->name('registro_docente');
+    Route::post('/docentes', [DocenteController::class, 'store'])->name('docentes.store');
+    Route::get('/docentes', [DocenteController::class, 'index'])->name('docentes.index');
+    Route::get('/docentes/{id}', [DocenteController::class, 'show'])->name('docentes.show');
+    Route::get('/docentes/{id}/edit', [DocenteController::class, 'edit'])->name('docentes.edit');
+    Route::put('/docentes/{id}', [DocenteController::class, 'update'])->name('docentes.update');
+    Route::delete('/docentes/{id}', [DocenteController::class, 'destroy'])->name('docentes.destroy');
 
     Route::get('/gestionar', function () {
         return view('/admin/gestion');
@@ -54,12 +65,16 @@ Route::middleware(['auth', 'rol:admin'])->group(function () {
     Route::post('/respaldo/automatico', [RespaldoController::class, 'automatico'])->name('respaldo.automatico.store');
     Route::get('/respaldo/descargar/{archivo}', [RespaldoController::class, 'download'])->name('respaldo.descargar');
 });
-
 // Rutas protegidas para docentes
 Route::middleware(['auth', 'rol:docente'])->group(function () {
     Route::get('/docente/dashboard', function () {
         return view('/auth/docentes/escritorioDocente');
     })->name('docente.dashboard');
+
+ // RUTAS DE ASESORÍAS
+    Route::get('/docente/asesoria', [AsesoriaController::class, 'create'])->name('registro');
+    Route::post('/docente/asesoria', [AsesoriaController::class, 'store'])->name('asesoria.store');
+    Route::post('/docente/asesoria/pdf', [AsesoriaController::class, 'generarPDF'])->name('asesoria.pdf');
 });
 
 //rutas protegidas para alumnos
@@ -76,7 +91,7 @@ Route::middleware(['auth', 'rol:alumno'])->group(function () {
 //rutas protedigas para tutor
 //aun no poner nada aqui porfavor
 
-//rutas compartidas (docentes -> admin)
+//rutas compartidas (docentes y admin)
 Route::middleware(['auth', 'rol:admin,docente'])->group(function () {
     Route::get('/grupos', function () {
         return view('/auth/grupos');

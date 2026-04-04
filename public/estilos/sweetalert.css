@@ -1,0 +1,13 @@
+/* public/css/sweetalert.css */
+.swal2-popup {
+    font-size: 1rem !important;
+    font-family: inherit !important;
+}
+
+.swal2-title {
+    font-size: 1.5rem !important;
+}
+
+.swal2-html-container {
+    font-size: 1rem !important;
+}

@@ -9,10 +9,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('docentes', function (Blueprint $table) {
-            // Agregar carrera_id
             $table->foreignId('carrera_id')->nullable()->constrained('carreras')->onDelete('set null');
-            // También podemos eliminar departamento si ya no lo usas
-            // $table->dropColumn('departamento');
+            $table->dropColumn('departamento'); // Eliminar campo antiguo
         });
     }
 
@@ -21,6 +19,7 @@ return new class extends Migration
         Schema::table('docentes', function (Blueprint $table) {
             $table->dropForeign(['carrera_id']);
             $table->dropColumn('carrera_id');
+            $table->string('departamento')->nullable();
         });
     }
 };
