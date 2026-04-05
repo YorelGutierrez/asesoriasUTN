@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\alumnos;
 use App\Models\carreras;
 use App\Models\grupos;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
