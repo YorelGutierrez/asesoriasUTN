@@ -22,10 +22,11 @@ class User extends Authenticatable implements JWTSubject
         'telefono',
         'foto_perfil',
         'rol',
-        'estado',   // ← IMPORTANTE para bloqueo
+        'estado',
     ];
 
     protected $hidden = ['password', 'remember_token'];
+    
     protected $casts = [
         'email_verified_at' => 'datetime',
         'fecha_nacimiento' => 'date',
@@ -35,18 +36,37 @@ class User extends Authenticatable implements JWTSubject
     const ROL_DOCENTE = 'docente';
     const ROL_ALUMNO = 'alumno';
 
-    // Relación con docente (un usuario puede ser docente)
+    // Relación con docente
     public function docente()
     {
         return $this->hasOne(docentes::class, 'user_id');
     }
 
-    // Relación con alumno (un usuario puede ser alumno)
+    // Relación con alumno
     public function alumno()
     {
         return $this->hasOne(alumnos::class, 'user_id');
     }
+
     // JWT
-    public function getJWTIdentifier() { return $this->getKey(); }
-    public function getJWTCustomClaims() { return []; }
+    public function getJWTIdentifier() 
+    { 
+        return $this->getKey(); 
+    }
+    
+    public function getJWTCustomClaims() 
+    { 
+        return []; 
+    }
+
+    // Accesor para obtener la URL de la foto de perfil
+    public function getFotoUrlAttribute()
+    {
+        if ($this->foto_perfil) {
+            return asset('storage/' . $this->foto_perfil);
+        }
+        // Generar avatar con iniciales
+        $nombre = urlencode($this->nombres . '+' . $this->apellido_paterno);
+        return "https://ui-avatars.com/api/?name={$nombre}&background=0d6efd&color=fff";
+    }
 }

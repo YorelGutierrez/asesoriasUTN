@@ -15,8 +15,7 @@ class RespaldoController extends Controller
      */
     public function dashboard()
     {
-        // ========== BITÁCORA ==========
-        $logs = logs::with('user')->latest()->take(50)->get();
+        
 
         // ========== RESPALDOS ==========
         $archivos = File::files(storage_path('app/respaldo'));
@@ -55,6 +54,9 @@ class RespaldoController extends Controller
                 }
             }
         }
+
+        // ========== BITÁCORA ==========
+        $logs = logs::with('user')->latest()->take(10)->get();
 
         return view('admin.dashboard', compact('ultimo', 'horaProgramada', 'logs'));
     }

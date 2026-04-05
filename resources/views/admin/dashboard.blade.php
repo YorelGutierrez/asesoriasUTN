@@ -92,73 +92,20 @@
     <!-- BITÁCORA -->
     <div class="col-md-6">
         <div class="card shadow-sm border-0 rounded-4 h-100">
-            <div class="card-body p-4">
+            <div class="card-body p-4 d-flex flex-column">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h5 class="fw-semibold mb-0">Bitácora de actividad</h5>
-                    <form action="{{ route('bitacora.limpiar') }}" method="POST" onsubmit="return confirm('¿Eliminar TODOS los registros?')">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-danger btn-sm rounded-pill">Limpiar todo</button>
-                    </form>
+                    <button id="btnLimpiarLogs" class="btn btn-danger btn-sm rounded-pill">Limpiar todo</button>
                 </div>
-
-                <div style="max-height: 300px; overflow-y: auto;">
-                    @if($logs->count() > 0)
-                        @foreach($logs as $log)
-                        <div style="border-bottom: 1px solid #eee; padding: 10px 0;">
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                                <div>
-                                    @if($log->accion == 'CREAR')
-                                        <span style="background: green; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px;">CREAR</span>
-                                    @elseif($log->accion == 'EDITAR')
-                                        <span style="background: orange; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px;">EDITAR</span>
-                                    @elseif($log->accion == 'ELIMINAR')
-                                        <span style="background: red; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px;">ELIMINAR</span>
-                                    @else
-                                        <span style="background: blue; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px;">{{ $log->accion }}</span>
-                                    @endif
-                                    <strong style="margin-left: 8px;">{{ $log->user->nombres ?? 'Sistema' }}</strong>
-                                </div>
-                                <small style="color: gray;">{{ $log->created_at->diffForHumans() }}</small>
-                            </div>
-                            <div style="color: #555; font-size: 13px; margin-top: 5px;">
-                                {{ $log->descripcion ?? 'Sin descripción' }}
-                                <span style="color: #999; font-size: 11px;">({{ $log->modulo ?? '' }})</span>
-                            </div>
-                            <form action="{{ route('bitacora.eliminar', $log->id) }}" method="POST" style="margin-top: 5px;" onsubmit="return confirm('¿Eliminar este registro?')">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" style="background: none; border: none; color: red; font-size: 12px; cursor: pointer;">
-                                    <i class="bi bi-trash3"></i> Eliminar
-                                </button>
-                            </form>
-                        </div>
-                        @endforeach
-                    @else
-                        <div style="text-align: center; color: gray; padding: 20px;">
-                            No hay registros en la bitácora
-                        </div>
-                    @endif
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ACCIONES DE GESTIÓN -->
-    <div class="col-md-6">
-        <div class="card shadow-sm border-0 rounded-4 h-100">
-            <div class="card-body p-4">
-                <h5 class="fw-semibold mb-4">Gestión del sistema | Acciones rápidas</h5>
-                <div class="d-grid gap-2">
-                    <a href="{{ route('gestion', ['tab' => 'alumnos']) }}" class="btn-principal">Gestionar alumnos</a>
-                    <a href="{{ route('gestion', ['tab' => 'grupos']) }}" class="btn-principal">Gestionar grupos</a>
-                    <a href="{{ route('gestion', ['tab' => 'docentes']) }}" class="btn-principal">Gestionar docentes</a>
+                <div id="bitacora" class="flex-grow-1 pe-2" style="height: 255px; overflow-y: auto; display: block;">
+                    <div class="text-center text-muted py-3">Cargando...</div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
+<!-- ASIGNACIÓN ACADÉMICA -->
 <div class="card shadow-sm border-0 rounded-4">
     <div class="card-body">
         <h5 class="fw-semibold mb-4">Asignación académica | Asignaciones actuales</h5>
@@ -196,6 +143,71 @@
         </div>
     </div>
 </div>
+<script src="{{ asset('js/logs.js') }}"></script>
+<script>
+function cargarLogs() {
+    fetch('/api/logs', {
+        headers: {
+            'Authorization': 'Bearer ' + getCookie('jwt_token'),
+            'Accept': 'application/json'
+        }
+    })
+    .then(res => res.json())
+    .then(logs => {
+        const container = document.getElementById('bitacora');
+        if (!container) return;
+        container.innerHTML = '';
+
+        // LIMITAR A 3 REGISTROS VISIBLES (el resto se verá con scroll)
+        const logsMostrar = logs.slice(0, 5);
+
+        logsMostrar.forEach(log => {
+            let nombreUsuario = 'Sistema';
+            let fotoUrl = 'https://ui-avatars.com/api/?name=Sistema&background=e9ecef&color=343a40';
+            if (log.user) {
+                const nombres = [log.user.nombres, log.user.apellido_paterno, log.user.apellido_materno].filter(Boolean).join(' ');
+                nombreUsuario = nombres || 'Usuario';
+                fotoUrl = log.user.foto_perfil ? log.user.foto_perfil : `https://ui-avatars.com/api/?name=${encodeURIComponent(nombreUsuario)}&background=e9ecef&color=343a40`;
+            }
+
+            const item = document.createElement('div');
+            item.className = "d-flex align-items-start mb-3 border-bottom pb-2";
+            item.innerHTML = `
+                <img src="${fotoUrl}" class="rounded-circle me-3 mt-1" width="36" height="36">
+                <div class="flex-grow-1">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="fw-semibold" style="font-size: 0.9rem;">${escapeHtml(nombreUsuario)}</span>
+                        <small class="text-black-50" style="font-size: 0.75rem;">${formatearFecha(log.created_at)}</small>
+                    </div>
+                    <p class="mb-0 text-muted lh-sm" style="font-size: 0.85rem;">${escapeHtml(log.descripcion ?? 'Sin descripción')}</p>
+                </div>
+                <button class="btn btn-sm text-danger p-0 ms-2 mt-1 border-0 eliminar-log" data-id="${log.id}" title="Eliminar registro">
+                    <i class="bi bi-trash3"></i>
+                </button>
+            `;
+
+            const deleteBtn = item.querySelector('.eliminar-log');
+            deleteBtn.addEventListener('click', () => {
+                const logId = deleteBtn.dataset.id;
+                fetch(`/api/logs/${logId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': 'Bearer ' + getCookie('jwt_token'),
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(() => item.remove())
+                .catch(err => console.error(err));
+            });
+
+            container.appendChild(item);
+        });
+    })
+    .catch(err => console.error(err));
+}
+
+document.addEventListener('DOMContentLoaded', cargarLogs);
+</script>
 
 <script>
     window.respaldoAutomaticoUrl = "{{ route('respaldo.automatico.store') }}";
