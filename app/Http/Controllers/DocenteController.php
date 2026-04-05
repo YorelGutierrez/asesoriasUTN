@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\docentes;
 use App\Models\carreras;
 use App\Models\materias;
+use App\Helpers\functions; 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
@@ -62,7 +63,6 @@ class DocenteController extends Controller
         try {
             DB::beginTransaction();
 
-            // Guardar foto
             $fotoPath = null;
             if ($request->hasFile('foto_perfil')) {
                 $fotoPath = $request->file('foto_perfil')->store('fotos_perfil', 'public');
@@ -88,38 +88,23 @@ class DocenteController extends Controller
 
             DB::commit();
 
-            return redirect()->route('docentes.index')->with('success', 'Docente registrado correctamente');
+            registrar_log('CREAR', 'Docente: ' . $user->nombres . ' ' . $user->apellido_paterno . ' | Núm. empleado: ' . $request->numero_empleado, 'docentes');
+
+            return redirect()->route('gestion', ['tab' => 'docentes'])->with('success', 'Docente registrado correctamente');
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->route('docentes.index')->with('error', 'Error: ' . $e->getMessage())->withInput();
+            return redirect()->route('gestion', ['tab' => 'docentes'])->with('error', 'Error: ' . $e->getMessage())->withInput();
         }
     }
 
-    // Listar docentes
-    public function index()
-    {
-        $docentes = docentes::with(['user', 'carrera'])->paginate(10);
-        return view('admin.docentes.index', compact('docentes'));
-    }
-
-    // Ver detalles del docente
-    public function show($id)
-    {
-        $docente = docentes::with(['user', 'carrera', 'materias'])->findOrFail($id);
-        return view('admin.docentes.show', compact('docente'));
-    }
-
-    // Mostrar formulario de edición
     public function edit($id)
     {
         $docente = docentes::with('user')->findOrFail($id);
         $carreras = carreras::all();
-        $materias = materias::all();
-        return view('admin.docentes.edit', compact('docente', 'carreras', 'materias'));
+        return view('admin.actualizarDocente', compact('docente', 'carreras'));
     }
 
-    // Actualizar docente
     public function update(Request $request, $id)
     {
         $docente = docentes::findOrFail($id);
@@ -130,23 +115,17 @@ class DocenteController extends Controller
             'apellido_paterno' => 'required|string|max:255',
             'apellido_materno' => 'nullable|string|max:255',
             'email' => 'required|email|ends_with:@utnay.edu.mx|unique:users,email,' . $user->id,
-            'fecha_nacimiento' => 'required|date|before:today',
-            'telefono' => 'required|string|regex:/^[0-9]{10}$/',
+            'fecha_nacimiento' => 'nullable|date|before:today',
+            'telefono' => 'nullable|string|regex:/^[0-9]{10}$/',
             'numero_empleado' => 'required|string|unique:docentes,numero_empleado,' . $docente->id,
             'carrera_id' => 'required|exists:carreras,id',
             'foto_perfil' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'password' => 'nullable|string|min:6|confirmed',
-        ], [
-            'email.ends_with' => 'El correo debe ser del dominio @utnay.edu.mx',
-            'foto_perfil.image' => 'El archivo debe ser una imagen.',
-            'foto_perfil.mimes' => 'La imagen debe ser de tipo: jpeg, png, jpg, gif.',
-            'foto_perfil.max' => 'La imagen no debe pesar más de 2MB.',
         ]);
 
         try {
             DB::beginTransaction();
 
-            // Actualizar foto
             if ($request->hasFile('foto_perfil')) {
                 if ($user->foto_perfil) {
                     Storage::disk('public')->delete($user->foto_perfil);
@@ -167,8 +146,6 @@ class DocenteController extends Controller
             if ($request->filled('password')) {
                 $user->password = Hash::make($request->password);
                 $user->save();
-            } else {
-                $user->save();
             }
 
             $docente->update([
@@ -176,18 +153,15 @@ class DocenteController extends Controller
                 'carrera_id' => $request->carrera_id,
             ]);
 
-            // Sincronizar materias si se seleccionaron
-            if ($request->has('materias')) {
-                $docente->materias()->sync($request->materias);
-            }
-
             DB::commit();
 
-            return redirect()->route('docentes.index')->with('success', 'Docente actualizado correctamente');
+            registrar_log('EDITAR', 'Docente ID: ' . $id . ' | Núm. empleado: ' . $request->numero_empleado, 'docentes');
+
+            return redirect()->route('gestion', ['tab' => 'docentes'])->with('success', 'Docente actualizado correctamente');
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Error: ' . $e->getMessage())->withInput();
+            return back()->with('error', 'Error: ' . $e->getMessage());
         }
     }
 
@@ -198,8 +172,11 @@ class DocenteController extends Controller
             DB::beginTransaction();
 
             $docente = docentes::with('user')->findOrFail($id);
-            $docente->materias()->detach();
             $user = $docente->user;
+
+            registrar_log('ELIMINAR', 'Docente: ' . $docente->user->nombres . ' ' . $docente->user->apellido_paterno . ' | Núm. empleado: ' . $docente->numero_empleado, 'docentes');
+
+            $docente->materias()->detach();
 
             if ($user->foto_perfil) {
                 Storage::disk('public')->delete($user->foto_perfil);
@@ -210,8 +187,7 @@ class DocenteController extends Controller
 
             DB::commit();
 
-            return redirect()->route('docentes.index')
-                ->with('success', 'Docente eliminado correctamente');
+            return redirect()->route('gestion', ['tab' => 'docentes'])->with('success', 'Docente eliminado correctamente');
 
         } catch (\Exception $e) {
             DB::rollBack();
