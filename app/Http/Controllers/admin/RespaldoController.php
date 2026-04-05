@@ -4,6 +4,7 @@ namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
 use Carbon\Carbon;
+use App\Models\logs; 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 
@@ -14,6 +15,10 @@ class RespaldoController extends Controller
      */
     public function dashboard()
     {
+        // ========== BITÁCORA ==========
+        $logs = logs::with('user')->latest()->take(50)->get();
+
+        // ========== RESPALDOS ==========
         $archivos = File::files(storage_path('app/respaldo'));
 
         $ultimo = null;
@@ -51,7 +56,7 @@ class RespaldoController extends Controller
             }
         }
 
-        return view('admin.dashboard', compact('ultimo', 'horaProgramada'));
+        return view('admin.dashboard', compact('ultimo', 'horaProgramada', 'logs'));
     }
 
     /**
@@ -77,6 +82,8 @@ class RespaldoController extends Controller
         system($command, $resultado);
 
         if ($resultado === 0) {
+            // Registrar log
+            registrar_log('CREAR', 'Respaldo generado: ' . $nombre, 'respaldos');
             return back()->with('success', 'Respaldo generado correctamente');
         } else {
             return back()->with('error', 'Error al generar el respaldo');
@@ -96,6 +103,9 @@ class RespaldoController extends Controller
             'fecha' => $request->fecha
         ]));
 
+        // Registrar log
+        registrar_log('PROGRAMAR', 'Respaldo programado para: ' . $request->fecha, 'respaldos');
+
         return response()->json(['success' => true]);
     }
     
@@ -109,6 +119,9 @@ class RespaldoController extends Controller
         if (!file_exists($ruta)) {
             abort(404);
         }
+
+        // Registrar log
+        registrar_log('DESCARGAR', 'Respaldo descargado: ' . $archivo, 'respaldos');
 
         return response()->download($ruta);
     }

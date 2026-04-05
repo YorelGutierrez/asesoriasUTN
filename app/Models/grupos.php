@@ -24,10 +24,10 @@ class grupos extends Model
         return $this->belongsTo(carreras::class);
     }
 
-    // Relación con alumnos (si tienes la tabla alumnos)
+    // Relación con alumnos - clave foránea correcta: grupo_id
     public function alumnos()
     {
-        return $this->hasMany(alumnos::class);
+        return $this->hasMany(alumnos::class, 'grupo_id');
     }
 
     // Relación muchos a muchos con materias

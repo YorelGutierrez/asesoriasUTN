@@ -52,7 +52,6 @@
             <div class="card-body p-4">
                 <h5 class="fw-semibold mb-4">Respaldos del sistema</h5>
 
-                {{-- Último respaldo --}}
                 @if($ultimo)
                 <p><strong>Último respaldo:</strong> {{ $ultimo['fecha'] }}</p>
                 <p><strong>Estado:</strong> <span class="text-success">Correcto</span></p>
@@ -61,12 +60,10 @@
                 <p><strong>Estado:</strong> <span class="text-danger">Sin respaldos</span></p>
                 @endif
 
-                {{-- Programado --}}
                 @if($horaProgramada)
                 <p><strong>Programado para:</strong> {{ $horaProgramada }}</p>
                 @endif
 
-                {{-- Botones --}}
                 <div class="row g-2 mt-3">
                     <div class="col d-flex">
                         <form action="{{ route('respaldo.generar') }}" method="POST" class="w-100">
@@ -79,7 +76,6 @@
                     </div>
                 </div>
 
-                {{-- Calendario oculto --}}
                 <div id="calendarBox" class="mt-3 d-none">
                     <input type="datetime-local" id="fechaHora" class="form-control">
                     <div class="d-flex gap-2 mt-2">
@@ -93,24 +89,66 @@
 </div>
 
 <div class="row mb-4 align-items-stretch">
+    <!-- BITÁCORA -->
     <div class="col-md-6">
         <div class="card shadow-sm border-0 rounded-4 h-100">
-            <div class="card-body p-4 d-flex flex-column">
+            <div class="card-body p-4">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h5 class="fw-semibold mb-0">Bitácora de actividad</h5>
-                    <button id="btnLimpiarLogs" class="btn btn-danger btn-sm rounded-pill">Limpiar todo</button>
+                    <form action="{{ route('bitacora.limpiar') }}" method="POST" onsubmit="return confirm('¿Eliminar TODOS los registros?')">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-danger btn-sm rounded-pill">Limpiar todo</button>
+                    </form>
                 </div>
-                <div id="bitacora" class="flex-grow-1 pe-2" style="max-height: 220px; overflow-y: auto;">
-                    <!-- Los logs se cargarán dinámicamente aquí -->
+
+                <div style="max-height: 300px; overflow-y: auto;">
+                    @if($logs->count() > 0)
+                        @foreach($logs as $log)
+                        <div style="border-bottom: 1px solid #eee; padding: 10px 0;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                <div>
+                                    @if($log->accion == 'CREAR')
+                                        <span style="background: green; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px;">CREAR</span>
+                                    @elseif($log->accion == 'EDITAR')
+                                        <span style="background: orange; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px;">EDITAR</span>
+                                    @elseif($log->accion == 'ELIMINAR')
+                                        <span style="background: red; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px;">ELIMINAR</span>
+                                    @else
+                                        <span style="background: blue; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px;">{{ $log->accion }}</span>
+                                    @endif
+                                    <strong style="margin-left: 8px;">{{ $log->user->nombres ?? 'Sistema' }}</strong>
+                                </div>
+                                <small style="color: gray;">{{ $log->created_at->diffForHumans() }}</small>
+                            </div>
+                            <div style="color: #555; font-size: 13px; margin-top: 5px;">
+                                {{ $log->descripcion ?? 'Sin descripción' }}
+                                <span style="color: #999; font-size: 11px;">({{ $log->modulo ?? '' }})</span>
+                            </div>
+                            <form action="{{ route('bitacora.eliminar', $log->id) }}" method="POST" style="margin-top: 5px;" onsubmit="return confirm('¿Eliminar este registro?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" style="background: none; border: none; color: red; font-size: 12px; cursor: pointer;">
+                                    <i class="bi bi-trash3"></i> Eliminar
+                                </button>
+                            </form>
+                        </div>
+                        @endforeach
+                    @else
+                        <div style="text-align: center; color: gray; padding: 20px;">
+                            No hay registros en la bitácora
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>
     </div>
+
     <!-- ACCIONES DE GESTIÓN -->
     <div class="col-md-6">
         <div class="card shadow-sm border-0 rounded-4 h-100">
             <div class="card-body p-4">
-                <h5 class="fw-semibold mb-4">Gestión del sistema | Acciones rapidas</h5>
+                <h5 class="fw-semibold mb-4">Gestión del sistema | Acciones rápidas</h5>
                 <div class="d-grid gap-2">
                     <a href="{{ route('gestion', ['tab' => 'alumnos']) }}" class="btn-principal">Gestionar alumnos</a>
                     <a href="{{ route('gestion', ['tab' => 'grupos']) }}" class="btn-principal">Gestionar grupos</a>
@@ -123,12 +161,10 @@
 
 <div class="card shadow-sm border-0 rounded-4">
     <div class="card-body">
-
-        <h5 class="fw-semibold mb-4">Asignación académica | Asiganaciones actuales</h5>
+        <h5 class="fw-semibold mb-4">Asignación académica | Asignaciones actuales</h5>
 
         <div class="table-responsive">
             <table class="table table-hover align-middle">
-
                 <thead class="table-light">
                     <tr>
                         <th>Docente</th>
@@ -139,7 +175,6 @@
                         <th>Acciones</th>
                     </tr>
                 </thead>
-
                 <tbody>
                     <tr>
                         <td>Juan Manuel Tovar Sanchez</td>
@@ -156,11 +191,9 @@
             </table>
         </div>
 
-        <!-- BOTÓN -->
         <div class="mt-3 d-flex justify-content-end">
             <button class="btn-principal">+ Nueva asignación</button>
         </div>
-
     </div>
 </div>
 
@@ -169,6 +202,7 @@
     window.csrfToken = "{{ csrf_token() }}";
 </script>
 <script src="{{ asset('js/ajax-respaldos.js') }}"></script>
+
 <script>
     function getCookie(name) {
         const value = `; ${document.cookie}`;
@@ -176,25 +210,20 @@
         if (parts.length === 2) return parts.pop().split(';').shift();
     }
 
-    // Consumir API con JWT
     fetch('/api/me', {
-            headers: {
-                'Authorization': 'Bearer ' + getCookie('jwt_token')
-            }
-        })
-        .then(res => res.json())
-        .then(data => {
-            console.log('JWT funcionando:', data);
-
-            // Mostrar nombre real
-            document.getElementById('nombreUsuario').innerText = data.nombres;
-        })
-        .catch(err => {
-            console.error('Error JWT:', err);
-
-            // fallback
-            document.getElementById('nombreUsuario').innerText = 'Administrador jejej';
-        });
+        headers: {
+            'Authorization': 'Bearer ' + getCookie('jwt_token')
+        }
+    })
+    .then(res => res.json())
+    .then(data => {
+        console.log('JWT funcionando:', data);
+        document.getElementById('nombreUsuario').innerText = data.nombres;
+    })
+    .catch(err => {
+        console.error('Error JWT:', err);
+        document.getElementById('nombreUsuario').innerText = 'Administrador';
+    });
 </script>
-<script src="{{ asset('js/logs.js') }}"></script>
-@endsection()
+
+@endsection

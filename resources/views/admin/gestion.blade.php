@@ -74,7 +74,9 @@
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h5 class="fw-semibold mb-0">Listado de grupos</h5>
                     <div class="col-md-4">
-                        <button class="btn-principal"><i class="bi bi-plus-circle"></i> Nuevo grupo</button>
+                        <button class="btn-principal" data-bs-toggle="modal" data-bs-target="#modalGrupo">
+                            <i class="bi bi-plus-circle"></i> Nuevo grupo
+                        </button>
                     </div>
                 </div>
                 <div class="table-responsive">
@@ -89,20 +91,35 @@
                                 <th>Acciones</th>
                             </tr>
                         </thead>
-                        <tbody id="tabla-grupos">
+                        <tbody>
+                            @forelse($grupos as $grupo)
                             <tr>
-                                <td>1</td>
-                                <td>IDGS-84</td>
-                                <td>Ingeniería en Desarrollo de Software</td>
-                                <td>8vo</td>
-                                <td>25</td>
+                                <td>{{ $grupo->id }}</td>
+                                <td>{{ $grupo->nombre }}</td>
+                                <td>{{ $grupo->carrera ? $grupo->carrera->nombre : 'N/A' }}</td>
+                                <td>{{ $grupo->cuatrimestre }}</td>
+                                <td>{{ $grupo->alumnos_count ?? 0 }}</td>
                                 <td>
-                                    <button class="btn btn-sm btn-outline-warning editar-grupo" data-id="1">Editar</button>
-                                    <button class="btn btn-sm btn-outline-danger eliminar-grupo" data-id="1">Eliminar</button>
+                                    <div class="d-flex gap-2">
+                                        <button class="btn btn-sm btn-outline-warning editar-grupo" data-id="{{ $grupo->id }}" data-nombre="{{ $grupo->nombre }}" data-carrera_id="{{ $grupo->carrera_id }}" data-cuatrimestre="{{ $grupo->cuatrimestre }}">
+                                            <i class="bi bi-pencil"></i> Editar
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger eliminar-grupo" data-id="{{ $grupo->id }}" data-nombre="{{ $grupo->nombre }}">
+                                            <i class="bi bi-trash"></i> Eliminar
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
+                            @empty
+                            <tr>
+                                <td colspan="6" class="text-center">No hay grupos registrados</td>
+                            </tr>
+                            @endforelse
                         </tbody>
                     </table>
+                </div>
+                <div class="mt-3">
+                    {{ $grupos->links() }}
                 </div>
             </div>
         </div>
@@ -115,7 +132,9 @@
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h5 class="fw-semibold mb-0">Listado de alumnos</h5>
                     <div class="col-md-4">
-                        <button class="btn-principal"><i class="bi bi-plus-circle"></i> Nuevo alumno</button>
+                        <a href="{{ route('registro_alumnos') }}" class="btn-principal">
+                            <i class="bi bi-plus-circle"></i> Nuevo alumno
+                        </a>
                     </div>
                 </div>
                 <div class="table-responsive">
@@ -131,21 +150,42 @@
                                 <th>Acciones</th>
                             </tr>
                         </thead>
-                        <tbody id="tabla-alumnos">
+                        <tbody>
+                            @forelse($alumnos as $alumno)
                             <tr>
-                                <td>TIC-310036</td>
-                                <td>Yorel Gutiérrez</td>
-                                <td>IDGS-84</td>
-                                <td>Ingeniería en Desarrollo de Software</td>
-                                <td>yorel@email.com</td>
-                                <td>Activo</td>
+                                <td>{{ $alumno->matricula }}</td>
+                                <td>{{ $alumno->user->nombres }} {{ $alumno->user->apellido_paterno }} {{ $alumno->user->apellido_materno }}</td>
+                                <td>{{ $alumno->grupo ? $alumno->grupo->nombre : 'N/A' }}</td>
+                                <td>{{ $alumno->carrera ? $alumno->carrera->nombre : 'N/A' }}</td>
+                                <td>{{ $alumno->user->email }}</td>
                                 <td>
-                                    <button class="btn btn-sm btn-outline-warning editar-alumno" data-id="1">Editar</button>
-                                    <button class="btn btn-sm btn-outline-danger eliminar-alumno" data-id="1">Eliminar</button>
+                                    @if($alumno->user->estado ?? true)
+                                        <span class="badge bg-success">Activo</span>
+                                    @else
+                                        <span class="badge bg-danger">Inactivo</span>
+                                    @endif
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-2">
+                                        <a href="{{ route('alumnos.edit', $alumno->id) }}" class="btn btn-sm btn-outline-warning">
+                                            <i class="bi bi-pencil"></i> Editar
+                                        </a>
+                                        <button class="btn btn-sm btn-outline-danger eliminar-alumno" data-id="{{ $alumno->id }}" data-nombre="{{ $alumno->user->nombres }}">
+                                            <i class="bi bi-trash"></i> Eliminar
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
+                            @empty
+                            <tr>
+                                <td colspan="7" class="text-center">No hay alumnos registrados</td>
+                            </tr>
+                            @endforelse
                         </tbody>
                     </table>
+                </div>
+                <div class="mt-3">
+                    {{ $alumnos->links() }}
                 </div>
             </div>
         </div>
@@ -158,7 +198,9 @@
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h5 class="fw-semibold mb-0">Listado de docentes</h5>
                     <div class="col-md-4">
-                        <button class="btn-principal"><i class="bi bi-plus-circle"></i> Nuevo docente</button>
+                        <a href="{{ route('registro_docente') }}" class="btn-principal">
+                            <i class="bi bi-plus-circle"></i> Nuevo docente
+                        </a>
                     </div>
                 </div>
                 <div class="table-responsive">
@@ -167,31 +209,135 @@
                             <tr>
                                 <th>Núm. empleado</th>
                                 <th>Nombre completo</th>
-                                <th>Carrera(s)</th>
+                                <th>Carrera</th>
                                 <th>Correo</th>
                                 <th>Estado</th>
                                 <th>Acciones</th>
                             </tr>
                         </thead>
-                        <tbody id="tabla-docentes">
+                        <tbody>
+                            @forelse($docentes as $docente)
                             <tr>
-                                <td>19cJICP</td>
-                                <td>Juan Manuel Tovar Sánchez</td>
-                                <td>Ing. Software, Redes</td>
-                                <td>juan.tovar@utnay.edu.mx</td>
-                                <td>Activo</td>
+                                <td>{{ $docente->numero_empleado }}</td>
+                                <td>{{ $docente->user->nombres }} {{ $docente->user->apellido_paterno }} {{ $docente->user->apellido_materno }}</td>
+                                <td>{{ $docente->carrera ? $docente->carrera->nombre : 'N/A' }}</td>
+                                <td>{{ $docente->user->email }}</td>
                                 <td>
-                                    <button class="btn btn-sm btn-outline-warning editar-docente" data-id="1">Editar</button>
-                                    <button class="btn btn-sm btn-outline-danger eliminar-docente" data-id="1">Eliminar</button>
+                                    @if($docente->user->estado ?? true)
+                                        <span class="badge bg-success">Activo</span>
+                                    @else
+                                        <span class="badge bg-danger">Inactivo</span>
+                                    @endif
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-2">
+                                        <a href="{{ route('docentes.edit', $docente->id) }}" class="btn btn-sm btn-outline-warning">
+                                            <i class="bi bi-pencil"></i> Editar
+                                        </a>
+                                        <button class="btn btn-sm btn-outline-danger eliminar-docente" data-id="{{ $docente->id }}" data-nombre="{{ $docente->user->nombres }}">
+                                            <i class="bi bi-trash"></i> Eliminar
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
+                            @empty
+                            <tr>
+                                <td colspan="6" class="text-center">No hay docentes registrados</td>
+                            </tr>
+                            @endforelse
                         </tbody>
                     </table>
+                </div>
+                <div class="mt-3">
+                    {{ $docentes->links() }}
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Formulario oculto para eliminar -->
+<form id="form-eliminar" action="" method="POST" style="display: none;">
+    @csrf
+    @method('DELETE')
+</form>
+
+<script>
+    // Eliminar Alumno
+    document.querySelectorAll('.eliminar-alumno').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const id = this.dataset.id;
+            const nombre = this.dataset.nombre;
+            
+            Swal.fire({
+                title: '¿Eliminar alumno?',
+                text: `¿Estás seguro de eliminar a ${nombre}? Esta acción no se puede deshacer.`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const form = document.getElementById('form-eliminar');
+                    form.action = `/alumnos/${id}`;
+                    form.submit();
+                }
+            });
+        });
+    });
+
+    // Eliminar Docente
+    document.querySelectorAll('.eliminar-docente').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const id = this.dataset.id;
+            const nombre = this.dataset.nombre;
+            
+            Swal.fire({
+                title: '¿Eliminar docente?',
+                text: `¿Estás seguro de eliminar a ${nombre}? Esta acción no se puede deshacer.`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const form = document.getElementById('form-eliminar');
+                    form.action = `/docentes/${id}`;
+                    form.submit();
+                }
+            });
+        });
+    });
+
+    // Eliminar Grupo
+    document.querySelectorAll('.eliminar-grupo').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const id = this.dataset.id;
+            const nombre = this.dataset.nombre;
+            
+            Swal.fire({
+                title: '¿Eliminar grupo?',
+                text: `¿Estás seguro de eliminar el grupo ${nombre}?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const form = document.getElementById('form-eliminar');
+                    form.action = `/grupos/${id}`;
+                    form.submit();
+                }
+            });
+        });
+    });
+</script>
 
 <script src="{{ asset('js/gestion-opciones.js') }}"></script>
 @endsection

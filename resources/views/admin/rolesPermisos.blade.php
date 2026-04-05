@@ -129,6 +129,13 @@
                     <h5 class="fw-semibold mb-0">Usuarios registrados</h5>
                 </div>
 
+                @if(session('success'))
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        {{ session('success') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @endif
+
                 <div class="table-responsive">
                     <table class="table table-hover align-middle">
                         <thead class="table-light">
@@ -136,34 +143,79 @@
                                 <th>Nombre</th>
                                 <th>Correo</th>
                                 <th>Carrera</th>
-                                <th>Matricula/Clave</th>
+                                <th>Matrícula/Clave</th>
                                 <th>Rol</th>
                                 <th>Estado</th>
                                 <th>Gestión</th>
                             </tr>
                         </thead>
-
                         <tbody>
+                            @forelse($usuarios as $usuario)
                             <tr>
-                                <td>Yorel Gutiérrez</td>
-                                <td>yorel@email.com</td>
-                                <td>Ing. Software</td>
-                                <td>TIC-310036</td>
-                                <td><span>Administrador</span></td>
-                                <td><span>Activo</span></td>
+                                <td>{{ $usuario->nombres }} {{ $usuario->apellido_paterno }}</td>
+                                <td>{{ $usuario->email }}</td>
                                 <td>
-                                    <a href="#" class="btn btn-outline-warning btn-sm">Editar</a>
-                                    <a href="#" class="btn btn-outline-danger btn-sm">Eliminar</a>
-                                    <br>
-                                    <a href="#" class="btn btn-outline-primary btn-sm">Desbloquear cuenta</a>
-                                    <a href="#" class="btn btn-outline-success btn-sm">Bloquear cuenta</a>
+                                    @if($usuario->rol == 'alumno' && $usuario->alumno && $usuario->alumno->carrera)
+                                        {{ $usuario->alumno->carrera->nombre }}
+                                    @elseif($usuario->rol == 'docente' && $usuario->docente && $usuario->docente->carrera)
+                                        {{ $usuario->docente->carrera->nombre }}
+                                    @else
+                                        -
+                                    @endif
+                                </td>
+                                <td>
+                                    @if($usuario->rol == 'alumno' && $usuario->alumno)
+                                        {{ $usuario->alumno->matricula }}
+                                    @elseif($usuario->rol == 'docente' && $usuario->docente)
+                                        {{ $usuario->docente->numero_empleado }}
+                                    @else
+                                        -
+                                    @endif
+                                </td>
+                                <td>
+                                    @if($usuario->rol == 'admin')
+                                        <span class="badge bg-danger">Administrador</span>
+                                    @elseif($usuario->rol == 'docente')
+                                        <span class="badge bg-primary">Docente</span>
+                                    @elseif($usuario->rol == 'alumno')
+                                        <span class="badge bg-success">Alumno</span>
+                                    @else
+                                        <span class="badge bg-secondary">{{ $usuario->rol }}</span>
+                                    @endif
+                                </td>
+                                <td>
+                                    @if($usuario->estado)
+                                        <span class="badge bg-success">Activo</span>
+                                    @else
+                                        <span class="badge bg-danger">Bloqueado</span>
+                                    @endif
+                                </td>
+                                <td>
+                                    <div class="d-flex flex-wrap gap-1">
+                                        <a href="#" class="btn btn-outline-warning btn-sm">Editar</a>
+                                        <a href="#" class="btn btn-outline-danger btn-sm">Eliminar</a>
+                                        @if($usuario->estado)
+                                            <form action="{{ route('usuarios.toggleBlock', $usuario->id) }}" method="POST" class="d-inline">
+                                                @csrf
+                                                <button type="submit" class="btn btn-outline-success btn-sm">Bloquear</button>
+                                            </form>
+                                        @else
+                                            <form action="{{ route('usuarios.toggleBlock', $usuario->id) }}" method="POST" class="d-inline">
+                                                @csrf
+                                                <button type="submit" class="btn btn-outline-primary btn-sm">Desbloquear</button>
+                                            </form>
+                                        @endif
+                                    </div>
                                 </td>
                             </tr>
-
+                            @empty
+                            <tr>
+                                <td colspan="7" class="text-center">No hay usuarios registrados</td>
+                            </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
-
             </div>
         </div>
     </div>
