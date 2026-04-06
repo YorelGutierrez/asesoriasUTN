@@ -14,7 +14,7 @@ class GruposSeeder extends Seeder
      */
     public function run(): void
     {
-        $carrera = carreras::where('clave', 'IDGS')->first();
+        $carrera = carreras::where('clave', 'ITIID')->first();
 
         if (!$carrera) {
             $this->command->error('No se encontró la carrera IDGS. Ejecuta primero CarrerasSeeder.');
