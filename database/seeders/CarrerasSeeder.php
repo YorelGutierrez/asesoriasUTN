@@ -14,20 +14,20 @@ class CarrerasSeeder extends Seeder
     public function run(): void
     {
         $carreras = [
-            ['nombre' => 'Ingeniería en Desarrollo y Gestión de Software', 'clave' => 'IDGS', 'logo' => 'https://www.utnay.edu.mx/assets/IDGS.png'],
-            ['nombre' => 'Ingeniería en Redes', 'clave' => 'IR', 'logo' => 'https://www.utnay.edu.mx/assets/IR.png'],
-            ['nombre' => 'Ingeniería en Energías Renovables', 'clave' => 'IER', 'logo' => 'https://www.utnay.edu.mx/assets/IER.png'],
-            ['nombre' => 'Ingeniería en Electrónica', 'clave' => 'IE', 'logo' => 'https://www.utnay.edu.mx/assets/IE.png'],
-            ['nombre' => 'Ingeniería en Mecatrónica', 'clave' => 'IM', 'logo' => 'https://www.utnay.edu.mx/assets/IM.png'],
-            ['nombre' => 'Ingeniería en Biotecnología', 'clave' => 'IB', 'logo' => 'https://www.utnay.edu.mx/assets/IB.png'],
-            ['nombre' => 'Licenciatura en Administración', 'clave' => 'LA', 'logo' => 'https://www.utnay.edu.mx/assets/LA.png'],
-            ['nombre' => 'Licenciatura en Contaduría', 'clave' => 'LC', 'logo' => 'https://www.utnay.edu.mx/assets/LC.png'],
-            ['nombre' => 'Licenciatura en Mercadotecnia', 'clave' => 'LM', 'logo' => 'https://www.utnay.edu.mx/assets/LM.png'],
-            ['nombre' => 'Licenciatura en Gastronomía', 'clave' => 'LG', 'logo' => 'https://www.utnay.edu.mx/assets/LG.png'],
-            ['nombre' => 'Licenciatura en Turismo', 'clave' => 'LT', 'logo' => 'https://www.utnay.edu.mx/assets/LT.png'],
-            ['nombre' => 'Técnico Superior Universitario en Tecnologías de la Información', 'clave' => 'TSU-TI', 'logo' => 'https://www.utnay.edu.mx/assets/TSU-TI.png'],
-            ['nombre' => 'Técnico Superior Universitario en Energías Renovables', 'clave' => 'TSU-ER', 'logo' => 'https://www.utnay.edu.mx/assets/TSU-ER.png'],
-            ['nombre' => 'Técnico Superior Universitario en Procesos Alimentarios', 'clave' => 'TSU-PA', 'logo' => 'https://www.utnay.edu.mx/assets/TSU-PA.png'],
+            ['nombre' => 'TSU en inteligencia artificial', 'clave' => 'IA', 'logo' => '/img/carreras/IA-DIxRWf-C.png'],
+            ['nombre' => 'Ingeniería en alimentos', 'clave' => 'IAL', 'logo' => '/img/carreras/IAL-D7vwp92R.png'],
+            ['nombre' => 'Ingeniería en civil', 'clave' => 'IC', 'logo' => '/img/carreras/IC-DVbWQOvg.png'],
+            ['nombre' => 'Ingeniería en logística internacional', 'clave' => 'ILI', 'logo' => '/img/carreras/ILI-Be-QpSkC.png'],
+            ['nombre' => 'Ingeniería en mantenimineto industrial', 'clave' => 'IMI', 'logo' => '/img/carreras/IMI-B-buC3Pg.png'],
+            ['nombre' => 'Ingeniería en microelectrónica y semiconductores', 'clave' => 'IMS', 'logo' => '/img/carreras/IMS-DWpSJ3cI.png'],
+            ['nombre' => 'Ingenieria en mecatronica', 'clave' => 'IMT', 'logo' => '/img/carreras/IMT-Ch5y60fw.png'],
+            ['nombre' => 'ingenieria en tecnologías de la información e innovación digital', 'clave' => 'ITIID', 'logo' => '/img/carreras/ITIID-DDH-gJkG.png'],
+            ['nombre' => 'Licenciatura en administración', 'clave' => 'LAD', 'logo' => '/img/carreras/LAD-Cek-Xcxa.png'],
+            ['nombre' => 'Licenciatura en gestión y desarrollo turístico', 'clave' => 'LGDT', 'logo' => '/img/carreras/LGDT-D7fFmQRl.png'],
+            ['nombre' => 'Licenciatura en gastronomía', 'clave' => 'LGT', 'logo' => '/img/carreras/LGT-CdJNfZHA.png'],
+            ['nombre' => 'Licenciatura en negocios y mercadotecnia', 'clave' => 'LINM', 'logo' => '/img/carreras/LINM-LAz2BrcJ.png'],
+            ['nombre' => 'Licenciatura en psicología', 'clave' => 'LPS', 'logo' => '/img/carreras/LPS-CBEmlYDO.png'],
+            ['nombre' => 'Licenciatura en seguridad pública', 'clave' => 'LSP', 'logo' => '/img/carreras/LSP-D0qqiMn7.png'],
         ];
 
         foreach ($carreras as $c) {
