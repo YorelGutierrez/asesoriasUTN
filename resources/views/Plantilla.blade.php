@@ -111,6 +111,8 @@
                 <i class="bi bi-list"></i>
             </a>
             <span class="menu-title"></span>
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSpPReQfrDeeJiv0BuOf6r-eEUnb5Eos8DJTQ&s"
+                alt="Logo" class="menu-logo">
         </div>
 
         <a href="@if(auth()->user()->rol === 'admin') {{ route('admin.dashboard') }} 
@@ -157,7 +159,8 @@
         @if(auth()->user()->rol === 'admin')
         <div class="menu-seccion">
             <a href="#" class="menu-principal">
-                <i class="bi bi-person-fill-add" style="font-size: 18px;"></i>Registros<i class="bi bi-chevron-compact-down"></i>
+                <span><i class="bi bi-person-fill-add" style="font-size: 18px;"></i> Registros</span>
+                <i class="bi bi-chevron-compact-down"></i>
             </a>
             <div class="subseccion">
                 <a href="{{ route('registro_alumnos') }}" class="{{ request()->routeIs('registro_alumnos') ? 'activo' : '' }}">
