@@ -102,10 +102,10 @@
                                 <td>
                                     <div class="d-flex gap-2">
                                         <button class="btn btn-sm btn-outline-warning editar-grupo" data-id="{{ $grupo->id }}" data-nombre="{{ $grupo->nombre }}" data-carrera_id="{{ $grupo->carrera_id }}" data-cuatrimestre="{{ $grupo->cuatrimestre }}">
-                                            <i class="bi bi-pencil"></i> Editar
+                                             Editar
                                         </button>
                                         <button class="btn btn-sm btn-outline-danger eliminar-grupo" data-id="{{ $grupo->id }}" data-nombre="{{ $grupo->nombre }}">
-                                            <i class="bi bi-trash"></i> Eliminar
+                                             Eliminar
                                         </button>
                                     </div>
                                 </td>
@@ -168,10 +168,10 @@
                                 <td>
                                     <div class="d-flex gap-2">
                                         <a href="{{ route('alumnos.edit', $alumno->id) }}" class="btn btn-sm btn-outline-warning">
-                                            <i class="bi bi-pencil"></i> Editar
+                                            Editar
                                         </a>
                                         <button class="btn btn-sm btn-outline-danger eliminar-alumno" data-id="{{ $alumno->id }}" data-nombre="{{ $alumno->user->nombres }}">
-                                            <i class="bi bi-trash"></i> Eliminar
+                                            Eliminar
                                         </button>
                                     </div>
                                 </td>
@@ -232,10 +232,10 @@
                                 <td>
                                     <div class="d-flex gap-2">
                                         <a href="{{ route('docentes.edit', $docente->id) }}" class="btn btn-sm btn-outline-warning">
-                                            <i class="bi bi-pencil"></i> Editar
+                                             Editar
                                         </a>
                                         <button class="btn btn-sm btn-outline-danger eliminar-docente" data-id="{{ $docente->id }}" data-nombre="{{ $docente->user->nombres }}">
-                                            <i class="bi bi-trash"></i> Eliminar
+                                             Eliminar
                                         </button>
                                     </div>
                                 </td>

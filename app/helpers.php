@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\logs;
+use App\Models\User;
 
 function registrar_log($accion, $descripcion = null, $modulo = null)
 {
@@ -11,4 +12,14 @@ function registrar_log($accion, $descripcion = null, $modulo = null)
         'modulo' => $modulo,
         'ip' => request()->ip()
     ]);
+}
+
+function getUserStats()
+{
+    return [
+        'admins' => User::where('rol', 'admin')->count(),
+        'docentes' => User::where('rol', 'docente')->count(),
+        'tutores' => User::where('rol', 'tutor')->count(),
+        'alumnos' => User::where('rol', 'alumno')->count(),
+    ];
 }

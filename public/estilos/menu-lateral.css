@@ -37,11 +37,19 @@
     display: block;
     transition: 0.2s;
     border-radius: 100px;
+    margin-left: 10px;
+    margin-right: 10px;
 }
 
 .menu-lateral a:hover {
     background-color: #e6ffef;
+    color: #00937f;
 }
+
+.menu-lateral a.activo {
+    color: #00937f;
+}
+
 
 /* Contenedor de título */
 .menu-header {

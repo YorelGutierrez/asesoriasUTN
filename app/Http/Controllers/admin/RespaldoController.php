@@ -4,7 +4,8 @@ namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
 use Carbon\Carbon;
-use App\Models\logs; 
+use App\Models\logs;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 
@@ -15,9 +16,13 @@ class RespaldoController extends Controller
      */
     public function dashboard()
     {
-        
+        //contador de usuarios
+        $totalAdministradores = User::where('rol', 'admin')->count();
+        $totalDocentes = User::where('rol', 'docente')->count();
+        $totalTutores = User::where('rol', 'tutor')->count();
+        $totalAlumnos = User::where('rol', 'alumno')->count();
 
-        // ========== RESPALDOS ==========
+        // RESPALDOS 
         $archivos = File::files(storage_path('app/respaldo'));
 
         $ultimo = null;
@@ -55,10 +60,10 @@ class RespaldoController extends Controller
             }
         }
 
-        // ========== BITÁCORA ==========
+        //logs
         $logs = logs::with('user')->latest()->take(10)->get();
 
-        return view('admin.dashboard', compact('ultimo', 'horaProgramada', 'logs'));
+        return view('admin.dashboard', compact('ultimo', 'horaProgramada', 'logs', 'totalAdministradores', 'totalDocentes', 'totalTutores', 'totalAlumnos'));
     }
 
     /**

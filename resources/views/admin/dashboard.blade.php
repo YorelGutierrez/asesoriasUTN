@@ -15,31 +15,20 @@
                 <h5 class="fw-semibold mb-3">Total de usuarios</h5>
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item d-flex justify-content-between align-items-start">
-                        <div>
-                            <div class="fw-semibold">Administradores</div>
-                        </div>
-                        <span class="badge rounded-pill text-bg-success"><i class="bi bi-person-fill"></i> 3</span>
+                        <div class="fw-semibold">Administradores</div>
+                        <span class="badge rounded-pill text-bg-success"><i class="bi bi-person-fill"></i> {{ $totalAdministradores }}</span>
                     </li>
-
                     <li class="list-group-item d-flex justify-content-between align-items-start">
-                        <div>
-                            <div class="fw-semibold">Docentes</div>
-                        </div>
-                        <span class="badge rounded-pill text-bg-success"><i class="bi bi-person-fill"></i> 8</span>
+                        <div class="fw-semibold">Docentes</div>
+                        <span class="badge rounded-pill text-bg-success"><i class="bi bi-person-fill"></i> {{ $totalDocentes }}</span>
                     </li>
-
                     <li class="list-group-item d-flex justify-content-between align-items-start">
-                        <div>
-                            <div class="fw-semibold">Tutores</div>
-                        </div>
-                        <span class="badge rounded-pill text-bg-success"><i class="bi bi-person-fill"></i> 5</span>
+                        <div class="fw-semibold">Tutores</div>
+                        <span class="badge rounded-pill text-bg-success"><i class="bi bi-person-fill"></i> {{ $totalTutores }}</span>
                     </li>
-
                     <li class="list-group-item d-flex justify-content-between align-items-start">
-                        <div>
-                            <div class="fw-semibold">Alumnos</div>
-                        </div>
-                        <span class="badge rounded-pill text-bg-success"><i class="bi bi-person-fill"></i> 120</span>
+                        <div class="fw-semibold">Alumnos</div>
+                        <span class="badge rounded-pill text-bg-success"><i class="bi bi-person-fill"></i> {{ $totalAlumnos }}</span>
                     </li>
                 </ul>
             </div>
@@ -89,7 +78,6 @@
 </div>
 
 <div class="row mb-4 align-items-stretch">
-    <!-- BITÁCORA -->
     <div class="col-md-6">
         <div class="card shadow-sm border-0 rounded-4 h-100">
             <div class="card-body p-4 d-flex flex-column">
@@ -97,8 +85,21 @@
                     <h5 class="fw-semibold mb-0">Bitácora de actividad</h5>
                     <button id="btnLimpiarLogs" class="btn btn-danger btn-sm rounded-pill">Limpiar todo</button>
                 </div>
-                <div id="bitacora" class="flex-grow-1 pe-2" style="height: 255px; overflow-y: auto; display: block;">
-                    <div class="text-center text-muted py-3">Cargando...</div>
+                <div id="bitacora" class="flex-grow-1 pe-2" style="max-height: 220px; overflow-y: auto;">
+                    <!-- Los logs se cargarán dinámicamente aquí -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ACCIONES DE GESTIÓN -->
+    <div class="col-md-6">
+        <div class="card shadow-sm border-0 rounded-4 h-100">
+            <div class="card-body p-4">
+                <h5 class="fw-semibold mb-4">Gestión del sistema | Acciones rapidas</h5>
+                <div class="d-grid gap-2">
+                    <a href="{{ route('gestion', ['tab' => 'alumnos']) }}" class="btn-principal">Gestionar alumnos</a>
+                    <a href="{{ route('gestion', ['tab' => 'grupos']) }}" class="btn-principal">Gestionar grupos</a>
+                    <a href="{{ route('gestion', ['tab' => 'docentes']) }}" class="btn-principal">Gestionar docentes</a>
                 </div>
             </div>
         </div>
@@ -145,34 +146,34 @@
 </div>
 <script src="{{ asset('js/logs.js') }}"></script>
 <script>
-function cargarLogs() {
-    fetch('/api/logs', {
-        headers: {
-            'Authorization': 'Bearer ' + getCookie('jwt_token'),
-            'Accept': 'application/json'
-        }
-    })
-    .then(res => res.json())
-    .then(logs => {
-        const container = document.getElementById('bitacora');
-        if (!container) return;
-        container.innerHTML = '';
+    function cargarLogs() {
+        fetch('/api/logs', {
+                headers: {
+                    'Authorization': 'Bearer ' + getCookie('jwt_token'),
+                    'Accept': 'application/json'
+                }
+            })
+            .then(res => res.json())
+            .then(logs => {
+                const container = document.getElementById('bitacora');
+                if (!container) return;
+                container.innerHTML = '';
 
-        // LIMITAR A 3 REGISTROS VISIBLES (el resto se verá con scroll)
-        const logsMostrar = logs.slice(0, 5);
+                // LIMITAR A 3 REGISTROS VISIBLES (el resto se verá con scroll)
+                const logsMostrar = logs.slice(0, 5);
 
-        logsMostrar.forEach(log => {
-            let nombreUsuario = 'Sistema';
-            let fotoUrl = 'https://ui-avatars.com/api/?name=Sistema&background=e9ecef&color=343a40';
-            if (log.user) {
-                const nombres = [log.user.nombres, log.user.apellido_paterno, log.user.apellido_materno].filter(Boolean).join(' ');
-                nombreUsuario = nombres || 'Usuario';
-                fotoUrl = log.user.foto_perfil ? log.user.foto_perfil : `https://ui-avatars.com/api/?name=${encodeURIComponent(nombreUsuario)}&background=e9ecef&color=343a40`;
-            }
+                logsMostrar.forEach(log => {
+                    let nombreUsuario = 'Sistema';
+                    let fotoUrl = 'https://ui-avatars.com/api/?name=Sistema&background=e9ecef&color=343a40';
+                    if (log.user) {
+                        const nombres = [log.user.nombres, log.user.apellido_paterno, log.user.apellido_materno].filter(Boolean).join(' ');
+                        nombreUsuario = nombres || 'Usuario';
+                        fotoUrl = log.user.foto_perfil ? log.user.foto_perfil : `https://ui-avatars.com/api/?name=${encodeURIComponent(nombreUsuario)}&background=e9ecef&color=343a40`;
+                    }
 
-            const item = document.createElement('div');
-            item.className = "d-flex align-items-start mb-3 border-bottom pb-2";
-            item.innerHTML = `
+                    const item = document.createElement('div');
+                    item.className = "d-flex align-items-start mb-3 border-bottom pb-2";
+                    item.innerHTML = `
                 <img src="${fotoUrl}" class="rounded-circle me-3 mt-1" width="36" height="36">
                 <div class="flex-grow-1">
                     <div class="d-flex justify-content-between align-items-center">
@@ -186,27 +187,27 @@ function cargarLogs() {
                 </button>
             `;
 
-            const deleteBtn = item.querySelector('.eliminar-log');
-            deleteBtn.addEventListener('click', () => {
-                const logId = deleteBtn.dataset.id;
-                fetch(`/api/logs/${logId}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Authorization': 'Bearer ' + getCookie('jwt_token'),
-                        'Accept': 'application/json'
-                    }
-                })
-                .then(() => item.remove())
-                .catch(err => console.error(err));
-            });
+                    const deleteBtn = item.querySelector('.eliminar-log');
+                    deleteBtn.addEventListener('click', () => {
+                        const logId = deleteBtn.dataset.id;
+                        fetch(`/api/logs/${logId}`, {
+                                method: 'DELETE',
+                                headers: {
+                                    'Authorization': 'Bearer ' + getCookie('jwt_token'),
+                                    'Accept': 'application/json'
+                                }
+                            })
+                            .then(() => item.remove())
+                            .catch(err => console.error(err));
+                    });
 
-            container.appendChild(item);
-        });
-    })
-    .catch(err => console.error(err));
-}
+                    container.appendChild(item);
+                });
+            })
+            .catch(err => console.error(err));
+    }
 
-document.addEventListener('DOMContentLoaded', cargarLogs);
+    document.addEventListener('DOMContentLoaded', cargarLogs);
 </script>
 
 <script>
@@ -223,19 +224,19 @@ document.addEventListener('DOMContentLoaded', cargarLogs);
     }
 
     fetch('/api/me', {
-        headers: {
-            'Authorization': 'Bearer ' + getCookie('jwt_token')
-        }
-    })
-    .then(res => res.json())
-    .then(data => {
-        console.log('JWT funcionando:', data);
-        document.getElementById('nombreUsuario').innerText = data.nombres;
-    })
-    .catch(err => {
-        console.error('Error JWT:', err);
-        document.getElementById('nombreUsuario').innerText = 'Administrador';
-    });
+            headers: {
+                'Authorization': 'Bearer ' + getCookie('jwt_token')
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            console.log('JWT funcionando:', data);
+            document.getElementById('nombreUsuario').innerText = data.nombres;
+        })
+        .catch(err => {
+            console.error('Error JWT:', err);
+            document.getElementById('nombreUsuario').innerText = 'Administrador';
+        });
 </script>
 
 @endsection

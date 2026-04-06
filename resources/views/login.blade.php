@@ -126,7 +126,7 @@
                        name="password" placeholder="Ingresa tu contraseña" required>
             </div>
 
-            <button type="submit" class="btn btn-success w-100 py-2 fw-semibold" style="background-color: #3FD4A4; border-color: #3FD4A4;">
+            <button type="submit" class="btn-principal">
                 <i class="bi bi-box-arrow-in-right me-2"></i>Iniciar sesión
             </button>
         </form>

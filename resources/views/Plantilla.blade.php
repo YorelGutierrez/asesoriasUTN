@@ -149,7 +149,7 @@
             <i class="bi bi-clipboard2-check-fill" style="font-size: 18px;"></i> Roles y permisos
         </a>
         <a href="{{ route('gestion') }}" class="{{ request()->routeIs('gestion') ? 'activo' : '' }}">
-            <i class="bi bi-person-workspace" style="font-size: 18px;"></i> Gestión administrativa
+            <i class="bi bi-person-workspace" style="font-size: 18px;"></i> Gestión admin.
         </a>
         @endif
 

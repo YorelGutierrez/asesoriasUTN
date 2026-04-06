@@ -67,7 +67,6 @@ class RegistroController extends Controller
                 return redirect()->route('alumno.dashboard');
         }
 
-        // Si llegamos aquí, el rol no es válido
         Auth::logout();
         return redirect()->route('login')->withErrors([
             'email' => 'Rol de usuario no válido',
