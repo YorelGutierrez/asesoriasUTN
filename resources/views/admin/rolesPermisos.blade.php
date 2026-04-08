@@ -5,9 +5,7 @@
 <link rel="stylesheet" href="{{ asset('estilos/titulos.css') }}">
 
 <div class="titulo">
-    <h1>
-        Roles y permisos
-    </h1>
+    <h1>Roles y permisos</h1>
 </div>
 
 <!-- CONTENEDOR SUPERIOR -->
@@ -129,13 +127,6 @@
                     <h5 class="fw-semibold mb-0">Usuarios registrados</h5>
                 </div>
 
-                @if(session('success'))
-                    <div class="alert alert-success alert-dismissible fade show" role="alert">
-                        {{ session('success') }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                @endif
-
                 <div class="table-responsive">
                     <table class="table table-hover align-middle">
                         <thead class="table-light">
@@ -192,20 +183,43 @@
                                 </td>
                                 <td>
                                     <div class="d-flex flex-wrap gap-1">
-                                        <a href="#" class="btn btn-outline-warning btn-sm">Editar</a>
-                                        <a href="#" class="btn btn-outline-danger btn-sm">Eliminar</a>
+                                        {{-- EDITAR --}}
+                                        @if($usuario->rol == 'alumno')
+                                            <a href="{{ route('alumnos.edit', $usuario->alumno->id ?? $usuario->id) }}" class="btn btn-outline-warning btn-sm">Editar</a>
+                                        @elseif($usuario->rol == 'docente')
+                                            <a href="{{ route('docentes.edit', $usuario->docente->id ?? $usuario->id) }}" class="btn btn-outline-warning btn-sm">Editar</a>
+                                        @else
+                                            <a href="#" class="btn btn-outline-warning btn-sm disabled">Editar</a>
+                                        @endif
+                                        
+                                        {{-- ELIMINAR (solo para alumnos y docentes) --}}
+                                        @if($usuario->rol == 'alumno')
+                                            <form action="{{ route('alumnos.destroy', $usuario->alumno->id ?? $usuario->id) }}" method="POST" class="d-inline eliminar-alumno">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-outline-danger btn-sm">Eliminar</button>
+                                            </form>
+                                        @elseif($usuario->rol == 'docente')
+                                            <form action="{{ route('docentes.destroy', $usuario->docente->id ?? $usuario->id) }}" method="POST" class="d-inline eliminar-docente">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-outline-danger btn-sm">Eliminar</button>
+                                            </form>
+                                        @endif
+                                        
+                                        {{-- BLOQUEAR / DESBLOQUEAR --}}
                                         @if($usuario->estado)
-                                            <form action="{{ route('usuarios.toggleBlock', $usuario->id) }}" method="POST" class="d-inline">
+                                            <form action="{{ route('usuarios.toggleBlock', $usuario->id) }}" method="POST" class="d-inline toggle-block">
                                                 @csrf
                                                 <button type="submit" class="btn btn-outline-success btn-sm">Bloquear</button>
                                             </form>
                                         @else
-                                            <form action="{{ route('usuarios.toggleBlock', $usuario->id) }}" method="POST" class="d-inline">
+                                            <form action="{{ route('usuarios.toggleBlock', $usuario->id) }}" method="POST" class="d-inline toggle-block">
                                                 @csrf
                                                 <button type="submit" class="btn btn-outline-primary btn-sm">Desbloquear</button>
                                             </form>
                                         @endif
-                                    </div>
+                                    </div>  
                                 </td>
                             </tr>
                             @empty
@@ -221,4 +235,95 @@
     </div>
 </div>
 
-@endsection()
+<script>
+    // Alerta para eliminar alumno
+    document.querySelectorAll('.eliminar-alumno').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            Swal.fire({
+                title: '¿Eliminar alumno?',
+                text: 'Esta acción no se puede deshacer',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        });
+    });
+
+    // Alerta para eliminar docente
+    document.querySelectorAll('.eliminar-docente').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            Swal.fire({
+                title: '¿Eliminar docente?',
+                text: 'Esta acción no se puede deshacer',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        });
+    });
+
+    // Alerta para bloquear/desbloquear
+    document.querySelectorAll('.toggle-block').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const action = this.querySelector('button').innerText;
+            const title = action === 'Bloquear' ? '¿Bloquear cuenta?' : '¿Desbloquear cuenta?';
+            const text = action === 'Bloquear' ? 'El usuario no podrá iniciar sesión' : 'El usuario podrá iniciar sesión nuevamente';
+            
+            Swal.fire({
+                title: title,
+                text: text,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: action === 'Bloquear' ? '#d33' : '#28a745',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Sí, ' + action.toLowerCase(),
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        });
+    });
+</script>
+
+@if(session('success'))
+<script>
+    Swal.fire({
+        icon: 'success',
+        title: '¡Éxito!',
+        text: '{{ session('success') }}',
+        confirmButtonColor: '#3085d6'
+    });
+</script>
+@endif
+
+@if(session('error'))
+<script>
+    Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: '{{ session('error') }}',
+        confirmButtonColor: '#d33'
+    });
+</script>
+@endif
+
+@endsection

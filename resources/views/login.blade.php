@@ -133,7 +133,6 @@
             </div>
         </div>
     </div>
-
     @if(session('error'))
     <script>
         Swal.fire({
@@ -145,6 +144,18 @@
         });
     </script>
     @endif
+
+    @if(session('warning'))
+        <script>
+            Swal.fire({
+                icon: 'warning',
+                title: 'Atención',
+                text: '{{ session('warning') }}',
+                confirmButtonColor: '#ffc107',
+                confirmButtonText: 'Entendido'
+            });
+        </script>
+        @endif
 
     @if($errors->has('email') && !session('error'))
     <script>

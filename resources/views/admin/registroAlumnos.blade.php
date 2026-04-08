@@ -4,6 +4,7 @@
 
 <link rel="stylesheet" href="{{ asset('estilos/titulos.css') }}">
 <link rel="stylesheet" href="{{ asset('estilos/botones.css') }}">
+<link rel="stylesheet" href="{{ asset('estilos/sweetalert.css') }}">
 
 <div class="titulo">
     <h1>Registro de Alumno</h1>
@@ -62,7 +63,7 @@
                         <select class="form-control @error('carrera_id') is-invalid @enderror" name="carrera_id">
                             <option value="">Seleccionar carrera</option>
                             @foreach($carreras as $carrera)
-                                <option value="{{ $carrera->id }}" {{ old('carrera_id') == $carrera->id ? 'selected' : '' }}>
+                                <option value="{{ $carrera->id }}">
                                     {{ $carrera->nombre }}
                                 </option>
                             @endforeach
@@ -139,12 +140,16 @@
                 </div>
 
                 {{-- Botones --}}
-                <div class="row mt-4">
-                    <div class="col-md-6 mb-2 mb-md-0">
-                        <button type="submit" class="btn-principal">Registrar</button>
+                <div class="row mt-3 g-2">
+                    <div class="col-12 col-md-6">
+                        <button type="submit" class="btn-principal w-100" style="padding: 10px 20px; font-size: 16px;">
+                            Registrar
+                        </button>
                     </div>
-                    <div class="col-md-6">
-                        <button type="button" class="btn-secundario" onclick="window.history.back();">Cancelar</button>
+                    <div class="col-12 col-md-6">
+                        <button type="button" class="btn-secundario w-100" style="padding: 10px 20px; font-size: 16px;" onclick="window.history.back();">
+                            Cancelar
+                        </button>
                     </div>
                 </div>
             </form>
@@ -152,5 +157,39 @@
         </div>
     </div>
 </div>
+
+<script>
+    // Alerta de éxito
+    @if(session('success'))
+    Swal.fire({
+        icon: 'success',
+        title: '¡Registrado!',
+        text: '{{ session('success') }}',
+        confirmButtonColor: '#3085d6',
+        confirmButtonText: 'Aceptar'
+    });
+    @endif
+
+    // Alerta de error general
+    @if(session('error'))
+    Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: '{{ session('error') }}',
+        confirmButtonColor: '#d33',
+        confirmButtonText: 'Aceptar'
+    });
+    @endif
+
+    // Alerta de errores de validación
+    @if($errors->any())
+    Swal.fire({
+        icon: 'error',
+        title: 'Errores en el formulario',
+        confirmButtonColor: '#d33',
+        confirmButtonText: 'Aceptar'
+    });
+    @endif
+</script>
 
 @endsection
