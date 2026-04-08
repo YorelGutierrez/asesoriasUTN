@@ -4,6 +4,7 @@
 
 <link rel="stylesheet" href="{{ asset('estilos/titulos.css') }}">
 <link rel="stylesheet" href="{{ asset('estilos/botones.css') }}">
+<link rel="stylesheet" href="{{ asset('estilos/sweetalert.css') }}">
 
 <div class="titulo">
     <h1>Registro de Docente</h1>
@@ -62,7 +63,7 @@
                         <select class="form-control @error('carrera_id') is-invalid @enderror" name="carrera_id">
                             <option value="">Seleccionar carrera</option>
                             @foreach($carreras as $carrera)
-                                <option value="{{ $carrera->id }}" {{ old('carrera_id') == $carrera->id ? 'selected' : '' }}>
+                                <option value="{{ $carrera->id }}">
                                     {{ $carrera->nombre }}
                                 </option>
                             @endforeach

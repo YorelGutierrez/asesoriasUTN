@@ -27,7 +27,14 @@ class AlumnoController extends Controller
             'apellido_paterno' => 'required|string|max:255',
             'apellido_materno' => 'nullable|string|max:255',
             'email' => 'required|email|ends_with:@utnay.edu.mx|unique:users,email',
-            'password' => 'required|string|min:6|confirmed',
+            'password' => [
+                'required',
+                'string',
+                'min:6',
+                'confirmed',
+                'not_in:12345678',
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/'
+            ],
             'fecha_nacimiento' => 'required|date|before:today',
             'telefono' => 'required|string|regex:/^[0-9]{10}$/',
             'matricula' => 'required|string|unique:alumnos,matricula',
@@ -36,16 +43,38 @@ class AlumnoController extends Controller
             'cuatrimestre' => 'nullable|integer|min:1|max:12',
             'foto_perfil' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ], [
+            'nombres.required' => 'El campo nombres es obligatorio.',
+            'nombres.max' => 'El campo nombres no puede tener más de 255 caracteres.',
+            'apellido_paterno.required' => 'El campo apellido paterno es obligatorio.',
+            'apellido_paterno.max' => 'El campo apellido paterno no puede tener más de 255 caracteres.',
+            'email.required' => 'El correo electrónico es obligatorio.',
+            'email.email' => 'Ingresa un correo electrónico válido.',
             'email.ends_with' => 'El correo debe ser del dominio @utnay.edu.mx',
+            'email.unique' => 'Este correo electrónico ya está registrado.',
+            'fecha_nacimiento.date' => 'Ingresa una fecha de nacimiento válida.',
+            'fecha_nacimiento.before' => 'La fecha de nacimiento no puede ser futura.',
+            'telefono.regex' => 'El teléfono debe tener exactamente 10 dígitos.',
+            'matricula.required' => 'La matrícula es obligatoria.',
+            'matricula.unique' => 'Esta matrícula ya está registrada.',
+            'carrera_id.required' => 'Debes seleccionar una carrera.',
+            'carrera_id.exists' => 'La carrera seleccionada no existe.',
+            'grupo_id.exists' => 'El grupo seleccionado no existe.',
+            'cuatrimestre.integer' => 'El cuatrimestre debe ser un número entero.',
+            'cuatrimestre.min' => 'El cuatrimestre debe ser al menos 1.',
+            'cuatrimestre.max' => 'El cuatrimestre no puede ser mayor a 12.',
             'foto_perfil.image' => 'El archivo debe ser una imagen.',
             'foto_perfil.mimes' => 'La imagen debe ser de tipo: jpeg, png, jpg, gif.',
             'foto_perfil.max' => 'La imagen no debe pesar más de 2MB.',
+            'password.required' => 'La contraseña es obligatoria.',
+            'password.min' => 'La contraseña debe tener al menos 6 caracteres.',
+            'password.confirmed' => 'Las contraseñas no coinciden.',
+            'password.not_in' => 'La contraseña no puede ser "12345678". Elige una contraseña más segura.',
+            'password.regex' => 'La contraseña debe contener al menos una mayúscula, una minúscula y un número.',
         ]);
 
         try {
             DB::beginTransaction();
 
-            // Guardar foto
             $fotoPath = null;
             if ($request->hasFile('foto_perfil')) {
                 $fotoPath = $request->file('foto_perfil')->store('fotos_perfil', 'public');
@@ -73,7 +102,10 @@ class AlumnoController extends Controller
 
             DB::commit();
 
-            return redirect()->route('alumnos.index')->with('success', 'Alumno registrado correctamente');
+            // REGISTRAR LOG
+            registrar_log('CREAR', 'Alumno: ' . $user->nombres . ' ' . $user->apellido_paterno . ' | Matrícula: ' . $request->matricula, 'alumnos');
+
+            return redirect()->route('gestion', ['tab' => 'alumnos'])->with('success', 'Alumno registrado correctamente');
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -94,77 +126,79 @@ class AlumnoController extends Controller
     }
 
     public function edit($id)
-{
-    $alumno = alumnos::with('user')->findOrFail($id);
-    $carreras = carreras::all();
-    $grupos = grupos::all();
-    return view('admin.actualizarAlumno', compact('alumno', 'carreras', 'grupos'));
-}
+    {
+        $alumno = alumnos::with('user')->findOrFail($id);
+        $carreras = carreras::all();
+        $grupos = grupos::all();
+        return view('admin.actualizarAlumno', compact('alumno', 'carreras', 'grupos'));
+    }
 
     public function update(Request $request, $id)
-{
-    $alumno = alumnos::findOrFail($id);
-    $user = $alumno->user;
+    {
+        $alumno = alumnos::findOrFail($id);
+        $user = $alumno->user;
 
-    $request->validate([
-        'nombres' => 'required|string|max:255',
-        'apellido_paterno' => 'required|string|max:255',
-        'apellido_materno' => 'nullable|string|max:255',
-        'email' => 'required|email|ends_with:@utnay.edu.mx|unique:users,email,' . $user->id,
-        'fecha_nacimiento' => 'nullable|date|before:today',
-        'telefono' => 'nullable|string|regex:/^[0-9]{10}$/',
-        'matricula' => 'required|string|unique:alumnos,matricula,' . $alumno->id,
-        'carrera_id' => 'required|exists:carreras,id',
-        'grupo_id' => 'nullable|exists:grupos,id',
-        'cuatrimestre' => 'nullable|integer|min:1|max:12',
-        'foto_perfil' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        'password' => 'nullable|string|min:6|confirmed',
-    ]);
+        $request->validate([
+            'nombres' => 'required|string|max:255',
+            'apellido_paterno' => 'required|string|max:255',
+            'apellido_materno' => 'nullable|string|max:255',
+            'email' => 'required|email|ends_with:@utnay.edu.mx|unique:users,email,' . $user->id,
+            'fecha_nacimiento' => 'nullable|date|before:today',
+            'telefono' => 'nullable|string|regex:/^[0-9]{10}$/',
+            'matricula' => 'required|string|unique:alumnos,matricula,' . $alumno->id,
+            'carrera_id' => 'required|exists:carreras,id',
+            'grupo_id' => 'nullable|exists:grupos,id',
+            'cuatrimestre' => 'nullable|integer|min:1|max:12',
+            'foto_perfil' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'password' => 'nullable|string|min:6|confirmed',
+        ]);
 
-    try {
-        DB::beginTransaction();
+        try {
+            DB::beginTransaction();
 
-        // Actualizar foto
-        if ($request->hasFile('foto_perfil')) {
-            if ($user->foto_perfil) {
-                Storage::disk('public')->delete($user->foto_perfil);
+            if ($request->hasFile('foto_perfil')) {
+                if ($user->foto_perfil) {
+                    Storage::disk('public')->delete($user->foto_perfil);
+                }
+                $fotoPath = $request->file('foto_perfil')->store('fotos_perfil', 'public');
+                $user->foto_perfil = $fotoPath;
             }
-            $fotoPath = $request->file('foto_perfil')->store('fotos_perfil', 'public');
-            $user->foto_perfil = $fotoPath;
+
+            $user->update([
+                'nombres' => $request->nombres,
+                'apellido_paterno' => $request->apellido_paterno,
+                'apellido_materno' => $request->apellido_materno,
+                'email' => $request->email,
+                'fecha_nacimiento' => $request->fecha_nacimiento,
+                'telefono' => $request->telefono,
+            ]);
+
+            if ($request->filled('password')) {
+                $user->password = Hash::make($request->password);
+                $user->save();
+            } else {
+                $user->save();
+            }
+
+            $alumno->update([
+                'matricula' => $request->matricula,
+                'carrera_id' => $request->carrera_id,
+                'grupo_id' => $request->grupo_id,
+                'cuatrimestre' => $request->cuatrimestre,
+            ]);
+
+            DB::commit();
+
+            // REGISTRAR LOG
+            registrar_log('EDITAR', 'Alumno: ' . $user->nombres . ' ' . $user->apellido_paterno . ' | Matrícula: ' . $request->matricula, 'alumnos');
+
+            return redirect()->route('gestion', ['tab' => 'alumnos'])->with('success', 'Alumno actualizado correctamente');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Error: ' . $e->getMessage());
         }
-
-        $user->update([
-            'nombres' => $request->nombres,
-            'apellido_paterno' => $request->apellido_paterno,
-            'apellido_materno' => $request->apellido_materno,
-            'email' => $request->email,
-            'fecha_nacimiento' => $request->fecha_nacimiento,
-            'telefono' => $request->telefono,
-        ]);
-
-        if ($request->filled('password')) {
-            $user->password = Hash::make($request->password);
-            $user->save();
-        } else {
-            $user->save();
-        }
-
-        $alumno->update([
-            'matricula' => $request->matricula,
-            'carrera_id' => $request->carrera_id,
-            'grupo_id' => $request->grupo_id,
-            'cuatrimestre' => $request->cuatrimestre,
-        ]);
-
-        DB::commit();
-
-        return redirect()->route('gestion')->with('success', 'Alumno actualizado correctamente');
-
-    } catch (\Exception $e) {
-        DB::rollBack();
-        return back()->with('error', 'Error: ' . $e->getMessage());
     }
-}
 
     public function destroy($id)
     {
@@ -173,6 +207,9 @@ class AlumnoController extends Controller
 
             $alumno = alumnos::with('user')->findOrFail($id);
             $user = $alumno->user;
+
+            // REGISTRAR LOG ANTES DE ELIMINAR
+            registrar_log('ELIMINAR', 'Alumno: ' . $user->nombres . ' ' . $user->apellido_paterno . ' | Matrícula: ' . $alumno->matricula, 'alumnos');
 
             if ($user->foto_perfil) {
                 Storage::disk('public')->delete($user->foto_perfil);
@@ -183,8 +220,7 @@ class AlumnoController extends Controller
 
             DB::commit();
 
-            return redirect()->route('gestion', ['tab' => 'alumnos'])
-            ->with('success', 'Alumno eliminado correctamente');
+            return redirect()->route('gestion', ['tab' => 'alumnos'])->with('success', 'Alumno eliminado correctamente');
 
         } catch (\Exception $e) {
             DB::rollBack();

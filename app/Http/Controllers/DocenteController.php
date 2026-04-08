@@ -30,7 +30,14 @@ class DocenteController extends Controller
             'apellido_paterno' => 'required|string|max:255',
             'apellido_materno' => 'nullable|string|max:255',
             'email' => 'required|email|ends_with:@utnay.edu.mx|unique:users,email',
-            'password' => 'required|string|min:6|confirmed',
+            'password' => [
+                'required',
+                'string',
+                'min:6',
+                'confirmed',
+                'not_in:12345678',
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/'
+            ],
             'fecha_nacimiento' => 'required|date|before:today',
             'telefono' => 'required|string|regex:/^[0-9]{10}$/',
             'numero_empleado' => 'required|string|unique:docentes,numero_empleado',
@@ -45,6 +52,8 @@ class DocenteController extends Controller
             'email.ends_with' => 'El correo debe ser del dominio @utnay.edu.mx',
             'password.required' => 'La contraseña es obligatoria.',
             'password.min' => 'La contraseña debe tener al menos 6 caracteres.',
+            'password.not_in' => 'La contraseña no puede ser "12345678". Elige una contraseña más segura.',
+            'password.regex' => 'La contraseña debe contener al menos una mayúscula, una minúscula y un número.',
             'password.confirmed' => 'Las contraseñas no coinciden.',
             'numero_empleado.required' => 'El número de empleado es obligatorio.',
             'numero_empleado.unique' => 'Este número de empleado ya está registrado.',
@@ -88,6 +97,7 @@ class DocenteController extends Controller
 
             DB::commit();
 
+            // REGISTRAR LOG - CREAR DOCENTE
             registrar_log('CREAR', 'Docente: ' . $user->nombres . ' ' . $user->apellido_paterno . ' | Núm. empleado: ' . $request->numero_empleado, 'docentes');
 
             return redirect()->route('gestion', ['tab' => 'docentes'])->with('success', 'Docente registrado correctamente');
@@ -155,7 +165,8 @@ class DocenteController extends Controller
 
             DB::commit();
 
-            registrar_log('EDITAR', 'Docente ID: ' . $id . ' | Núm. empleado: ' . $request->numero_empleado, 'docentes');
+            // REGISTRAR LOG - EDITAR DOCENTE
+            registrar_log('EDITAR', 'Docente: ' . $user->nombres . ' ' . $user->apellido_paterno . ' | Núm. empleado: ' . $request->numero_empleado, 'docentes');
 
             return redirect()->route('gestion', ['tab' => 'docentes'])->with('success', 'Docente actualizado correctamente');
 
@@ -174,7 +185,8 @@ class DocenteController extends Controller
             $docente = docentes::with('user')->findOrFail($id);
             $user = $docente->user;
 
-            registrar_log('ELIMINAR', 'Docente: ' . $docente->user->nombres . ' ' . $docente->user->apellido_paterno . ' | Núm. empleado: ' . $docente->numero_empleado, 'docentes');
+            // REGISTRAR LOG - ELIMINAR DOCENTE (antes de eliminar)
+            registrar_log('ELIMINAR', 'Docente: ' . $user->nombres . ' ' . $user->apellido_paterno . ' | Núm. empleado: ' . $docente->numero_empleado, 'docentes');
 
             $docente->materias()->detach();
 

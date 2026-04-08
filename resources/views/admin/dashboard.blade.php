@@ -3,6 +3,7 @@
 @section('contenido')
 <link rel="stylesheet" href="{{ asset('estilos/botones.css') }}">
 <link rel="stylesheet" href="{{ asset('estilos/titulos.css') }}">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <div class="titulo">
     <h1>Bienvenido <span id="nombreUsuario">...</span></h1>
@@ -144,6 +145,17 @@
         </div>
     </div>
 </div>
+@if(session('success'))
+<script>
+    Swal.fire({
+        icon: 'success',
+        title: '¡Bienvenido!',
+        text: '{{ session('success') }}',
+        confirmButtonColor: '#3085d6',
+        confirmButtonText: 'Aceptar'
+    });
+</script>
+@endif
 <script src="{{ asset('js/logs.js') }}"></script>
 <script>
     function cargarLogs() {

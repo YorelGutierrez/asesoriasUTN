@@ -3,6 +3,7 @@
 @section('contenido')
 <link rel="stylesheet" href="{{ asset('estilos/botones.css') }}">
 <link rel="stylesheet" href="{{ asset('estilos/titulos.css') }}">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <div class="titulo">
     <h1>Bienvenido {{ Auth::user()->nombres . ' ' . Auth::user()->apellido_paterno . ' ' . Auth::user()->apellido_materno }}!</h1>
@@ -158,5 +159,15 @@
         </div>
     </div>
 </div>
-
+@if(session('success'))
+<script>
+    Swal.fire({
+        icon: 'success',
+        title: '¡Bienvenido!',
+        text: '{{ session('success') }}',
+        confirmButtonColor: '#3085d6',
+        confirmButtonText: 'Aceptar'
+    });
+</script>
+@endif
 @endsection()
