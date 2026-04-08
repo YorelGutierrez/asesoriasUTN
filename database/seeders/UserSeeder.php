@@ -32,6 +32,27 @@ class UserSeeder extends Seeder
             'updated_at' => now(),
         ];
 
+        // Usuario docente
+User::create([
+    'nombres' => 'Juan',
+    'apellido_paterno' => 'Tovar',
+    'apellido_materno' => 'Sánchez',
+    'nickname' => 'juan.tovar',
+    'email' => 'tovar@utnay.edu.mx',
+    'password' => bcrypt('12345678'),
+    'edad' => 35,
+    'fecha_nacimiento' => '1989-05-20',
+    'telefono' => '3111234567',
+    'foto_perfil' => '/img/default-avatar.png',  // ✅ Ahora sí
+    'rol' => 'docente',
+    'estado' => true,
+    'email_verified_at' => now(),
+    'created_at' => now(),
+    'updated_at' => now(),
+]);
+
+
+
         $existingUser = User::where('email', $adminData['email'])
                             ->orWhere('nickname', $adminData['nickname'])
                             ->first();

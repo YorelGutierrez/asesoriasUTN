@@ -137,3 +137,9 @@ Route::middleware(['auth', 'rol:admin,docente'])->group(function () {
 
 // Cerrar sesión
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+
+// Agendar asesorías (solo docentes/admin)
+Route::middleware(['auth', 'role:docente,admin'])->group(function () {
+    Route::get('/agendar', [AsesoriaController::class, 'create'])->name('agenda');
+    Route::post('/agendar', [AsesoriaController::class, 'store'])->name('agenda.store');
+});
