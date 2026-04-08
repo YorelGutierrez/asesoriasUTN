@@ -122,9 +122,9 @@ Route::middleware(['auth', 'rol:admin,docente'])->group(function () {
         return view('auth.alumnos');
     })->name('alumnos');
 
-    Route::get('/agenda', function () {
-        return view('auth.agendar');
-    })->name('agenda');
+    //Route::get('/agenda', function () {
+     //   return view('auth.agendar');
+   // })->name('agenda');
 
     Route::get('/alumnos/expediente', function () {
         return view('auth.expediente_alumnos');
@@ -139,7 +139,7 @@ Route::middleware(['auth', 'rol:admin,docente'])->group(function () {
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 // Agendar asesorías (solo docentes/admin)
-Route::middleware(['auth', 'role:docente,admin'])->group(function () {
-    Route::get('/agendar', [AsesoriaController::class, 'create'])->name('agenda');
-    Route::post('/agendar', [AsesoriaController::class, 'store'])->name('agenda.store');
+Route::middleware(['auth', 'rol:docente,admin'])->group(function () {
+    Route::get('/agenda', [App\Http\Controllers\AsesoriaController::class, 'create'])->name('agenda');
+    Route::post('/agenda', [App\Http\Controllers\AsesoriaController::class, 'store'])->name('agenda.store');
 });

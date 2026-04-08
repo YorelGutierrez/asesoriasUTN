@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Asesoria;
 use App\Models\User;
 use App\Models\Grupo;
+use App\Models\carreras;
+use App\Models\materias;
+use App\Models\alumnos;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -13,45 +16,56 @@ class AsesoriaController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
-        $this->middleware('role:docente,admin'); // Solo docentes y admin
+        $this->middleware('rol:docente,admin'); // Solo docentes y admin
     }
 
     public function create()
     {
-        $alumnos = User::where('rol', 'alumno')->get();
+        // Para la vista agendar.blade.php
+        $carreras = carreras::all();
+        $materias = materias::all();
+        $alumnos = alumnos::with(['user', 'grupo'])->get();
         $grupos = Grupo::all();
         
-        return view('agendar', compact('alumnos', 'grupos'));
+        return view('agendar', compact('carreras', 'materias', 'alumnos', 'grupos'));
     }
 
     public function store(Request $request)
     {
+        // Validar los datos
         $request->validate([
-            'tipo' => 'required|in:individual,grupal',
-            'alumno_id' => 'required_if:tipo,individual|nullable|exists:users,id',
-            'grupo_id' => 'required_if:tipo,grupal|nullable|exists:grupos,id',
-            'materia' => 'required|string|max:255',
+            'carrera_id' => 'required|exists:carreras,id',
+            'tipo_asesoria' => 'required|in:individual,grupal',
+            'materia_id' => 'required|exists:materias,id',
             'tema' => 'required|string',
-            'modalidad' => 'required|in:presencial,virtual',
-            'fecha' => 'required|date|after_or_equal:today',
-            'hora' => 'required',
-            'preguntas' => 'nullable|string'
+            'fecha' => 'required|date',
+            'hora_inicio' => 'nullable',
+            'hora_fin' => 'nullable',
+            'alumnos' => 'required|array|min:1',
+            'alumnos.*' => 'exists:alumnos,id',
+            'modalidad' => 'required|in:presencial,virtual'
         ]);
 
-        $asesoria = Asesoria::create([
-            'docente_id' => Auth::id(),
-            'tipo' => $request->tipo,
-            'alumno_id' => $request->alumno_id,
-            'grupo_id' => $request->grupo_id,
-            'materia' => $request->materia,
-            'tema' => $request->tema,
-            'modalidad' => $request->modalidad,
-            'fecha' => $request->fecha,
-            'hora' => $request->hora,
-            'preguntas' => $request->preguntas,
-            'estado' => 'pendiente'
-        ]);
+        try {
+            // Crear la asesoría
+            $asesoria = Asesoria::create([
+                'docente_id' => Auth::id(),
+                'tipo' => $request->tipo_asesoria,
+                'alumno_id' => $request->tipo_asesoria == 'individual' ? ($request->alumnos[0] ?? null) : null,
+                'grupo_id' => null, // Si tienes grupo, puedes asignarlo
+                'materia' => materias::find($request->materia_id)->nombre,
+                'tema' => $request->tema,
+                'modalidad' => $request->modalidad,
+                'fecha' => $request->fecha,
+                'hora' => $request->hora_inicio,
+                'preguntas' => null,
+                'estado' => 'pendiente'
+            ]);
 
-        return redirect()->route('agenda')->with('success', 'Asesoría agendada correctamente');
+            return redirect()->route('agenda')->with('success', 'Asesoría agendada correctamente');
+
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Error al guardar: ' . $e->getMessage())->withInput();
+        }
     }
 }
