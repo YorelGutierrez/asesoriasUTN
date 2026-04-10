@@ -138,3 +138,16 @@ Route::middleware(['auth', 'rol:admin,docente'])->group(function () {
 
 // Cerrar sesión
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+
+
+// Resetear navegación (para el botón Inicio)
+Route::get('/reset-navigation', function () {
+    session()->forget('navigation_history');
+    return redirect()->route(
+        match(auth()->user()->rol) {
+            'admin' => 'admin.dashboard',
+            'docente' => 'docente.dashboard',
+            default => 'alumno.dashboard'
+        }
+    );
+})->name('reset.navigation');
