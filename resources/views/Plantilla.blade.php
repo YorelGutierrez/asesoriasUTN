@@ -288,6 +288,9 @@
         <a href="{{ route('solicitud') }}" class="{{ request()->routeIs('solicitud') ? 'activo' : '' }}">
             <i class="bi bi-calendar-plus-fill" style="font-size: 18px;"></i> Solicitud
         </a>
+        <a href="{{ route('agenda') }}" class="{{ request()->routeIs('agenda') ? 'activo' : '' }}">
+            <i class="bi bi-calendar-plus-fill" style="font-size: 18px;"></i> Agendar
+        </a>
         @endif
         <!-- Grupos y Alumnos: solo admin y docente -->
         @if(in_array(auth()->user()->rol, ['admin', 'docente']))

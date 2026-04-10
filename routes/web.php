@@ -31,12 +31,17 @@ Route::get('/registro', [RegistroController::class, 'showRegistrationForm'])->na
 Route::post('/login', [LoginController::class, 'login'])->name('login.procesar');
 Route::post('/registro', [RegistroController::class, 'register'])->name('registro.procesar');
 
+// Ruta AGENDA para TODOS los roles autenticados (ALUMNOS, DOCENTES, ADMIN)
+Route::middleware(['auth'])->group(function () {
+    Route::get('/agenda', [AsesoriaController::class, 'agendar'])->name('agenda');
+});
+
 // Rutas protegidas para el admin
 Route::middleware(['auth', 'rol:admin'])->group(function () {
     
     Route::get('/admin/dashboard', [RespaldoController::class, 'dashboard'])->name('admin.dashboard');
 
-    // ========== ROLES Y PERMISOS (con usuarios reales) ==========
+    // ========== ROLES Y PERMISOS ==========
     Route::get('/roles_permisos', function () {
         $usuarios = App\Models\User::with(['docente', 'alumno'])->get();
         return view('admin.rolesPermisos', compact('usuarios'));
@@ -71,7 +76,7 @@ Route::middleware(['auth', 'rol:admin'])->group(function () {
         return redirect()->back()->with('success', 'Registro eliminado');
     })->name('bitacora.eliminar');
 
-    // ========== RUTA DE BLOQUEO/DESBLOQUEO DE USUARIOS ==========
+    // ========== RUTA DE BLOQUEO/DESBLOQUEO ==========
     Route::post('/usuarios/bloquear/{id}', [UserController::class, 'toggleBlock'])->name('usuarios.toggleBlock');
 
     // ========== RUTA GESTIÓN ==========
@@ -121,8 +126,6 @@ Route::middleware(['auth', 'rol:admin,docente'])->group(function () {
     Route::get('/alumnos', function () {
         return view('auth.alumnos');
     })->name('alumnos');
-
-    Route::get('/agenda', [AsesoriaController::class, 'agendar'])->name('agenda');
 
     Route::get('/alumnos/expediente', function () {
         return view('auth.expediente_alumnos');

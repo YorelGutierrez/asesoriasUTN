@@ -18,15 +18,32 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class AsesoriaController extends Controller
 {
-    public function agendar()
-    {
-        $carreras = carreras::all();
-        $materias = materias::all();
-        $alumnos = alumnos::with(['user', 'grupo'])->get() ?? collect();
-        $docentes = docentes::with('user', 'carrera')->get();
-
-        return view('auth.agendar', compact('carreras', 'materias', 'alumnos', 'docentes'));
+   public function agendar()
+{
+    $carreras = carreras::all();
+    $materias = materias::all();
+    $user = auth()->user();
+    
+    // Cargar datos según el rol
+    if ($user->rol == 'alumno') {
+        // Alumno ve docentes
+        $docentes = docentes::with(['user', 'carrera'])->get();
+        $alumnos = collect(); // vacío
+        $tipoVista = 'alumno';
+    } elseif ($user->rol == 'docente') {
+        // Docente ve alumnos
+        $alumnos = alumnos::with(['user', 'grupo'])->get();
+        $docentes = collect(); // vacío
+        $tipoVista = 'docente';
+    } else {
+        // Admin ve alumnos (por defecto)
+        $alumnos = alumnos::with(['user', 'grupo'])->get();
+        $docentes = collect(); // vacío
+        $tipoVista = 'admin';
     }
+
+    return view('auth.agendar', compact('carreras', 'materias', 'alumnos', 'docentes', 'tipoVista'));
+}
     public function create()
     {
         $carreras = carreras::all();

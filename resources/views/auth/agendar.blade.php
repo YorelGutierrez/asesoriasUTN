@@ -14,30 +14,41 @@
     }
     
     .schedule-container {
+        width: 100%;
         max-width: 1800px;
         margin: 0 auto;
-        padding: 20px;
+        padding: 15px;
     }
     
-  .titulo {
-       display: flex;
-    width: 100%;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5); 
-    border-radius: 10px;
-    background: linear-gradient(to left, #00937f, #2c9f49);
-    color: #fff;
-    margin-bottom: 20px;
-    padding: 10px;
+    @media (max-width: 768px) {
+        .schedule-container { padding: 10px; }
     }
     
-    /* Tarjetas */
+    .titulo {
+        display: flex;
+        width: 100%;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5); 
+        border-radius: 10px;
+        background: linear-gradient(to left, #00937f, #2c9f49);
+        color: #fff;
+        margin-bottom: 20px;
+        padding: 10px;
+    }
+    
+    .titulo h1 { font-size: 1.5rem; }
+    
+    @media (max-width: 768px) { .titulo h1 { font-size: 1.2rem; } }
+    
     .card-moderno {
         background: white;
         border-radius: 16px;
-        padding: 24px;
+        padding: 20px;
         box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         border: 1px solid #e2e8f0;
+        margin-bottom: 20px;
     }
+    
+    @media (max-width: 768px) { .card-moderno { padding: 15px; } }
     
     .card-title {
         font-size: 1.25rem;
@@ -51,13 +62,22 @@
         padding-left: 15px;
     }
     
-    /* Pasos */
+    @media (max-width: 768px) { .card-title { font-size: 1rem; padding-left: 10px; } }
+    
     .steps-container {
         display: flex;
         gap: 20px;
         margin-bottom: 30px;
         border-bottom: 2px solid #e2e8f0;
         padding-bottom: 15px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    @media (max-width: 640px) {
+        .steps-container { gap: 10px; }
+        .step span { font-size: 12px; }
+        .step-number { width: 24px; height: 24px; font-size: 12px; }
     }
     
     .step {
@@ -68,9 +88,7 @@
         font-weight: 500;
     }
     
-    .step.active {
-        color: var(--verde-principal);
-    }
+    .step.active { color: var(--verde-principal); }
     
     .step-number {
         width: 30px;
@@ -83,19 +101,16 @@
         font-weight: bold;
     }
     
-    .step.active .step-number {
-        background: var(--verde-principal);
-        color: white;
-    }
+    .step.active .step-number { background: var(--verde-principal); color: white; }
     
-    /* Grid */
     .main-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 30px;
     }
     
-    /* Botones VERDES */
+    @media (max-width: 768px) { .main-grid { grid-template-columns: 1fr; gap: 20px; } }
+    
     .btn-agendar {
         background: linear-gradient(135deg, var(--verde-principal) 0%, var(--verde-oscuro) 100%);
         color: white;
@@ -126,13 +141,11 @@
         transition: all 0.3s ease;
     }
     
-    .btn-cancelar:hover {
-        background: #dc2626;
-        transform: translateY(-2px);
-    }
+    .btn-cancelar:hover { background: #dc2626; transform: translateY(-2px); }
     
-    /* Inputs con focus verde */
-    .search-box input, .topic-input, .modalidad-select {
+    @media (max-width: 480px) { .btn-agendar, .btn-cancelar { padding: 10px 20px; font-size: 14px; } }
+    
+    .search-box input, .topic-input, .modalidad-select, textarea {
         width: 100%;
         padding: 12px 16px;
         border: 1px solid #e2e8f0;
@@ -141,13 +154,12 @@
         transition: all 0.3s ease;
     }
     
-    .search-box input:focus, .topic-input:focus, .modalidad-select:focus {
+    .search-box input:focus, .topic-input:focus, .modalidad-select:focus, textarea:focus {
         border-color: var(--verde-principal);
         outline: none;
         box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
     }
     
-    /* Lista de asesores */
     .asesores-list {
         max-height: 400px;
         overflow-y: auto;
@@ -162,16 +174,18 @@
         cursor: pointer;
         transition: background 0.2s;
         border-radius: 10px;
+        flex-wrap: wrap;
+        gap: 10px;
     }
     
-    .asesor-item:hover {
-        background: var(--verde-bg);
+    @media (max-width: 480px) {
+        .asesor-item { flex-direction: column; text-align: center; }
+        .asesor-info h4 { font-size: 14px; }
+        .asesor-info p { font-size: 12px; }
     }
     
-    .asesor-item.selected {
-        background: var(--verde-bg);
-        border-left: 3px solid var(--verde-principal);
-    }
+    .asesor-item:hover { background: var(--verde-bg); }
+    .asesor-item.selected { background: var(--verde-bg); border-left: 3px solid var(--verde-principal); }
     
     .badge-disponible {
         background: #d1fae5;
@@ -182,13 +196,16 @@
         font-weight: 500;
     }
     
-    /* Calendario */
     .calendar-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
         margin-bottom: 20px;
+        flex-wrap: wrap;
+        gap: 10px;
     }
+    
+    .calendar-nav { display: flex; gap: 10px; }
     
     .calendar-nav button {
         background: #f3f4f6;
@@ -199,10 +216,7 @@
         transition: all 0.3s ease;
     }
     
-    .calendar-nav button:hover {
-        background: var(--verde-principal);
-        color: white;
-    }
+    .calendar-nav button:hover { background: var(--verde-principal); color: white; }
     
     .calendar-weekdays {
         display: grid;
@@ -219,6 +233,12 @@
         gap: 5px;
     }
     
+    @media (max-width: 480px) {
+        .calendar-days { gap: 2px; }
+        .calendar-day { font-size: 12px; }
+        .calendar-weekdays div { font-size: 11px; }
+    }
+    
     .calendar-day {
         aspect-ratio: 1;
         display: flex;
@@ -227,27 +247,14 @@
         border-radius: 10px;
         cursor: pointer;
         transition: all 0.2s;
+        font-size: 14px;
     }
     
-    .calendar-day:hover {
-        background: var(--verde-bg);
-    }
+    .calendar-day:hover { background: var(--verde-bg); }
+    .calendar-day.selected { background: var(--verde-principal); color: white; }
+    .calendar-day.past { opacity: 0.3; cursor: not-allowed; }
+    .calendar-day.weekend { color: #ef4444; }
     
-    .calendar-day.selected {
-        background: var(--verde-principal);
-        color: white;
-    }
-    
-    .calendar-day.past {
-        opacity: 0.3;
-        cursor: not-allowed;
-    }
-    
-    .calendar-day.weekend {
-        color: #ef4444;
-    }
-    
-    /* Horarios */
     .time-slots {
         margin-top: 20px;
         display: flex;
@@ -264,21 +271,12 @@
         transition: all 0.3s ease;
     }
     
-    .time-slot:hover {
-        border-color: var(--verde-principal);
-        background: var(--verde-bg);
-    }
+    @media (max-width: 480px) { .time-slot { padding: 6px 12px; font-size: 12px; } }
     
-    .time-slot.selected {
-        background: var(--verde-principal);
-        color: white;
-        border-color: var(--verde-principal);
-    }
+    .time-slot:hover { border-color: var(--verde-principal); background: var(--verde-bg); }
+    .time-slot.selected { background: var(--verde-principal); color: white; border-color: var(--verde-principal); }
     
-    /* Preguntas */
-    .questions-list {
-        margin-top: 20px;
-    }
+    .questions-list { margin-top: 20px; }
     
     .question-item {
         margin-bottom: 10px;
@@ -286,18 +284,19 @@
         background: var(--verde-bg);
         border-radius: 10px;
         transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 10px;
     }
     
-    .question-item:hover {
-        background: #d1fae5;
+    @media (max-width: 480px) {
+        .question-item { font-size: 13px; }
+        .question-item label { font-size: 13px; }
     }
     
-    .question-item input {
-        margin-right: 10px;
-        accent-color: var(--verde-principal);
-    }
+    .question-item:hover { background: #d1fae5; }
+    .question-item input { margin-right: 10px; accent-color: var(--verde-principal); }
     
-    /* Alertas */
     .alert-info {
         background: var(--verde-bg);
         border-left: 4px solid var(--verde-principal);
@@ -307,11 +306,7 @@
         color: var(--verde-oscuro);
     }
     
-    .error-message {
-        color: #ef4444;
-        font-size: 12px;
-        margin-top: 5px;
-    }
+    .error-message { color: #ef4444; font-size: 12px; margin-top: 5px; }
     
     .action-buttons {
         display: flex;
@@ -320,18 +315,24 @@
         margin-top: 30px;
         padding-top: 20px;
         border-top: 1px solid #e2e8f0;
+        flex-wrap: wrap;
     }
     
-    input[type="checkbox"] {
-        width: 18px;
-        height: 18px;
-        cursor: pointer;
-        accent-color: var(--verde-principal);
+    @media (max-width: 480px) {
+        .action-buttons { justify-content: center; }
+        .action-buttons button { width: 100%; }
+    }
+    
+    input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; accent-color: var(--verde-principal); }
+    
+    @media (max-width: 768px) {
+        label, p, .form-text, .alert-info { font-size: 14px; }
+        h4 { font-size: 16px; }
+        .badge-disponible { font-size: 10px; }
     }
 </style>
 
 <div class="schedule-container">
-    <!-- Barra verde exactamente como en la imagen -->
     <div class="titulo">
         <h1>Programación de Asesorías</h1>
     </div>
@@ -339,7 +340,7 @@
     <div class="steps-container">
         <div class="step active" id="step1-indicator">
             <div class="step-number">1</div>
-            <span>Seleccionar Asesor</span>
+            <span>Seleccionar {{ Auth::user()->rol == 'alumno' ? 'Docente' : (Auth::user()->rol == 'docente' ? 'Alumno' : 'Alumno') }}</span>
         </div>
         <div class="step" id="step2-indicator">
             <div class="step-number">2</div>
@@ -359,30 +360,64 @@
             <div>
                 <div class="card-moderno" id="step1-card">
                     <div class="card-title">
-                        <span>Seleccionar Asesor</span>
+                        <span>Seleccionar {{ Auth::user()->rol == 'alumno' ? 'Docente' : (Auth::user()->rol == 'docente' ? 'Alumno' : 'Alumno') }}</span>
                     </div>
                     
                     <div class="search-box">
-                        <input type="text" id="searchAsesor" placeholder="Buscar por nombre o materia...">
+                        <input type="text" id="searchAsesor" placeholder="Buscar por nombre...">
                     </div>
                     
                     <div class="asesores-list" id="asesoresList">
-                        @if(isset($docentes) && $docentes->count() > 0)
-                            @foreach($docentes as $docente)
-                            <div class="asesor-item" data-id="{{ $docente->id }}" data-nombre="{{ $docente->user->nombres }} {{ $docente->user->apellido_paterno }}">
-                                <div class="asesor-info">
-                                    <h4>{{ $docente->user->nombres }} {{ $docente->user->apellido_paterno }}</h4>
-                                    <p>{{ $docente->carrera ? $docente->carrera->nombre : 'Docente' }}</p>
+                        @if(Auth::user()->rol == 'alumno')
+                            {{-- Si es ALUMNO, mostrar DOCENTES --}}
+                            @if(isset($docentes) && $docentes->count() > 0)
+                                @foreach($docentes as $docente)
+                                <div class="asesor-item" data-id="{{ $docente->id }}" data-nombre="{{ $docente->user->nombres }} {{ $docente->user->apellido_paterno }}" data-tipo="docente">
+                                    <div class="asesor-info">
+                                        <h4>{{ $docente->user->nombres }} {{ $docente->user->apellido_paterno }}</h4>
+                                        <p>{{ $docente->carrera ? $docente->carrera->nombre : 'Docente' }}</p>
+                                    </div>
+                                    <div class="badge-disponible">Disponible</div>
                                 </div>
-                                <div class="badge-disponible">Disponible</div>
-                            </div>
-                            @endforeach
+                                @endforeach
+                            @else
+                                <div class="alert-info">No hay docentes registrados. Contacta al administrador.</div>
+                            @endif
+                        @elseif(Auth::user()->rol == 'docente')
+                            {{-- Si es DOCENTE, mostrar ALUMNOS --}}
+                            @if(isset($alumnos) && $alumnos->count() > 0)
+                                @foreach($alumnos as $alumno)
+                                <div class="asesor-item" data-id="{{ $alumno->id }}" data-nombre="{{ $alumno->user->nombres }} {{ $alumno->user->apellido_paterno }}" data-tipo="alumno">
+                                    <div class="asesor-info">
+                                        <h4>{{ $alumno->user->nombres }} {{ $alumno->user->apellido_paterno }}</h4>
+                                        <p>{{ $alumno->carrera ? $alumno->carrera->nombre : 'Alumno' }} - {{ $alumno->matricula }}</p>
+                                    </div>
+                                    <div class="badge-disponible">Disponible</div>
+                                </div>
+                                @endforeach
+                            @else
+                                <div class="alert-info">No hay alumnos registrados. Contacta al administrador.</div>
+                            @endif
                         @else
-                            <div class="alert-info">No hay docentes registrados. Contacta al administrador.</div>
+                            {{-- Si es ADMIN, mostrar ALUMNOS --}}
+                            @if(isset($alumnos) && $alumnos->count() > 0)
+                                @foreach($alumnos as $alumno)
+                                <div class="asesor-item" data-id="{{ $alumno->id }}" data-nombre="{{ $alumno->user->nombres }} {{ $alumno->user->apellido_paterno }}" data-tipo="alumno">
+                                    <div class="asesor-info">
+                                        <h4>{{ $alumno->user->nombres }} {{ $alumno->user->apellido_paterno }}</h4>
+                                        <p>{{ $alumno->carrera ? $alumno->carrera->nombre : 'Alumno' }} - {{ $alumno->matricula }}</p>
+                                    </div>
+                                    <div class="badge-disponible">Disponible</div>
+                                </div>
+                                @endforeach
+                            @else
+                                <div class="alert-info">No hay alumnos registrados. Contacta al administrador.</div>
+                            @endif
                         @endif
                     </div>
                     
-                    <input type="hidden" name="docente_id" id="docente_id" required>
+                    <input type="hidden" name="destinatario_id" id="destinatario_id" required>
+                    <input type="hidden" name="tipo_destinatario" id="tipo_destinatario" required>
                     <div class="error-message" id="docenteError"></div>
                 </div>
 
@@ -476,8 +511,9 @@
     document.getElementById('asesoriaForm').addEventListener('submit', function(e) {
         let isValid = true;
         
-        if (!document.getElementById('docente_id').value) {
-            document.getElementById('docenteError').textContent = 'Por favor, selecciona un asesor';
+        if (!document.getElementById('destinatario_id').value) {
+            document.getElementById('docenteError').textContent = 'Por favor, selecciona un ' + 
+                (@json(Auth::user()->rol == 'alumno' ? 'docente' : (Auth::user()->rol == 'docente' ? 'alumno' : 'alumno')));
             isValid = false;
         } else {
             document.getElementById('docenteError').textContent = '';
@@ -499,7 +535,12 @@
         
         if (!isValid) {
             e.preventDefault();
-            alert('Por favor, completa todos los campos requeridos');
+            Swal.fire({
+                icon: 'error',
+                title: 'Campos incompletos',
+                text: 'Por favor, completa todos los campos requeridos',
+                confirmButtonColor: '#d33'
+            });
         }
     });
     
@@ -526,7 +567,8 @@
         asesor.addEventListener('click', function() {
             document.querySelectorAll('.asesor-item').forEach(a => a.classList.remove('selected'));
             this.classList.add('selected');
-            document.getElementById('docente_id').value = this.dataset.id;
+            document.getElementById('destinatario_id').value = this.dataset.id;
+            document.getElementById('tipo_destinatario').value = this.dataset.tipo;
             document.getElementById('docenteError').textContent = '';
         });
     });
