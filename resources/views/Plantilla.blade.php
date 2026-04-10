@@ -108,94 +108,95 @@
 
     // Mapeo de nombres de rutas a etiquetas amigables
     $routeLabels = [
-        'admin.dashboard' => 'Inicio',
-        'docente.dashboard' => 'Inicio',
-        'alumno.dashboard' => 'Inicio',
-        'grupos' => 'Grupos',
-        'alumnos' => 'Alumnos',
-        'agenda' => 'Agendar',
-        'registro' => 'Registro de asesorías',
-        'historial' => 'Historial',
-        'roles_permisos' => 'Roles y permisos',
-        'gestion' => 'Gestión admin.',
-        'registro_alumnos' => 'Registro Alumnos',
-        'registro_docente' => 'Registro Docentes',
-        'solicitud' => 'Solicitud',
+    'admin.dashboard' => 'Inicio',
+    'docente.dashboard' => 'Inicio',
+    'alumno.dashboard' => 'Inicio',
+    'grupos' => 'Grupos',
+    'alumnos' => 'Alumnos',
+    'agenda' => 'Agendar',
+    'registro' => 'Registro de asesorías',
+    'historial' => 'Historial',
+    'roles_permisos' => 'Roles y permisos',
+    'gestion' => 'Gestión admin.',
+    'registro_alumnos' => 'Registro Alumnos',
+    'registro_docente' => 'Registro Docentes',
+    'solicitud' => 'Solicitud',
     ];
 
     // Construir breadcrumbs desde el historial de navegación
     if (!empty($navigationHistory)) {
-        foreach ($navigationHistory as $index => $navRoute) {
-            $label = $routeLabels[$navRoute] ?? ucfirst(str_replace('_', ' ', $navRoute));
-            
-            // El último es el actual (sin enlace)
-            if ($index === count($navigationHistory) - 1) {
-                $breadcrumbs[] = ['label' => $label];
-            } else {
-                $breadcrumbs[] = ['label' => $label, 'route' => $navRoute];
-            }
-        }
+    foreach ($navigationHistory as $index => $navRoute) {
+    $label = $routeLabels[$navRoute] ?? ucfirst(str_replace('_', ' ', $navRoute));
+
+    // El último es el actual (sin enlace)
+    if ($index === count($navigationHistory) - 1) {
+    $breadcrumbs[] = ['label' => $label];
     } else {
-        // Si no hay historial, mostrar solo la página actual
-        $currentLabel = $routeLabels[$routeName] ?? ucfirst(str_replace('_', ' ', $routeName));
-        $breadcrumbs = [['label' => $currentLabel]];
+    $breadcrumbs[] = ['label' => $label, 'route' => $navRoute];
+    }
+    }
+    } else {
+    // Si no hay historial, mostrar solo la página actual
+    $currentLabel = $routeLabels[$routeName] ?? ucfirst(str_replace('_', ' ', $routeName));
+    $breadcrumbs = [['label' => $currentLabel]];
     }
 
     // Casos especiales para submenús
     if ($routeName === 'registro_alumnos' || $routeName === 'registro_docente') {
-        $hasRegistros = false;
-        foreach ($breadcrumbs as $crumb) {
-            if ($crumb['label'] === 'Registros') {
-                $hasRegistros = true;
-                break;
-            }
-        }
-        
-        if (!$hasRegistros) {
-            $lastItem = array_pop($breadcrumbs);
-            $breadcrumbs[] = ['label' => 'Registros'];
-            $breadcrumbs[] = $lastItem;
-        }
+    $hasRegistros = false;
+    foreach ($breadcrumbs as $crumb) {
+    if ($crumb['label'] === 'Registros') {
+    $hasRegistros = true;
+    break;
+    }
+    }
+
+    if (!$hasRegistros) {
+    $lastItem = array_pop($breadcrumbs);
+    $breadcrumbs[] = ['label' => 'Registros'];
+    $breadcrumbs[] = $lastItem;
+    }
     }
     @endphp
 
     <div class="main-content" id="main-content">
 
-        <!-- NAV -->
+        <!-- Menú Superior -->
         <nav>
             <ul>
+                <!-- Icono del menú dentro del nav -->
                 <li class="menu-icon">
-                    <a href="javascript:void(0)" onclick="toggleMenu()">
-                        <i class="bi bi-list"></i>
-                    </a>
+                    <a href="javascript:void(0)" onclick="toggleMenu()"><i class="bi bi-list"></i> <span class="menu-title"></span></a>
                 </li>
 
+                <!-- Opciones posicionadas de lado izquierdo -->
                 <div class="nav-left">
-                    <li class="ExtrasMenu"><i class="bi bi-calendar-event-fill"></i></li>
-                    <li class="ExtrasMenu"><i class="bi bi-bell-fill"></i></li>
 
+                    <!-- Opciones extras -->
+                    <li class="ExtrasMenu"><i class="bi bi-calendar-event-fill"></i></li>
+                    <li class="ExtrasMenu"><i class="bi bi-bell-fill"></i></li><!-- Notificaciones -->
+
+                    <!--Apartados del perfil-->
                     <li class="perfil">
-                        <a style="color:white;">
-                            {{ Auth::user()->nombres . ' ' . Auth::user()->apellido_paterno }}
-                        </a>
-                        <img src="{{ Auth::user()->foto_url }}" class="perfil-img">
+                        <a style="color: white;"></i> {{ Auth::user()->nombres . ' ' . Auth::user()->apellido_paterno . ' ' . Auth::user()->apellido_materno }}</a>
+                        <img src="{{ Auth::user()->foto_url }}" alt="Perfil" class="perfil-img">
                     </li>
                 </div>
             </ul>
         </nav>
 
-<!-- BREADCRUMBS -->
-<div class="breadcrumb-container">
-    <ol class="custom-breadcrumb">
+        <!-- BREADCRUMBS -->
+        <div class="breadcrumb-container">
+            <ol class="custom-breadcrumb">
 
-        <li>
-            <a href="{{ route('reset.navigation') }}">
-                <i class="bi bi-house-door-fill"></i> Inicio
-            </a>
-        </li>
+                <li>
+                    <a href="{{ route('reset.navigation') }}">
+                        <i class="bi bi-house-door-fill"></i> Inicio
+                    </a>
+                </li>
 
-        @foreach($breadcrumbs as $index => $crumb)
-            @if($crumb['label'] !== 'Inicio')
+                @foreach($breadcrumbs as $index => $crumb)
+                @if($crumb['label'] !== 'Inicio')
                 <li class="separator">
                     <i class="bi bi-chevron-right"></i>
                 </li>
@@ -209,138 +210,150 @@
                     {{ $crumb['label'] }}
                     @endif
                 </li>
-            @endif
-        @endforeach
+                @endif
+                @endforeach
 
-    </ol>
-</div>
+            </ol>
+        </div>
 
         <section>
             @yield('contenido')
         </section>
 
-    <!-- DROPDOWN PERFIL -->
-    <div class="perfil-dropdown">
-        <div class="perfil-header"></div>
-        <img src="{{ Auth::user()->foto_url }}" alt="Perfil" class="perfil-foto">
-        <b>{{ Auth::user()->nombres }}</b>
-
-        <button onclick="translatePage('es')" class="lang-btn active" id="btn-es">🇪🇸 Español</button>
-        <button onclick="translatePage('en')" class="lang-btn" id="btn-en">🇺🇸 English</button>
-        <div id="google_translate_element" style="display:none;"></div>
-
-        @if(in_array(auth()->user()->rol, ['admin', 'docente']))
-        <a href="{{ route('historial') }}"><i class="bi bi-clock-history"></i> Historial</a>
-        @endif
-        <form method="POST" action="{{ route('logout') }}">
-            @csrf
-            <button class="cerrar-btn"><i class="bi bi-box-arrow-right"></i> Cerrar sesión</button>
-        </form>
-    </div>
-
-    <!-- Menú lateral -->
-    <aside id="menu-lateral" class="menu-lateral">
-        <div class="menu-header">
-            <a href="javascript:void(0)" class="close-btn" onclick="toggleMenu()">
-                <i class="bi bi-list"></i>
-            </a>
-            <span class="menu-title"></span>
-            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSpPReQfrDeeJiv0BuOf6r-eEUnb5Eos8DJTQ&s"
-                alt="Logo" class="menu-logo">
-        </div>
-
-        <a href="{{ route('reset.navigation') }}"
-            class="{{ request()->routeIs('admin.dashboard') || request()->routeIs('docente.dashboard') || request()->routeIs('alumno.dashboard') ? 'activo' : '' }}">
-            <i class="bi bi-house-fill"></i> {{ __('Inicio') }}
-        </a>
-        <!-- Alumnos -->
-        @if(auth()->user()->rol === 'alumno')
-        <a href="{{ route('solicitud') }}" class="{{ request()->routeIs('solicitud') ? 'activo' : '' }}">
-            <i class="bi bi-calendar-plus-fill" style="font-size: 18px;"></i> Solicitud
-        </a>
-        <a href="{{ route('agenda') }}" class="{{ request()->routeIs('agenda') ? 'activo' : '' }}">
-            <i class="bi bi-calendar-plus-fill" style="font-size: 18px;"></i> Agendar
-        </a>
-        @endif
-        <!-- Grupos y Alumnos: solo admin y docente -->
-        @if(in_array(auth()->user()->rol, ['admin', 'docente']))
-        <a href="{{ route('grupos') }}" class="{{ request()->routeIs('grupos') ? 'activo' : '' }}">
-            <i class="bi bi-people-fill"></i> Grupos
-        </a>
-        <a href="{{ route('alumnos') }}" class="{{ request()->routeIs('alumnos') ? 'activo' : '' }}">
-            <i class="bi bi-person-vcard-fill" style="font-size: 18px;"></i> Alumnos
-        </a>
-        <a href="{{ route('agenda') }}" class="{{ request()->routeIs('agenda') ? 'activo' : '' }}">
-            <i class="bi bi-calendar-plus-fill" style="font-size: 18px;"></i> Agendar
-        </a>
-        @endif
-        <!-- Solo Docente -->
-        @if(auth()->user()->rol === 'docente')
-        <a href="{{ route('registro') }}" class="{{ request()->routeIs('registro') ? 'activo' : '' }}">
-            <i class="bi bi-calendar-plus-fill" style="font-size: 18px;"></i> Registro de asesorias
-        </a>
-        @endif()
-        <!-- Roles y permisos: solo admin -->
-        @if(auth()->user()->rol === 'admin')
-        <a href="{{ route('roles_permisos') }}" class="{{ request()->routeIs('roles_permisos') ? 'activo' : '' }}">
-            <i class="bi bi-clipboard2-check-fill" style="font-size: 18px;"></i> Roles y permisos
-        </a>
-        <a href="{{ route('gestion') }}" class="{{ request()->routeIs('gestion') ? 'activo' : '' }}">
-            <i class="bi bi-person-workspace" style="font-size: 18px;"></i> Gestión admin.
-        </a>
-        @endif
-
-        <!-- Registros: solo admin -->
-        @if(auth()->user()->rol === 'admin')
-        <div class="menu-seccion">
-            <a href="#" class="menu-principal">
-                <span><i class="bi bi-person-fill-add" style="font-size: 18px;"></i> Registros</span>
-                <i class="bi bi-chevron-compact-down"></i>
-            </a>
-            <div class="subseccion">
-                <a href="{{ route('registro_alumnos') }}" class="{{ request()->routeIs('registro_alumnos') ? 'activo' : '' }}">
-                    Registro Alumnos
-                </a>
-                <a href="{{ route('registro_docente') }}" class="{{ request()->routeIs('registro_docente') ? 'activo' : '' }}">
-                    Registro Docentes
-                </a>
+        <footer class="pie-pagina">
+            <div class="info-universidad">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSKLc3LGB1aSLdgvmI7TwAd0-rJLeTNqExKUw&s">
+                <span>Universidad Tecnologica de Nayarit</span>
             </div>
+
+            <div class="derechos-autor">
+                © 2026 Equipo Web Asesorias. Todos los derechos reservados.
+            </div>
+        </footer>
+        
+    </div>
+        <!-- DROPDOWN PERFIL -->
+        <div class="perfil-dropdown">
+            <div class="perfil-header"></div>
+            <img src="{{ Auth::user()->foto_url }}" alt="Perfil" class="perfil-foto">
+            <b>{{ Auth::user()->nombres }}</b>
+
+            <button onclick="translatePage('es')" class="lang-btn active" id="btn-es">🇪🇸 Español</button>
+            <button onclick="translatePage('en')" class="lang-btn" id="btn-en">🇺🇸 English</button>
+            <div id="google_translate_element" style="display:none;"></div>
+
+            @if(in_array(auth()->user()->rol, ['admin', 'docente']))
+            <a href="{{ route('historial') }}"><i class="bi bi-clock-history"></i> Historial</a>
+            @endif
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button class="cerrar-btn"><i class="bi bi-box-arrow-right"></i> Cerrar sesión</button>
+            </form>
         </div>
-        @endif
-    </aside>
 
-    <div class="overlay"></div>
+        <!-- Menú lateral -->
+        <aside id="menu-lateral" class="menu-lateral">
+            <div class="menu-header">
+                <a href="javascript:void(0)" class="close-btn" onclick="toggleMenu()">
+                    <i class="bi bi-list"></i>
+                </a>
+                <span class="menu-title"></span>
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSpPReQfrDeeJiv0BuOf6r-eEUnb5Eos8DJTQ&s"
+                    alt="Logo" class="menu-logo">
+            </div>
 
-    <script src="{{ asset('js/menu-lateral.js') }}"></script>
-    <script src="{{ asset('js/perfil-dropdown.js') }}"></script>
+            <a href="{{ route('reset.navigation') }}"
+                class="{{ request()->routeIs('admin.dashboard') || request()->routeIs('docente.dashboard') || request()->routeIs('alumno.dashboard') ? 'activo' : '' }}">
+                <i class="bi bi-house-fill"></i> {{ __('Inicio') }}
+            </a>
+            <!-- Alumnos -->
+            @if(auth()->user()->rol === 'alumno')
+            <a href="{{ route('solicitud') }}" class="{{ request()->routeIs('solicitud') ? 'activo' : '' }}">
+                <i class="bi bi-calendar-plus-fill" style="font-size: 18px;"></i> Solicitud
+            </a>
+            <a href="{{ route('agenda') }}" class="{{ request()->routeIs('agenda') ? 'activo' : '' }}">
+                <i class="bi bi-calendar-plus-fill" style="font-size: 18px;"></i> Agendar
+            </a>
+            @endif
+            <!-- Grupos y Alumnos: solo admin y docente -->
+            @if(in_array(auth()->user()->rol, ['admin', 'docente']))
+            <a href="{{ route('grupos') }}" class="{{ request()->routeIs('grupos') ? 'activo' : '' }}">
+                <i class="bi bi-people-fill"></i> Grupos
+            </a>
+            <a href="{{ route('alumnos') }}" class="{{ request()->routeIs('alumnos') ? 'activo' : '' }}">
+                <i class="bi bi-person-vcard-fill" style="font-size: 18px;"></i> Alumnos
+            </a>
+            <a href="{{ route('agenda') }}" class="{{ request()->routeIs('agenda') ? 'activo' : '' }}">
+                <i class="bi bi-calendar-plus-fill" style="font-size: 18px;"></i> Agendar
+            </a>
+            @endif
+            <!-- Solo Docente -->
+            @if(auth()->user()->rol === 'docente')
+            <a href="{{ route('registro') }}" class="{{ request()->routeIs('registro') ? 'activo' : '' }}">
+                <i class="bi bi-calendar-plus-fill" style="font-size: 18px;"></i> Registro de asesorias
+            </a>
+            @endif()
+            <!-- Roles y permisos: solo admin -->
+            @if(auth()->user()->rol === 'admin')
+            <a href="{{ route('roles_permisos') }}" class="{{ request()->routeIs('roles_permisos') ? 'activo' : '' }}">
+                <i class="bi bi-clipboard2-check-fill" style="font-size: 18px;"></i> Roles y permisos
+            </a>
+            <a href="{{ route('gestion') }}" class="{{ request()->routeIs('gestion') ? 'activo' : '' }}">
+                <i class="bi bi-person-workspace" style="font-size: 18px;"></i> Gestión admin.
+            </a>
+            @endif
 
-    <script>
-        function googleTranslateElementInit() {
-            new google.translate.TranslateElement({
-                pageLanguage: 'es',
-                autoDisplay: false
-            }, 'google_translate_element');
-        }
+            <!-- Registros: solo admin -->
+            @if(auth()->user()->rol === 'admin')
+            <div class="menu-seccion">
+                <a href="#" class="menu-principal">
+                    <span><i class="bi bi-person-fill-add" style="font-size: 18px;"></i> Registros</span>
+                    <i class="bi bi-chevron-compact-down"></i>
+                </a>
+                <div class="subseccion">
+                    <a href="{{ route('registro_alumnos') }}" class="{{ request()->routeIs('registro_alumnos') ? 'activo' : '' }}">
+                        Registro Alumnos
+                    </a>
+                    <a href="{{ route('registro_docente') }}" class="{{ request()->routeIs('registro_docente') ? 'activo' : '' }}">
+                        Registro Docentes
+                    </a>
+                </div>
+            </div>
+            @endif
+        </aside>
 
-        function translatePage(lang) {
-            const interval = setInterval(() => {
-                const select = document.querySelector('.goog-te-combo');
+        <div class="overlay"></div>
 
-                if (select) {
-                    select.value = lang;
-                    select.dispatchEvent(new Event('change'));
+        <script src="{{ asset('js/menu-lateral.js') }}"></script>
+        <script src="{{ asset('js/perfil-dropdown.js') }}"></script>
 
-                    document.getElementById('btn-es').classList.remove('active');
-                    document.getElementById('btn-en').classList.remove('active');
-                    document.getElementById('btn-' + lang).classList.add('active');
+        <script>
+            function googleTranslateElementInit() {
+                new google.translate.TranslateElement({
+                    pageLanguage: 'es',
+                    autoDisplay: false
+                }, 'google_translate_element');
+            }
 
-                    clearInterval(interval);
-                }
-            }, 500);
-        }
-    </script>
+            function translatePage(lang) {
+                const interval = setInterval(() => {
+                    const select = document.querySelector('.goog-te-combo');
 
-    <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+                    if (select) {
+                        select.value = lang;
+                        select.dispatchEvent(new Event('change'));
+
+                        document.getElementById('btn-es').classList.remove('active');
+                        document.getElementById('btn-en').classList.remove('active');
+                        document.getElementById('btn-' + lang).classList.add('active');
+
+                        clearInterval(interval);
+                    }
+                }, 500);
+            }
+        </script>
+
+        <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
 </body>
 
