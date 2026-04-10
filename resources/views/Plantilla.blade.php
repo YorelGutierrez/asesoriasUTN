@@ -103,70 +103,60 @@
 
     @php
     $routeName = Route::currentRouteName();
+    $navigationHistory = session()->get('navigation_history', []);
+    $breadcrumbs = [];
 
-    $breadcrumbMap = [
-    'grupos' => [
-    ['label' => __('Grupos')]
-    ],
-
-    'alumnos' => [
-    ['label' => __('Grupos'), 'route' => 'grupos'],
-    ['label' => __('Alumnos')]
-    ],
-
-    'alumnos.edit' => [
-    ['label' => __('Grupos'), 'route' => 'grupos'],
-    ['label' => __('Alumnos'), 'route' => 'alumnos'],
-    ['label' => __('Editar')]
-    ],
-
-    'agenda' => [
-    ['label' => __('Grupos'), 'route' => 'grupos'],
-    ['label' => __('Alumnos'), 'route' => 'alumnos'],
-    ['label' => __('Agenda')]
-    ],
-
-    'registro' => [
-    ['label' => __('Grupos'), 'route' => 'grupos'],
-    ['label' => __('Alumnos'), 'route' => 'alumnos'],
-    ['label' => __('Agenda'), 'route' => 'agenda'],
-    ['label' => __('Registro de asesorías')]
-    ],
-
-    'registro_alumnos' => [
-    ['label' => __('Registros')],
-    ['label' => __('Registro Alumnos')]
-    ],
-
-    'registro_docente' => [
-    ['label' => __('Registros')],
-    ['label' => __('Registro Docentes')]
-    ],
-
-    'docentes.edit' => [
-    ['label' => __('Registros')],
-    ['label' => __('Registro Docentes'), 'route' => 'registro_docente'],
-    ['label' => __('Editar')]
-    ],
-
-    'historial' => [
-    ['label' => __('Historial')]
-    ],
-
-    'roles_permisos' => [
-    ['label' => __('Roles y permisos')]
-    ],
-
-    'gestion' => [
-    ['label' => __('Gestión admin.')]
-    ],
-
-    'solicitud' => [
-    ['label' => __('Solicitud')]
-    ],
+    // Mapeo de nombres de rutas a etiquetas amigables
+    $routeLabels = [
+        'admin.dashboard' => 'Inicio',
+        'docente.dashboard' => 'Inicio',
+        'alumno.dashboard' => 'Inicio',
+        'grupos' => 'Grupos',
+        'alumnos' => 'Alumnos',
+        'agenda' => 'Agendar',
+        'registro' => 'Registro de asesorías',
+        'historial' => 'Historial',
+        'roles_permisos' => 'Roles y permisos',
+        'gestion' => 'Gestión admin.',
+        'registro_alumnos' => 'Registro Alumnos',
+        'registro_docente' => 'Registro Docentes',
+        'solicitud' => 'Solicitud',
     ];
 
-    $breadcrumbs = $breadcrumbMap[$routeName] ?? [];
+    // Construir breadcrumbs desde el historial de navegación
+    if (!empty($navigationHistory)) {
+        foreach ($navigationHistory as $index => $navRoute) {
+            $label = $routeLabels[$navRoute] ?? ucfirst(str_replace('_', ' ', $navRoute));
+            
+            // El último es el actual (sin enlace)
+            if ($index === count($navigationHistory) - 1) {
+                $breadcrumbs[] = ['label' => $label];
+            } else {
+                $breadcrumbs[] = ['label' => $label, 'route' => $navRoute];
+            }
+        }
+    } else {
+        // Si no hay historial, mostrar solo la página actual
+        $currentLabel = $routeLabels[$routeName] ?? ucfirst(str_replace('_', ' ', $routeName));
+        $breadcrumbs = [['label' => $currentLabel]];
+    }
+
+    // Casos especiales para submenús
+    if ($routeName === 'registro_alumnos' || $routeName === 'registro_docente') {
+        $hasRegistros = false;
+        foreach ($breadcrumbs as $crumb) {
+            if ($crumb['label'] === 'Registros') {
+                $hasRegistros = true;
+                break;
+            }
+        }
+        
+        if (!$hasRegistros) {
+            $lastItem = array_pop($breadcrumbs);
+            $breadcrumbs[] = ['label' => 'Registros'];
+            $breadcrumbs[] = $lastItem;
+        }
+    }
     @endphp
 
     <div class="main-content" id="main-content">
@@ -194,19 +184,18 @@
             </ul>
         </nav>
 
-        <!-- BREADCRUMBS -->
-        <div class="breadcrumb-container">
-            <ol class="custom-breadcrumb">
+<!-- BREADCRUMBS -->
+<div class="breadcrumb-container">
+    <ol class="custom-breadcrumb">
 
-                <li>
-                    <a href="@if(auth()->user()->rol === 'admin') {{ route('admin.dashboard') }}
-                    @elseif(auth()->user()->rol === 'docente') {{ route('docente.dashboard') }}
-                    @else {{ route('alumno.dashboard') }} @endif">
-                        <i class="bi bi-house-door-fill"></i> Inicio
-                    </a>
-                </li>
+        <li>
+            <a href="{{ route('reset.navigation') }}">
+                <i class="bi bi-house-door-fill"></i> Inicio
+            </a>
+        </li>
 
-                @foreach($breadcrumbs as $crumb)
+        @foreach($breadcrumbs as $index => $crumb)
+            @if($crumb['label'] !== 'Inicio')
                 <li class="separator">
                     <i class="bi bi-chevron-right"></i>
                 </li>
@@ -220,27 +209,15 @@
                     {{ $crumb['label'] }}
                     @endif
                 </li>
-                @endforeach
+            @endif
+        @endforeach
 
-            </ol>
-        </div>
+    </ol>
+</div>
 
         <section>
             @yield('contenido')
         </section>
-
-        <footer class="pie-pagina">
-            <div class="info-universidad">
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSKLc3LGB1aSLdgvmI7TwAd0-rJLeTNqExKUw&s">
-                <span>Universidad Tecnologica de Nayarit</span>
-            </div>
-
-            <div class="derechos-autor">
-                © 2026 Equipo Web Asesorias. Todos los derechos reservados.
-            </div>
-        </footer>
-
-    </div>
 
     <!-- DROPDOWN PERFIL -->
     <div class="perfil-dropdown">
@@ -272,9 +249,7 @@
                 alt="Logo" class="menu-logo">
         </div>
 
-        <a href="@if(auth()->user()->rol === 'admin') {{ route('admin.dashboard') }} 
-            @elseif(auth()->user()->rol === 'docente') {{ route('docente.dashboard') }} 
-            @else {{ route('alumno.dashboard') }} @endif"
+        <a href="{{ route('reset.navigation') }}"
             class="{{ request()->routeIs('admin.dashboard') || request()->routeIs('docente.dashboard') || request()->routeIs('alumno.dashboard') ? 'activo' : '' }}">
             <i class="bi bi-house-fill"></i> {{ __('Inicio') }}
         </a>
