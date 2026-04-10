@@ -108,7 +108,6 @@
                                              Eliminar
                                         </button>
                                     </div>
-                                \n
                                 </tr>
                             @empty
                             <tr>
