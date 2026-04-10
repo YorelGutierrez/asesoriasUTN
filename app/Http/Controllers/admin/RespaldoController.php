@@ -91,7 +91,7 @@ class RespaldoController extends Controller
         if ($resultado === 0) {
             // Registrar log
             registrar_log('CREAR', 'Respaldo generado: ' . $nombre, 'respaldos');
-            return back()->with('success', 'Respaldo generado correctamente');
+            return back()->with('respaldo_success', 'Respaldo generado correctamente');
         } else {
             return back()->with('error', 'Error al generar el respaldo');
         }
@@ -113,7 +113,10 @@ class RespaldoController extends Controller
         // Registrar log
         registrar_log('PROGRAMAR', 'Respaldo programado para: ' . $request->fecha, 'respaldos');
 
-        return response()->json(['success' => true]);
+        return response()->json([
+            'success' => true,
+            'message' => 'Respaldo programado correctamente'
+        ]);
     }
     
     /**

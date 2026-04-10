@@ -145,17 +145,46 @@
         </div>
     </div>
 </div>
-@if(session('success'))
+
+{{-- Alerta de bienvenida (solo después de login) --}}
+@if(session('login_success'))
 <script>
     Swal.fire({
         icon: 'success',
         title: '¡Bienvenido!',
-        text: '{{ session('success') }}',
+        text: '{{ session('login_success') }}',
         confirmButtonColor: '#3085d6',
         confirmButtonText: 'Aceptar'
     });
 </script>
 @endif
+
+{{-- Alerta de respaldo exitoso --}}
+@if(session('respaldo_success'))
+<script>
+    Swal.fire({
+        icon: 'success',
+        title: '¡Respaldo completado!',
+        text: '{{ session('respaldo_success') }}',
+        confirmButtonColor: '#3085d6',
+        confirmButtonText: 'Aceptar'
+    });
+</script>
+@endif
+
+{{-- Alerta de error general --}}
+@if(session('error'))
+<script>
+    Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: '{{ session('error') }}',
+        confirmButtonColor: '#d33',
+        confirmButtonText: 'Aceptar'
+    });
+</script>
+@endif
+
 <script src="{{ asset('js/logs.js') }}"></script>
 <script>
     function cargarLogs() {
@@ -249,6 +278,45 @@
             console.error('Error JWT:', err);
             document.getElementById('nombreUsuario').innerText = 'Administrador';
         });
+</script>
+
+<script>
+    // Función para guardar la programación del respaldo con alerta
+    function guardarProgramacion() {
+        const fecha = document.getElementById('fechaHora').value;
+        if (!fecha) {
+            Swal.fire('Error', 'Selecciona una fecha y hora', 'error');
+            return;
+        }
+        
+        fetch(window.respaldoAutomaticoUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': window.csrfToken
+            },
+            body: JSON.stringify({ fecha: fecha })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Programado!',
+                    text: data.message || 'Respaldo programado correctamente',
+                    confirmButtonColor: '#3085d6'
+                }).then(() => {
+                    cerrarCalendario();
+                    location.reload();
+                });
+            } else {
+                Swal.fire('Error', data.message || 'Error al programar', 'error');
+            }
+        })
+        .catch(err => {
+            Swal.fire('Error', 'Error de conexión', 'error');
+        });
+    }
 </script>
 
 @endsection
