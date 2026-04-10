@@ -30,11 +30,6 @@
     padding: 10px;
     }
     
-    .titulo h1 {
-        
-       
-    }
-    
     /* Tarjetas */
     .card-moderno {
         background: white;
