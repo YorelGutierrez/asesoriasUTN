@@ -244,25 +244,20 @@
 
     <!-- DROPDOWN PERFIL -->
     <div class="perfil-dropdown">
-        <img src="{{ Auth::user()->foto_url }}" class="perfil-foto">
+        <div class="perfil-header"></div>
+        <img src="{{ Auth::user()->foto_url }}" alt="Perfil" class="perfil-foto">
         <b>{{ Auth::user()->nombres }}</b>
 
         <button onclick="translatePage('es')" class="lang-btn active" id="btn-es">🇪🇸 Español</button>
         <button onclick="translatePage('en')" class="lang-btn" id="btn-en">🇺🇸 English</button>
-
         <div id="google_translate_element" style="display:none;"></div>
 
-        @if(in_array(auth()->user()->rol,['admin','docente']))
-        <a href="{{ route('historial') }}">
-            <i class="bi bi-clock-history"></i> Historial
-        </a>
+        @if(in_array(auth()->user()->rol, ['admin', 'docente']))
+        <a href="{{ route('historial') }}"><i class="bi bi-clock-history"></i> Historial</a>
         @endif
-
         <form method="POST" action="{{ route('logout') }}">
             @csrf
-            <button class="cerrar-btn">
-                <i class="bi bi-box-arrow-right"></i> Cerrar sesión
-            </button>
+            <button class="cerrar-btn"><i class="bi bi-box-arrow-right"></i> Cerrar sesión</button>
         </form>
     </div>
 
