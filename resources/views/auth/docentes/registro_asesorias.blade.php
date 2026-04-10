@@ -56,8 +56,8 @@
                         <select class="form-select" name="materia_id" id="materia_id" required>
                             <option value="">-- Seleccionar asignatura --</option>
                             @foreach($materias as $materia)
-                                <option value="{{ $materia->id }}" {{ old('materia_id') == $materia->id ? 'selected' : '' }}>
-                                    {{ $materia->nombre }} ({{ $materia->clave }})
+                                <option value="{{ $materia->id }}">
+                                    {{ $materia->nombre }}
                                 </option>
                             @endforeach
                         </select>
@@ -166,6 +166,114 @@
         </div>
     </div>
 </div>
+<script>
+    document.getElementById('formAsesoria').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    
+    Swal.fire({
+        title: 'Guardando...',
+        text: 'Por favor espera',
+        allowOutsideClick: false,
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
+    
+    fetch('{{ route('asesoria.store') }}', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        }
+    })
+    .then(response => response.blob())
+    .then(blob => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'asesoria.pdf';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+        
+        Swal.fire({
+            icon: 'success',
+            title: '¡Asesoría registrada!',
+            text: 'El PDF se ha descargado correctamente',
+            confirmButtonColor: '#3085d6'
+        });
+    })
+    .catch(error => {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Ocurrió un error al registrar la asesoría',
+            confirmButtonColor: '#d33'
+        });
+    });
+});
+</script>
+<script>
+    @if(session('success'))
+<script>
+    Swal.fire({
+        icon: 'success',
+        title: '¡Asesoría registrada!',
+        text: '{{ session('success') }}',
+        confirmButtonColor: '#3085d6',
+        confirmButtonText: 'Aceptar'
+    }).then((result) => {
+        @if(session('pdf_path'))
+        window.location.href = '{{ route('descargar.pdf') }}?path={{ base64_encode(session('pdf_path')) }}';
+        @endif
+    });
+</script>
+@endif
+
+    // Alerta de error
+    @if(session('error'))
+    Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: '{{ session('error') }}',
+        confirmButtonColor: '#d33',
+        confirmButtonText: 'Aceptar'
+    });
+    @endif
+
+    // Alerta de errores de validación
+    @if($errors->any())
+    Swal.fire({
+        icon: 'error',
+        title: 'Errores en el formulario',
+        html: `{!! implode('<br>', $errors->all()) !!}`,
+        confirmButtonColor: '#d33',
+        confirmButtonText: 'Aceptar'
+    });
+    @endif
+
+    // Alerta de cancelación (al hacer clic en cancelar)
+    document.querySelector('.btn-secundario')?.addEventListener('click', function(e) {
+        Swal.fire({
+            icon: 'info',
+            title: '¿Cancelar registro?',
+            text: 'Los datos no se guardarán. ¿Estás seguro?',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, salir',
+            cancelButtonText: 'No, quedarme'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.history.back();
+            }
+        });
+    });
+</script>
+
 <script src="{{ asset('js/asesoria.js') }}"></script>
 @endsection()
 

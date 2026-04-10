@@ -9,11 +9,11 @@
     <h1>Gestión administrativa</h1>
 </div>
 
-<!-- filtrados cumunes -->
+<!-- filtrados comunes -->
 <div class="card shadow-sm mb-4 border-0">
     <div class="card-body p-4">
         <h5 class="fw-semibold mb-3">Filtros de búsqueda</h5>
-        <div class="row g-3 align-items-end"> <!-- Agregado align-items-end -->
+        <div class="row g-3 align-items-end">
             <div class="col-md-4">
                 <label class="form-label fw-semibold">Buscar por nombre / matrícula / empleado</label>
                 <div class="input-group">
@@ -108,8 +108,8 @@
                                              Eliminar
                                         </button>
                                     </div>
-                                </td>
-                            </tr>
+                                \n
+                                </tr>
                             @empty
                             <tr>
                                 <td colspan="6" class="text-center">No hay grupos registrados</td>
@@ -337,6 +337,30 @@
             });
         });
     });
+</script>
+
+<script>
+    // Alerta de éxito
+    @if(session('success'))
+    Swal.fire({
+        icon: 'success',
+        title: '¡Éxito!',
+        text: '{{ session('success') }}',
+        confirmButtonColor: '#3085d6',
+        confirmButtonText: 'Aceptar'
+    });
+    @endif
+
+    // Alerta de error
+    @if(session('error'))
+    Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: '{{ session('error') }}',
+        confirmButtonColor: '#d33',
+        confirmButtonText: 'Aceptar'
+    });
+    @endif
 </script>
 
 <script src="{{ asset('js/gestion-opciones.js') }}"></script>
