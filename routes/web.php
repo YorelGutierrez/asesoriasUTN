@@ -122,9 +122,7 @@ Route::middleware(['auth', 'rol:admin,docente'])->group(function () {
         return view('auth.alumnos');
     })->name('alumnos');
 
-    Route::get('/agenda', function () {
-        return view('auth.agendar');
-    })->name('agenda');
+    Route::get('/agenda', [AsesoriaController::class, 'agendar'])->name('agenda');
 
     Route::get('/alumnos/expediente', function () {
         return view('auth.expediente_alumnos');

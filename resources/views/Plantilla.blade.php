@@ -6,180 +6,362 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ asset('js/sweetalert.js') }}"></script>
     <link rel="stylesheet" href="{{ asset('estilos/sweetalert.css') }}">
+
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
     <!-- Metadatos -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="description del sitio.">
-    <meta name="keywords" content="palabras claves para busqueda del sitio">
-    <meta name="author" content="Corona Alain, Bernal Brandon, Gonzalez Rubi, Gutierrez Yorel, Rivera Vanessa, Samaniego Andy">
-    <!-- Titulos de la pagina -->
     <title>@yield('titulo', 'Asesorias-UTN')</title>
-    <!-- Link del icono en el navegador -->
-    <link rel="icon" type="image/x-icon" href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSKLc3LGB1aSLdgvmI7TwAd0-rJLeTNqExKUw&s">
-    <!-- Links aparte -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap">
+
     <link rel="stylesheet" href="{{ asset('estilos/menu-fotter.css') }}">
     <link rel="stylesheet" href="{{ asset('estilos/UserCard.css') }}">
     <link rel="stylesheet" href="{{ asset('estilos/menu-lateral.css') }}">
-    <!-- DaisyUI-->
-    <script type="module" src="https://unpkg.com/cally"></script>
+
+    <style>
+        .breadcrumb-container {
+            padding: 18px 24px 0 24px;
+        }
+
+        .custom-breadcrumb {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            list-style: none;
+            margin: 0;
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #16a34a, #15803d);
+            color: white;
+            border-radius: 14px;
+            box-shadow: 0 6px 18px rgba(22, 163, 74, 0.25);
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .custom-breadcrumb li {
+            display: flex;
+            align-items: center;
+        }
+
+        .custom-breadcrumb li a {
+            color: white;
+            text-decoration: none;
+            opacity: .9;
+            transition: .25s;
+        }
+
+        .custom-breadcrumb li a:hover {
+            opacity: 1;
+        }
+
+        .custom-breadcrumb .active {
+            color: #dcfce7;
+        }
+
+        .custom-breadcrumb .separator {
+            color: rgba(255,255,255,.75);
+            font-size: 11px;
+        }
+
+        .goog-te-banner-frame.skiptranslate,
+        iframe.skiptranslate,
+        .goog-te-gadget,
+        .goog-logo-link {
+            display: none !important;
+        }
+
+        body {
+            top: 0 !important;
+            position: static !important;
+        }
+
+        html {
+            margin-top: 0 !important;
+        }
+
+        .lang-btn {
+            width: 100%;
+            border: none;
+            padding: 8px;
+            border-radius: 8px;
+            margin-top: 5px;
+            cursor: pointer;
+            background: #f3f4f6;
+        }
+
+        .lang-btn.active {
+            background: #16a34a;
+            color: white;
+        }
+    </style>
 </head>
 
 <body>
 
-    <div class="main-content" id="main-content">
-        <!-- Menú Superior -->
-        <nav>
-            <ul>
-                <!-- Icono del menú dentro del nav -->
-                <li class="menu-icon">
-                    <a href="javascript:void(0)" onclick="toggleMenu()"><i class="bi bi-list"></i> <span class="menu-title"></span></a>
+@php
+$routeName = Route::currentRouteName();
+
+$breadcrumbMap = [
+    'grupos' => [
+        ['label' => __('Grupos')]
+    ],
+
+    'alumnos' => [
+        ['label' => __('Grupos'), 'route' => 'grupos'],
+        ['label' => __('Alumnos')]
+    ],
+
+    'alumnos.edit' => [
+        ['label' => __('Grupos'), 'route' => 'grupos'],
+        ['label' => __('Alumnos'), 'route' => 'alumnos'],
+        ['label' => __('Editar')]
+    ],
+
+    'agenda' => [
+        ['label' => __('Grupos'), 'route' => 'grupos'],
+        ['label' => __('Alumnos'), 'route' => 'alumnos'],
+        ['label' => __('Agenda')]
+    ],
+
+    'registro' => [
+        ['label' => __('Grupos'), 'route' => 'grupos'],
+        ['label' => __('Alumnos'), 'route' => 'alumnos'],
+        ['label' => __('Agenda'), 'route' => 'agenda'],
+        ['label' => __('Registro de asesorías')]
+    ],
+
+    'registro_alumnos' => [
+        ['label' => __('Registros')],
+        ['label' => __('Registro Alumnos')]
+    ],
+
+    'registro_docente' => [
+        ['label' => __('Registros')],
+        ['label' => __('Registro Docentes')]
+    ],
+
+    'docentes.edit' => [
+        ['label' => __('Registros')],
+        ['label' => __('Registro Docentes'), 'route' => 'registro_docente'],
+        ['label' => __('Editar')]
+    ],
+
+    'historial' => [
+        ['label' => __('Historial')]
+    ],
+
+    'roles_permisos' => [
+        ['label' => __('Roles y permisos')]
+    ],
+
+    'gestion' => [
+        ['label' => __('Gestión admin.')]
+    ],
+
+    'solicitud' => [
+        ['label' => __('Solicitud')]
+    ],
+];
+
+$breadcrumbs = $breadcrumbMap[$routeName] ?? [];
+@endphp
+
+<div class="main-content" id="main-content">
+
+    <!-- NAV -->
+    <nav>
+        <ul>
+            <li class="menu-icon">
+                <a href="javascript:void(0)" onclick="toggleMenu()">
+                    <i class="bi bi-list"></i>
+                </a>
+            </li>
+
+            <div class="nav-left">
+                <li class="ExtrasMenu"><i class="bi bi-calendar-event-fill"></i></li>
+                <li class="ExtrasMenu"><i class="bi bi-bell-fill"></i></li>
+
+                <li class="perfil">
+                    <a style="color:white;">
+                        {{ Auth::user()->nombres . ' ' . Auth::user()->apellido_paterno }}
+                    </a>
+                    <img src="{{ Auth::user()->foto_url }}" class="perfil-img">
+                </li>
+            </div>
+        </ul>
+    </nav>
+
+    <!-- BREADCRUMBS -->
+    <div class="breadcrumb-container">
+        <ol class="custom-breadcrumb">
+
+            <li>
+                <a href="@if(auth()->user()->rol === 'admin') {{ route('admin.dashboard') }}
+                    @elseif(auth()->user()->rol === 'docente') {{ route('docente.dashboard') }}
+                    @else {{ route('alumno.dashboard') }} @endif">
+                    <i class="bi bi-house-door-fill"></i> Inicio
+                </a>
+            </li>
+
+            @foreach($breadcrumbs as $crumb)
+                <li class="separator">
+                    <i class="bi bi-chevron-right"></i>
                 </li>
 
-                <!-- Opciones posicionadas de lado izquierdo -->
-                <div class="nav-left">
+                <li class="{{ isset($crumb['route']) ? '' : 'active' }}">
+                    @if(isset($crumb['route']))
+                        <a href="{{ route($crumb['route']) }}">
+                            {{ $crumb['label'] }}
+                        </a>
+                    @else
+                        {{ $crumb['label'] }}
+                    @endif
+                </li>
+            @endforeach
 
-                    <!-- Opciones extras -->
-                    <li class="ExtrasMenu"><i class="bi bi-calendar-event-fill"></i></li>
-                    <li class="ExtrasMenu"><i class="bi bi-bell-fill"></i></li><!-- Notificaciones -->
-
-                    <!--Apartados del perfil-->
-                    <li class="perfil">
-                        <a style="color: white;"></i> {{ Auth::user()->nombres . ' ' . Auth::user()->apellido_paterno . ' ' . Auth::user()->apellido_materno }}</a>
-                        <img src="{{ Auth::user()->foto_url }}" alt="Perfil" class="perfil-img">
-                    </li>
-                </div>
-            </ul>
-        </nav>
-
-        <!-- Contenido -->
-        <section>
-            @yield('contenido')
-        </section>
-
-
-        <!-- Pie de página -->
-        <footer class="pie-pagina">
-            <!-- Información de la universidad -->
-            <div class="info-universidad">
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSKLc3LGB1aSLdgvmI7TwAd0-rJLeTNqExKUw&s" alt="Logo de empresa">
-                <span>Universidad Tecnologica de Nayarit</span>
-            </div>
-            <!-- Derechos de autor -->
-            <div class="derechos-autor">
-                © 2026 Equipo Web Asesorias. Todos los derechos reservados.
-            </div>
-            <!-- Información de contacto -->
-            <div class="contacto">
-                Dirección: C4G3+5V, Carretera México 200, Km 9 63786, Col, 24 de Febrero, 63786 Xalisco, Nay. | Teléfono: 311 211 9800 | Email: info@utnay.edu.mx
-            </div>
-        </footer>
+        </ol>
     </div>
 
+    <section>
+        @yield('contenido')
+    </section>
 
-    <!-- Elementos emerguentes -->
-
-    <!-- Dropdown -->
-    @php
-    $currentLocale = session('locale', 'es'); // por defecto español
-    $switchToLang = $currentLocale === 'es' ? 'en' : 'es';
-    @endphp
-    <div class="perfil-dropdown">
-        <div class="perfil-header"></div>
-        <img src="{{ Auth::user()->foto_url }}" alt="Perfil" class="perfil-foto">
-        <b>{{ Auth::user()->nombres }}</b>
-        <a href="{{ route('lang.switch', $switchToLang) }}">
-            <i class="bi bi-translate"></i> {{ __('Cambiar idioma') }}
-        </a>
-        @if(in_array(auth()->user()->rol, ['admin', 'docente']))
-        <a href="{{ route('historial') }}"><i class="bi bi-clock-history"></i> Historial</a>
-        @endif
-        <form method="POST" action="{{ route('logout') }}">
-            @csrf
-            <button class="cerrar-btn"><i class="bi bi-box-arrow-right"></i> Cerrar sesión</button>
-        </form>
-    </div>
-
-    <!-- Menú lateral -->
-    <aside id="menu-lateral" class="menu-lateral">
-        <div class="menu-header">
-            <a href="javascript:void(0)" class="close-btn" onclick="toggleMenu()">
-                <i class="bi bi-list"></i>
-            </a>
-            <span class="menu-title"></span>
-            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSpPReQfrDeeJiv0BuOf6r-eEUnb5Eos8DJTQ&s"
-                alt="Logo" class="menu-logo">
+    <footer class="pie-pagina">
+        <div class="info-universidad">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSKLc3LGB1aSLdgvmI7TwAd0-rJLeTNqExKUw&s">
+            <span>Universidad Tecnologica de Nayarit</span>
         </div>
 
-        <a href="@if(auth()->user()->rol === 'admin') {{ route('admin.dashboard') }} 
-            @elseif(auth()->user()->rol === 'docente') {{ route('docente.dashboard') }} 
-            @else {{ route('alumno.dashboard') }} @endif"
-            class="{{ request()->routeIs('admin.dashboard') || request()->routeIs('docente.dashboard') || request()->routeIs('alumno.dashboard') ? 'activo' : '' }}">
-            <i class="bi bi-house-fill"></i> {{ __('Inicio') }}
+        <div class="derechos-autor">
+            © 2026 Equipo Web Asesorias. Todos los derechos reservados.
+        </div>
+    </footer>
+
+</div>
+
+<!-- DROPDOWN PERFIL -->
+<div class="perfil-dropdown">
+    <img src="{{ Auth::user()->foto_url }}" class="perfil-foto">
+    <b>{{ Auth::user()->nombres }}</b>
+
+    <button onclick="translatePage('es')" class="lang-btn active" id="btn-es">🇪🇸 Español</button>
+    <button onclick="translatePage('en')" class="lang-btn" id="btn-en">🇺🇸 English</button>
+
+    <div id="google_translate_element" style="display:none;"></div>
+
+    @if(in_array(auth()->user()->rol,['admin','docente']))
+        <a href="{{ route('historial') }}">
+            <i class="bi bi-clock-history"></i> Historial
         </a>
-        <!-- Alumnos -->
-        @if(auth()->user()->rol === 'alumno')
-        <a href="{{ route('solicitud') }}" class="{{ request()->routeIs('solicitud') ? 'activo' : '' }}">
-            <i class="bi bi-calendar-plus-fill" style="font-size: 18px;"></i> Solicitud
+    @endif
+
+    <form method="POST" action="{{ route('logout') }}">
+        @csrf
+        <button class="cerrar-btn">
+            <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+        </button>
+    </form>
+</div>
+
+<!-- MENÚ LATERAL -->
+<aside id="menu-lateral" class="menu-lateral">
+
+    <div class="menu-header">
+        <a href="javascript:void(0)" class="close-btn" onclick="toggleMenu()">
+            <i class="bi bi-list"></i>
         </a>
-        @endif
-        <!-- Grupos y Alumnos: solo admin y docente -->
-        @if(in_array(auth()->user()->rol, ['admin', 'docente']))
-        <a href="{{ route('grupos') }}" class="{{ request()->routeIs('grupos') ? 'activo' : '' }}">
+
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSpPReQfrDeeJiv0BuOf6r-eEUnb5Eos8DJTQ&s"
+            class="menu-logo">
+    </div>
+
+    <a href="@if(auth()->user()->rol === 'admin') {{ route('admin.dashboard') }}
+        @elseif(auth()->user()->rol === 'docente') {{ route('docente.dashboard') }}
+        @else {{ route('alumno.dashboard') }} @endif">
+        <i class="bi bi-house-fill"></i> Inicio
+    </a>
+
+    @if(auth()->user()->rol === 'alumno')
+        <a href="{{ route('solicitud') }}">
+            <i class="bi bi-calendar-plus-fill"></i> Solicitud
+        </a>
+    @endif
+
+    @if(in_array(auth()->user()->rol,['admin','docente']))
+        <a href="{{ route('grupos') }}">
             <i class="bi bi-people-fill"></i> Grupos
         </a>
-        <a href="{{ route('alumnos') }}" class="{{ request()->routeIs('alumnos') ? 'activo' : '' }}">
-            <i class="bi bi-person-vcard-fill" style="font-size: 18px;"></i> Alumnos
-        </a>
-        <a href="{{ route('agenda') }}" class="{{ request()->routeIs('agenda') ? 'activo' : '' }}">
-            <i class="bi bi-calendar-plus-fill" style="font-size: 18px;"></i> Agendar
-        </a>
-        @endif
-        <!-- Solo Docente -->
-        @if(auth()->user()->rol === 'docente')
-        <a href="{{ route('registro') }}" class="{{ request()->routeIs('registro') ? 'activo' : '' }}">
-            <i class="bi bi-calendar-plus-fill" style="font-size: 18px;"></i> Registro de asesorias
-        </a>
-        @endif()
-        <!-- Roles y permisos: solo admin -->
-        @if(auth()->user()->rol === 'admin')
-        <a href="{{ route('roles_permisos') }}" class="{{ request()->routeIs('roles_permisos') ? 'activo' : '' }}">
-            <i class="bi bi-clipboard2-check-fill" style="font-size: 18px;"></i> Roles y permisos
-        </a>
-        <a href="{{ route('gestion') }}" class="{{ request()->routeIs('gestion') ? 'activo' : '' }}">
-            <i class="bi bi-person-workspace" style="font-size: 18px;"></i> Gestión admin.
-        </a>
-        @endif
 
-        <!-- Registros: solo admin -->
-        @if(auth()->user()->rol === 'admin')
-        <div class="menu-seccion">
-            <a href="#" class="menu-principal">
-                <span><i class="bi bi-person-fill-add" style="font-size: 18px;"></i> Registros</span>
-                <i class="bi bi-chevron-compact-down"></i>
-            </a>
-            <div class="subseccion">
-                <a href="{{ route('registro_alumnos') }}" class="{{ request()->routeIs('registro_alumnos') ? 'activo' : '' }}">
-                    Registro Alumnos
-                </a>
-                <a href="{{ route('registro_docente') }}" class="{{ request()->routeIs('registro_docente') ? 'activo' : '' }}">
-                    Registro Docentes
-                </a>
-            </div>
-        </div>
-        @endif
-    </aside>
+        <a href="{{ route('alumnos') }}">
+            <i class="bi bi-person-vcard-fill"></i> Alumnos
+        </a>
 
-    <!-- Overlay -->
-    <div class="overlay"></div>
+        <a href="{{ route('agenda') }}">
+            <i class="bi bi-calendar-plus-fill"></i> Agendar
+        </a>
+    @endif
 
-    <!-- Scripts -->
-    <script src="{{ asset('js/menu-lateral.js') }}"></script>
-    <script src="{{ asset('js/perfil-dropdown.js') }}"></script>
+    @if(auth()->user()->rol === 'docente')
+        <a href="{{ route('registro') }}">
+            <i class="bi bi-journal-check"></i> Registro de asesorías
+        </a>
+    @endif
+
+    @if(auth()->user()->rol === 'admin')
+        <a href="{{ route('roles_permisos') }}">
+            <i class="bi bi-clipboard2-check-fill"></i> Roles y permisos
+        </a>
+
+        <a href="{{ route('gestion') }}">
+            <i class="bi bi-person-workspace"></i> Gestión admin.
+        </a>
+
+        <a href="{{ route('registro_alumnos') }}">
+            <i class="bi bi-person-plus-fill"></i> Registro Alumnos
+        </a>
+
+        <a href="{{ route('registro_docente') }}">
+            <i class="bi bi-person-badge-fill"></i> Registro Docentes
+        </a>
+    @endif
+
+</aside>
+
+<div class="overlay"></div>
+
+<script src="{{ asset('js/menu-lateral.js') }}"></script>
+<script src="{{ asset('js/perfil-dropdown.js') }}"></script>
+
+<script>
+function googleTranslateElementInit() {
+    new google.translate.TranslateElement({
+        pageLanguage: 'es',
+        autoDisplay: false
+    }, 'google_translate_element');
+}
+
+function translatePage(lang) {
+    const interval = setInterval(() => {
+        const select = document.querySelector('.goog-te-combo');
+
+        if (select) {
+            select.value = lang;
+            select.dispatchEvent(new Event('change'));
+
+            document.getElementById('btn-es').classList.remove('active');
+            document.getElementById('btn-en').classList.remove('active');
+            document.getElementById('btn-' + lang).classList.add('active');
+
+            clearInterval(interval);
+        }
+    }, 500);
+}
+</script>
+
+<script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
 </body>
-
 </html>
