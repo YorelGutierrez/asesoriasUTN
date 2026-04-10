@@ -133,4 +133,38 @@
     </div>
 </div>
 
+<script>
+    // Alerta de éxito
+    @if(session('success'))
+    Swal.fire({
+        icon: 'success',
+        title: '¡Registrado!',
+        text: '{{ session('success') }}',
+        confirmButtonColor: '#3085d6',
+        confirmButtonText: 'Aceptar'
+    });
+    @endif
+
+    // Alerta de error general
+    @if(session('error'))
+    Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: '{{ session('error') }}',
+        confirmButtonColor: '#d33',
+        confirmButtonText: 'Aceptar'
+    });
+    @endif
+
+    // Alerta de errores de validación
+    @if($errors->any())
+    Swal.fire({
+        icon: 'error',
+        title: 'Errores en el formulario',
+        confirmButtonColor: '#d33',
+        confirmButtonText: 'Aceptar'
+    });
+    @endif
+</script>
+
 @endsection

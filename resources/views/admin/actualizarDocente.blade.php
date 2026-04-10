@@ -96,14 +96,15 @@
                     </div>
                 </div>
 
-                <div class="row mt-4">
-                    <div class="col-md-6">
+                {{-- BOTONES CON ESPACIADO CORRECTO --}}
+                <div class="row mt-4 g-3">
+                    <div class="col-12 col-md-6">
                         <button type="submit" class="btn-principal w-100 py-2">
                             <i class="bi bi-save me-2"></i> Actualizar Docente
                         </button>
                     </div>
-                    <div class="col-md-6">
-                        <a href="{{ route('gestion') }}" class="btn-secundario w-100 py-2 d-block text-center">
+                    <div class="col-12 col-md-6">
+                        <a href="{{ route('gestion', ['tab' => 'docentes']) }}" class="btn-secundario w-100 py-2 d-block text-center">
                             <i class="bi bi-arrow-left me-2"></i> Cancelar
                         </a>
                     </div>
