@@ -1,66 +1,148 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 📚 Asesorías UT - Plataforma de Gestión de Asesorías Académicas
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+![Laravel](https://img.shields.io/badge/Laravel-10.x-red?logo=laravel)
+![PHP](https://img.shields.io/badge/PHP-8.1+-777BB4?logo=php)
+![MySQL](https://img.shields.io/badge/MySQL-8.0+-4479A1?logo=mysql)
+![Bootstrap](https://img.shields.io/badge/Bootstrap-5.3-purple?logo=bootstrap)
+![JWT](https://img.shields.io/badge/JWT-Auth-black?logo=jsonwebtokens)
 
-## About Laravel
+## 📖 Descripción del proyecto
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+**Asesorías UT** es una aplicación web diseñada para optimizar el proceso de solicitud, programación y seguimiento de asesorías académicas.  
+Centraliza la comunicación entre alumnos, docentes y administradores, y ofrece herramientas como:
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- Solicitud de asesorías (individual o grupal)
+- Programación de sesiones con modalidad presencial/virtual
+- Registro de acuerdos y resultados
+- Historial académico del alumno (materias reprobadas, temas no dominados)
+- Generación de reportes cuatrimestrales
+- Bitácora de actividades y respaldos de base de datos
+- Autenticación por roles (admin, docente, alumno) + JWT para API
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## 📌 Tabla de Contenidos
+- [Características principales](#-características-principales)
+- [Tecnologías utilizadas](#-tecnologías-utilizadas)
+- [Instalación y configuración](#-instalación-y-configuración)
+- [Estructura de la base de datos](#-estructura-de-la-base-de-datos)
+- [Roles y permisos](#-roles-y-permisos)
+- [Créditos](#-créditos)
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+---
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## ✨ Características principales
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- ✅ **Login por roles** (admin, docente, alumno, tutor) con redirección a paneles personalizados.
+- ✅ **Gestión de grupos, alumnos y docentes** (CRUD + filtros dinámicos).
+- ✅ **Solicitud y programación de asesorías** (individual o grupal, virtual o presencial).
+- ✅ **Historial de asesorías** con acuerdos y resultados.
+- ✅ **Generación de reportes cuatrimestrales** (solo admin/docente).
+- ✅ **Respaldos automáticos** de la base de datos mediante `mysqldump` (manual o programado).
+- ✅ **Bitácora de actividad** (logs de login, acciones importantes) con soft delete.
+- ✅ **Autenticación JWT** para proteger endpoints API.
+- ✅ **Diseño responsivo** con Bootstrap 5 y estilos personalizados.
+- ✅ **Internacionalización** (español/inglés básico).
 
-## Laravel Sponsors
+---
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## 🛠️ Tecnologías utilizadas
 
-### Premium Partners
+| Capa          | Tecnología                         |
+|---------------|------------------------------------|
+| Backend       | Laravel 10, PHP 8.1+              |
+| Frontend      | Bootstrap 5, Blade, CSS3, JS      |
+| Base de datos | MySQL 8.0                          |
+| Autenticación | Laravel Session + JWT (tymon/jwt-auth) |
+| Tareas programadas | Laravel Scheduler + mysqldump |
+| Íconos        | Bootstrap Icons                    |
+| Fuentes       | Google Fonts (Nunito)              |
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+---
 
-## Contributing
+## 🚀 Instalación y configuración
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### Requisitos previos
+- PHP >= 8.1
+- Composer
+- MySQL
+- Node.js (solo para assets opcionales)
+- Acceso a línea de comandos
 
-## Code of Conduct
+### Pasos de instalción
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```bash
+# 1. Clonar repositorio
+git clone https://github.com/YorelGutierrez/asesoriasUTN.git
+cd asesorias-ut
 
-## Security Vulnerabilities
+# 2. Instalar dependencias PHP
+composer install
+    #en caso de ya contar con composer utilizar
+    composer update
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+# 3. Copiar archivo de entorno y configurar
+cp .env.example .env
+php artisan key:generate
 
-## License
+# 4. Configurar base de datos en .env
+DB_DATABASE=asesorias_ut
+DB_USERNAME=root
+DB_PASSWORD=
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+# 5. Ejecutar migraciones y seeders
+php artisan migrate --seed
+
+# 6. Crear enlace simbólico para imágenes
+php artisan storage:link
+
+# 7. Instalar JWT
+composer require tymon/jwt-auth
+php artisan vendor:publish --provider="Tymon\JWTAuth\Providers\LaravelServiceProvider"
+php artisan jwt:secret
+
+# 8. Iniciar servidor de desarrollo
+php artisan serve
+
+# 9. (Opcional, utilizado para la realizacon de pruebas de respaldo de manera local) Planificar de tareas
+php artisan schedule:work #Nota: la hora esta adelanta 1 hora dentro del proyecto
+```
+---
+
+## Estructura de la base de datos
+
+Tablas principales:
+- users → datos comunes (nombre, email, rol, foto_perfil)
+- alumnos, docentes → datos específicos de cada rol
+- carreras, grupos, materias → catálogos académicos
+- solicitudes_asesoria, sesiones_asesoria, acuerdos_asesoria
+- historial_academico (materias reprobadas, temas no dominados)
+- logs → bitácora con soft delete
+- respaldo_config.json → configuración de backups programados
+
+---
+
+## Roles y Permisos
+
+Roles de la web:
+
+- Administrador
+- Docente
+- Alumno
+- Tutor (Aun no implementado)
+
+---
+
+## 👥 Creditos
+
+| Integrantes del equipo de desarollo 
+|--------
+| Bernal Hernandez Brandon Eduardo 
+| Corona Perez Alain Antonio 
+| Gonzalez Lares Alexandra Rubí 
+| Gutiérrez Zepeda Yorel Isai 
+| Rivera Orozco Vanessa de Jesús 
+| Samaniego de Leon Andy Alexander
+
+---
+
