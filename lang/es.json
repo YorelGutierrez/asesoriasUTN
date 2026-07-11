@@ -1,5 +1,17 @@
 {
 "ESTE ES EL ESCRITORIO": "ESTE ES EL ESCRITORIO",
 "Cambiar idioma": "Cambiar a ingles",
-"Inicio": "Inicio"
+"Inicio": "Inicio",
+"Historial":"Historial",
+"Cerrar sesión":"Cerrar sesión",
+"Solicitud":"Solicitud",
+"Agendar":"Agendar",
+"Grupos":"Grupos",
+"Alumnos":"Alumnos",
+"Registro de asesorias":"Registro de asesorias",
+"Roles y permisos":"Roles y permisos",
+"Gestión admin":"Gestión admin",
+"Registros":"Registros",
+"Registro Alumnos":"Registro Alumnos",
+"Registro Docentes":"Registro Docentes"
 }
