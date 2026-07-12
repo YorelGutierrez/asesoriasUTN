@@ -35,4 +35,11 @@ class grupos extends Model
     {
         return $this->belongsToMany(materias::class, 'materia_grupos', 'grupo_id', 'materia_id');
     }
+
+    // Docentes asignados a este grupo (docente_grupos.docente_id → users.id)
+    public function docentes()
+    {
+        return $this->belongsToMany(\App\Models\User::class, 'docente_grupos', 'grupo_id', 'docente_id')
+                    ->withTimestamps();
+    }
 }

@@ -170,6 +170,23 @@
 
     <div class="overlay"></div>
 
+    {{-- Burbuja flotante: grupo activo en sesión --}}
+    @if(in_array(auth()->user()->rol, ['admin', 'docente']) && session('grupo_activo_id'))
+        <div class="grupo-activo-bubble" title="Grupo activo en sesión">
+            <i class="bi bi-people-fill"></i>
+            <div class="grupo-activo-info">
+                <span class="grupo-activo-label">Grupo activo</span>
+                <span class="grupo-activo-nombre">{{ session('grupo_activo_nombre') }}</span>
+            </div>
+            <form method="POST" action="{{ route('grupos.limpiar') }}" class="grupo-activo-cambiar">
+                @csrf
+                <button type="submit" title="Cambiar grupo">
+                    <i class="bi bi-arrow-left-right"></i>
+                </button>
+            </form>
+        </div>
+    @endif
+
     <script src="{{ asset('js/menu-lateral.js') }}"></script>
     <script src="{{ asset('js/perfil-dropdown.js') }}"></script>
 

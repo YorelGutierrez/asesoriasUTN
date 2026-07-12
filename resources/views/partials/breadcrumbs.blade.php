@@ -20,6 +20,20 @@
         'solicitud'         => 'Solicitud',
     ];
 
+    // Rutas que requieren parámetros: nunca mostrar en breadcrumb
+    $rutasConParametros = [
+        'grupos.seleccionar', 'grupos.limpiar', 'grupos.destroy',
+        'alumnos.edit', 'alumnos.update', 'alumnos.destroy', 'alumnos.store',
+        'docentes.edit', 'docentes.update', 'docentes.destroy', 'docentes.store',
+        'asesoria.store', 'asesoria.pdf',
+        'usuarios.toggleBlock', 'bitacora.limpiar', 'bitacora.eliminar',
+    ];
+    $navigationHistory = array_filter(
+        $navigationHistory,
+        fn($r) => !in_array($r, $rutasConParametros)
+    );
+    $navigationHistory = array_values($navigationHistory);
+
     // Construir breadcrumbs desde el historial de navegación
     if (!empty($navigationHistory)) {
         foreach ($navigationHistory as $index => $navRoute) {

@@ -119,15 +119,17 @@ Route::middleware(['auth', 'rol:alumno'])->group(function () {
 
 // Rutas compartidas (docentes y admin)
 Route::middleware(['auth', 'rol:admin,docente'])->group(function () {
-    Route::get('/grupos', function () {
-        return view('auth.grupos');
-    })->name('grupos');
+    Route::get('/grupos', [GrupoController::class, 'index'])->name('grupos');
+    Route::post('/grupos/{id}/seleccionar', [GrupoController::class, 'seleccionar'])->name('grupos.seleccionar');
+    Route::post('/grupos/limpiar', [GrupoController::class, 'limpiarSeleccion'])->name('grupos.limpiar');
 
-    Route::get('/alumnos', function () {
-        return view('auth.alumnos');
-    })->name('alumnos');
+    Route::get('/alumnos', [AlumnoController::class, 'listar'])->name('alumnos');
 
     Route::get('/alumnos/expediente', function () {
+        // El alumno_id se guarda en sesión para la Fase 2
+        if (request('alumno_id')) {
+            session(['alumno_activo_id' => request('alumno_id')]);
+        }
         return view('auth.expediente_alumnos');
     })->name('expedienteAlumnos');
 

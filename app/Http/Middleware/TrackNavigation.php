@@ -24,7 +24,24 @@ class TrackNavigation
             'respaldo.automatico.store',
             'respaldo.descargar',
             'register',
-            'registro.procesar'
+            'registro.procesar',
+            // Rutas con parámetros o acciones POST que rompen el breadcrumb
+            'grupos.seleccionar',
+            'grupos.limpiar',
+            'grupos.destroy',
+            'alumnos.store',
+            'alumnos.edit',
+            'alumnos.update',
+            'alumnos.destroy',
+            'docentes.store',
+            'docentes.edit',
+            'docentes.update',
+            'docentes.destroy',
+            'asesoria.store',
+            'asesoria.pdf',
+            'usuarios.toggleBlock',
+            'bitacora.limpiar',
+            'bitacora.eliminar',
         ];
         
         // Rutas principales (dashboards) - NO se guardan
