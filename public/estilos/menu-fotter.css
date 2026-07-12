@@ -208,3 +208,72 @@ section{
     font-size: 10px;
     padding: 0 1px;
 }
+
+/* ===== Burbuja flotante: grupo activo ===== */
+.grupo-activo-bubble {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(135deg, #2c9f49, #00937f);
+    color: white;
+    padding: 10px 14px;
+    border-radius: 50px;
+    box-shadow: 0 4px 16px rgba(0, 147, 127, 0.35);
+    font-size: 13px;
+    cursor: default;
+    transition: box-shadow .2s;
+}
+ 
+.grupo-activo-bubble:hover {
+    box-shadow: 0 6px 20px rgba(0, 147, 127, 0.5);
+}
+ 
+.grupo-activo-bubble > .bi-people-fill {
+    font-size: 18px;
+    opacity: .9;
+}
+ 
+.grupo-activo-info {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+}
+ 
+.grupo-activo-label {
+    font-size: 10px;
+    opacity: .8;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+}
+ 
+.grupo-activo-nombre {
+    font-weight: 700;
+    font-size: 14px;
+}
+ 
+.grupo-activo-cambiar button {
+    background: rgba(255,255,255,.2);
+    border: none;
+    color: white;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background .2s;
+    font-size: 13px;
+}
+ 
+.grupo-activo-cambiar button:hover {
+    background: rgba(255,255,255,.35);
+}
+ 
+.grupo-activo-cambiar {
+    margin: 0;
+}

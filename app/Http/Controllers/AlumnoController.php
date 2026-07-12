@@ -13,6 +13,40 @@ use Illuminate\Support\Facades\Storage;
 
 class AlumnoController extends Controller
 {
+    /**
+     * Lista los alumnos del grupo activo en sesión.
+     * - Docente: solo alumnos del grupo que seleccionó.
+     * - Admin:   puede ver alumnos de cualquier grupo; si no hay grupo activo, muestra todos.
+     */
+    public function listar()
+    {
+        $grupoActivoId = session('grupo_activo_id');
+
+        if ($grupoActivoId) {
+            $grupo = grupos::with(['carrera', 'alumnos.user'])->findOrFail($grupoActivoId);
+            $alumnos = $grupo->alumnos()
+                ->with(['user', 'carrera', 'grupo'])
+                ->join('users', 'alumnos.user_id', '=', 'users.id')
+                ->orderBy('users.apellido_paterno')
+                ->orderBy('users.apellido_materno')
+                ->orderBy('users.nombres')
+                ->select('alumnos.*')
+                ->get();
+        } else {
+            // Admin sin grupo seleccionado: muestra todos
+            $grupo = null;
+            $alumnos = alumnos::with(['user', 'carrera', 'grupo'])
+                ->join('users', 'alumnos.user_id', '=', 'users.id')
+                ->orderBy('users.apellido_paterno')
+                ->orderBy('users.apellido_materno')
+                ->orderBy('users.nombres')
+                ->select('alumnos.*')
+                ->get();
+        }
+
+        return view('auth.alumnos', compact('alumnos', 'grupo'));
+    }
+
     public function create()
     {
         $carreras = carreras::all();
