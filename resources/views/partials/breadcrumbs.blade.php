@@ -1,72 +1,89 @@
 @php
-    $routeName = Route::currentRouteName();
-    $navigationHistory = session()->get('navigation_history', []);
-    $breadcrumbs = [];
+$routeName = Route::currentRouteName();
+$navigationHistory = session()->get('navigation_history', []);
+$breadcrumbs = [];
 
-    // Mapeo de nombres de rutas a etiquetas amigables
-    $routeLabels = [
-        'admin.dashboard'   => 'Inicio',
-        'docente.dashboard' => 'Inicio',
-        'alumno.dashboard'  => 'Inicio',
-        'grupos'            => 'Grupos',
-        'alumnos'           => 'Alumnos',
-        'agenda'            => 'Agendar',
-        'registro'          => 'Registro de asesorías',
-        'historial'         => 'Historial',
-        'roles_permisos'    => 'Roles y permisos',
-        'gestion'           => 'Gestión admin.',
-        'registro_alumnos'  => 'Registro Alumnos',
-        'registro_docente'  => 'Registro Docentes',
-        'solicitud'         => 'Solicitud',
-    ];
+// Mapeo de nombres de rutas a etiquetas amigables
+$routeLabels = [
+'admin.dashboard' => 'Inicio',
+'docente.dashboard' => 'Inicio',
+'alumno.dashboard' => 'Inicio',
+'grupos' => 'Grupos',
+'alumnos' => 'Alumnos',
+'agenda' => 'Agendar',
+'registro' => 'Registro de asesorías',
+'historial' => 'Historial',
+'roles_permisos' => 'Roles y permisos',
+'gestion' => 'Gestión admin.',
+'registro_alumnos' => 'Registro Alumnos',
+'registro_docente' => 'Registro Docentes',
+'solicitud' => 'Solicitud',
+'expedienteAlumnos' => 'Expediente', // ← Agregamos esta etiqueta
+];
 
-    // Rutas que requieren parámetros: nunca mostrar en breadcrumb
-    $rutasConParametros = [
-        'grupos.seleccionar', 'grupos.limpiar', 'grupos.destroy',
-        'alumnos.edit', 'alumnos.update', 'alumnos.destroy', 'alumnos.store',
-        'docentes.edit', 'docentes.update', 'docentes.destroy', 'docentes.store',
-        'asesoria.store', 'asesoria.pdf',
-        'usuarios.toggleBlock', 'bitacora.limpiar', 'bitacora.eliminar',
-    ];
-    $navigationHistory = array_filter(
-        $navigationHistory,
-        fn($r) => !in_array($r, $rutasConParametros)
-    );
-    $navigationHistory = array_values($navigationHistory);
+// Rutas que requieren parámetros (NUNCA deben tener enlace en breadcrumb)
+$rutasConParametros = [
+'reporte.ver',
+'grupos.seleccionar',
+'grupos.limpiar',
+'grupos.destroy',
+'alumnos.edit',
+'alumnos.update',
+'alumnos.destroy',
+'alumnos.store',
+'docentes.edit',
+'docentes.update',
+'docentes.destroy',
+'docentes.store',
+'asesoria.store',
+'asesoria.pdf',
+'agenda.store',
+'expedienteAlumnos', // ← ¡Agregamos esta!
+'usuarios.toggleBlock',
+'bitacora.limpiar',
+'bitacora.eliminar',
+];
 
-    // Construir breadcrumbs desde el historial de navegación
-    if (!empty($navigationHistory)) {
-        foreach ($navigationHistory as $index => $navRoute) {
-            $label = $routeLabels[$navRoute] ?? ucfirst(str_replace('_', ' ', $navRoute));
+// Filtrar rutas con parámetros del historial
+$navigationHistory = array_filter(
+$navigationHistory,
+fn($r) => !in_array($r, $rutasConParametros)
+);
+$navigationHistory = array_values($navigationHistory);
 
-            // El último elemento es el actual (sin enlace)
-            if ($index === count($navigationHistory) - 1) {
-                $breadcrumbs[] = ['label' => $label];
-            } else {
-                $breadcrumbs[] = ['label' => $label, 'route' => $navRoute];
-            }
-        }
-    } else {
-        // Sin historial, mostrar solo la página actual
-        $currentLabel = $routeLabels[$routeName] ?? ucfirst(str_replace('_', ' ', $routeName));
-        $breadcrumbs  = [['label' => $currentLabel]];
-    }
+// Construir breadcrumbs desde el historial de navegación
+if (!empty($navigationHistory)) {
+foreach ($navigationHistory as $index => $navRoute) {
+$label = $routeLabels[$navRoute] ?? ucfirst(str_replace('_', ' ', $navRoute));
 
-    // Casos especiales para submenús de registros
-    if ($routeName === 'registro_alumnos' || $routeName === 'registro_docente') {
-        $hasRegistros = false;
-        foreach ($breadcrumbs as $crumb) {
-            if ($crumb['label'] === 'Registros') {
-                $hasRegistros = true;
-                break;
-            }
-        }
-        if (!$hasRegistros) {
-            $lastItem     = array_pop($breadcrumbs);
-            $breadcrumbs[] = ['label' => 'Registros'];
-            $breadcrumbs[] = $lastItem;
-        }
-    }
+// El último elemento es el actual (sin enlace)
+if ($index === count($navigationHistory) - 1) {
+$breadcrumbs[] = ['label' => $label];
+} else {
+$breadcrumbs[] = ['label' => $label, 'route' => $navRoute];
+}
+}
+} else {
+// Sin historial, mostrar solo la página actual
+$currentLabel = $routeLabels[$routeName] ?? ucfirst(str_replace('_', ' ', $routeName));
+$breadcrumbs = [['label' => $currentLabel]];
+}
+
+// Casos especiales para submenús de registros
+if ($routeName === 'registro_alumnos' || $routeName === 'registro_docente') {
+$hasRegistros = false;
+foreach ($breadcrumbs as $crumb) {
+if ($crumb['label'] === 'Registros') {
+$hasRegistros = true;
+break;
+}
+}
+if (!$hasRegistros) {
+$lastItem = array_pop($breadcrumbs);
+$breadcrumbs[] = ['label' => 'Registros'];
+$breadcrumbs[] = $lastItem;
+}
+}
 @endphp
 
 <ol class="custom-breadcrumb">
@@ -77,17 +94,17 @@
     </li>
 
     @foreach($breadcrumbs as $crumb)
-        @if($crumb['label'] !== 'Inicio')
-            <li class="separator">
-                <i class="bi bi-chevron-right"></i>
-            </li>
-            <li class="{{ isset($crumb['route']) ? '' : 'active' }}">
-                @if(isset($crumb['route']))
-                    <a href="{{ route($crumb['route']) }}">{{ $crumb['label'] }}</a>
-                @else
-                    {{ $crumb['label'] }}
-                @endif
-            </li>
+    @if($crumb['label'] !== 'Inicio')
+    <li class="separator">
+        <i class="bi bi-chevron-right"></i>
+    </li>
+    <li class="{{ isset($crumb['route']) ? '' : 'active' }}">
+        @if(isset($crumb['route']) && !in_array($crumb['route'], $rutasConParametros))
+        <a href="{{ route($crumb['route']) }}">{{ $crumb['label'] }}</a>
+        @else
+        {{ $crumb['label'] }}
         @endif
+    </li>
+    @endif
     @endforeach
 </ol>

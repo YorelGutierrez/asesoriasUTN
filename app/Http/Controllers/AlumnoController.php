@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\alumnos;
 use App\Models\carreras;
 use App\Models\grupos;
+use App\Models\sesiones_asesoria;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
@@ -23,9 +24,9 @@ class AlumnoController extends Controller
         $grupoActivoId = session('grupo_activo_id');
 
         if ($grupoActivoId) {
-            $grupo = grupos::with(['carrera', 'alumnos.user'])->findOrFail($grupoActivoId);
-            $alumnos = $grupo->alumnos()
-                ->with(['user', 'carrera', 'grupo'])
+            $grupo = grupos::with('carrera')->findOrFail($grupoActivoId);
+            $alumnos = alumnos::with(['user', 'carrera', 'grupo'])
+                ->where('grupo_id', $grupoActivoId)
                 ->join('users', 'alumnos.user_id', '=', 'users.id')
                 ->orderBy('users.apellido_paterno')
                 ->orderBy('users.apellido_materno')
@@ -33,8 +34,7 @@ class AlumnoController extends Controller
                 ->select('alumnos.*')
                 ->get();
         } else {
-            // Admin sin grupo seleccionado: muestra todos
-            $grupo = null;
+            $grupo   = null;
             $alumnos = alumnos::with(['user', 'carrera', 'grupo'])
                 ->join('users', 'alumnos.user_id', '=', 'users.id')
                 ->orderBy('users.apellido_paterno')
@@ -45,6 +45,50 @@ class AlumnoController extends Controller
         }
 
         return view('auth.alumnos', compact('alumnos', 'grupo'));
+    }
+
+    /**
+     * Muestra el expediente completo de un alumno.
+     * Guarda el alumno en sesión para que otras vistas lo recuerden.
+     */
+    public function expediente($id)
+    {
+        $alumno = alumnos::with(['user', 'carrera', 'grupo'])->findOrFail($id);
+
+        // Guardar en sesión para uso en otras secciones
+        session(['alumno_activo_id' => $alumno->id]);
+
+        // Materias reprobadas del historial académico
+        $materiasReprobadas = $alumno->historialAcademico()
+            ->with('materia')
+            ->where('reprobada', true)
+            ->get();
+
+        // Temas no dominados (registros con temas_no_dominados no nulo)
+        $temasNoDominados = $alumno->historialAcademico()
+            ->with('materia')
+            ->whereNotNull('temas_no_dominados')
+            ->where('temas_no_dominados', '!=', '')
+            ->get();
+
+        // Asesorías del alumno: sesiones donde aparece en sesion_alumno
+        $sesiones = sesiones_asesoria::with(['docente', 'acuerdos', 'reporte'])
+            ->whereHas('alumnos', function ($q) use ($alumno) {
+                $q->where('sesion_alumno.alumno_id', $alumno->user_id);
+            })
+            ->orderBy('fecha_inicio', 'desc')
+            ->get();
+
+        // Últimas 3 asesorías para el resumen rápido
+        $ultimasSesiones = $sesiones->take(3);
+
+        return view('auth.expediente_alumnos', compact(
+            'alumno',
+            'materiasReprobadas',
+            'temasNoDominados',
+            'sesiones',
+            'ultimasSesiones'
+        ));
     }
 
     public function create()
@@ -140,7 +184,6 @@ class AlumnoController extends Controller
             registrar_log('CREAR', 'Alumno: ' . $user->nombres . ' ' . $user->apellido_paterno . ' | Matrícula: ' . $request->matricula, 'alumnos');
 
             return redirect()->route('gestion', ['tab' => 'alumnos'])->with('success', 'Alumno registrado correctamente');
-
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->back()->with('error', 'Error: ' . $e->getMessage())->withInput();
@@ -227,7 +270,6 @@ class AlumnoController extends Controller
             registrar_log('EDITAR', 'Alumno: ' . $user->nombres . ' ' . $user->apellido_paterno . ' | Matrícula: ' . $request->matricula, 'alumnos');
 
             return redirect()->route('gestion', ['tab' => 'alumnos'])->with('success', 'Alumno actualizado correctamente');
-
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', 'Error: ' . $e->getMessage());
@@ -255,7 +297,6 @@ class AlumnoController extends Controller
             DB::commit();
 
             return redirect()->route('gestion', ['tab' => 'alumnos'])->with('success', 'Alumno eliminado correctamente');
-
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', 'Error: ' . $e->getMessage());

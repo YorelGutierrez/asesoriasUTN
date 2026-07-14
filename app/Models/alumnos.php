@@ -32,4 +32,15 @@ class alumnos extends Model
     {
         return $this->belongsTo(grupos::class, 'grupo_id');
     }
+
+    public function historialAcademico()
+    {
+        return $this->hasMany(historial_academico::class, 'alumno_id');
+    }
+
+    public function sesiones()
+    {
+        return $this->belongsToMany(sesiones_asesoria::class, 'sesion_alumno', 'alumno_id', 'sesion_id', 'user_id')
+            ->withTimestamps();
+    }
 }

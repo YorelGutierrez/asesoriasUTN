@@ -10,10 +10,9 @@ return new class extends Migration
     {
         Schema::create('reportes_asesoria', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('docente_id')->nullable()->constrained('users')->onDelete('set null');
-            $table->string('periodo');
-            $table->text('contenido')->nullable();
-            $table->string('archivo_ruta')->nullable();
+            $table->foreignId('sesion_id')->constrained('sesiones_asesoria')->onDelete('cascade');
+            $table->string('nombre_archivo');
+            $table->string('ruta');
             $table->timestamps();
         });
     }

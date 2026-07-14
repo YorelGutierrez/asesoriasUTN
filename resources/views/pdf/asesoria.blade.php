@@ -26,7 +26,9 @@
         <tr><th>Carrera:</th><td>{{ $data['carrera_nombre'] }}</td></tr>
         <tr><th>Tipo de asesoría:</th><td>{{ ucfirst($data['tipo_asesoria']) }}</td></tr>
         <tr><th>Asignatura:</th><td>{{ $data['materia_nombre'] }}</td></tr>
+        <tr><th>Motivo:</th><td>{{ $data['motivo'] }}</td></tr>
         <tr><th>Tema:</th><td>{{ $data['tema'] }}</td></tr>
+        <tr><th>Modalidad:</th><td>{{ $data['modalidad'] }}</td></tr>
         <tr><th>Fecha:</th><td>{{ $data['fecha'] }}</td></tr>
         <tr><th>Horario:</th><td>{{ $data['hora_inicio'] }} - {{ $data['hora_fin'] }}</td></tr>
     </table>

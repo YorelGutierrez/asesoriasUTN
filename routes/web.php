@@ -15,6 +15,7 @@ use App\Models\alumnos;
 use App\Models\docentes;
 use App\Models\grupos;
 use App\Models\logs;
+use App\Models\reportes_asesoria;
 
 /*
 |--------------------------------------------------------------------------
@@ -38,7 +39,7 @@ Route::middleware(['auth'])->group(function () {
 
 // Rutas protegidas para el admin
 Route::middleware(['auth', 'rol:admin'])->group(function () {
-    
+
     Route::get('/admin/dashboard', [RespaldoController::class, 'dashboard'])->name('admin.dashboard');
 
     // ========== ROLES Y PERMISOS ==========
@@ -103,7 +104,6 @@ Route::middleware(['auth', 'rol:docente'])->group(function () {
     // RUTAS DE ASESORÍAS
     Route::get('/docente/asesoria', [AsesoriaController::class, 'create'])->name('registro');
     Route::post('/docente/asesoria', [AsesoriaController::class, 'store'])->name('asesoria.store');
-    Route::post('/docente/asesoria/pdf', [AsesoriaController::class, 'generarPDF'])->name('asesoria.pdf');
 });
 
 // Rutas protegidas para alumnos
@@ -124,18 +124,19 @@ Route::middleware(['auth', 'rol:admin,docente'])->group(function () {
     Route::post('/grupos/limpiar', [GrupoController::class, 'limpiarSeleccion'])->name('grupos.limpiar');
 
     Route::get('/alumnos', [AlumnoController::class, 'listar'])->name('alumnos');
-
-    Route::get('/alumnos/expediente', function () {
-        // El alumno_id se guarda en sesión para la Fase 2
-        if (request('alumno_id')) {
-            session(['alumno_activo_id' => request('alumno_id')]);
-        }
-        return view('auth.expediente_alumnos');
-    })->name('expedienteAlumnos');
+    Route::get('/alumnos/expediente/{id}', [AlumnoController::class, 'expediente'])->name('expedienteAlumnos');
 
     Route::get('/historial', function () {
         return view('auth.historial');
     })->name('historial');
+
+    // Rutas para PDF
+    Route::post('/docente/asesoria/reporte/generar', [AsesoriaController::class, 'generarReporte'])->name('asesoria.reporte.generar');
+    // Ver reporte (PDF) desde el expediente
+    Route::get('/docente/reporte/{id}', function ($id) {
+        $reporte = \App\Models\reportes_asesoria::findOrFail($id);
+        return response()->file(storage_path('app/public/' . $reporte->ruta));
+    })->name('reporte.ver');
 });
 
 // Cerrar sesión
@@ -146,7 +147,7 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 Route::get('/reset-navigation', function () {
     session()->forget('navigation_history');
     return redirect()->route(
-        match(auth()->user()->rol) {
+        match (auth()->user()->rol) {
             'admin' => 'admin.dashboard',
             'docente' => 'docente.dashboard',
             default => 'alumno.dashboard'

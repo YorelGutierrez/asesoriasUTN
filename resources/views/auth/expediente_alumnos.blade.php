@@ -11,17 +11,23 @@
 
 <div class="card shadow-sm border-0 rounded-4 mb-4">
     <div class="card-body p-4">
-        <h2 class="h4 fw-bold mb-3">Expediente del alumno: <span style="color: #2c9f49;">Gutiérrez Zepeda Yorel Isai</span></h2>
+        <h2 class="h4 fw-bold mb-3">Expediente del alumno:
+            <span style="color: #2c9f49;">
+                {{ $alumno->user->apellido_paterno }} {{ $alumno->user->apellido_materno }} {{ $alumno->user->nombres }}
+            </span>
+        </h2>
 
         <div class="row g-4">
             <!-- Información académica -->
             <div class="col-md-6">
                 <div class="bg-light p-3 rounded-3 h-100">
                     <h5 class="fw-semibold mb-3">Información académica</h5>
-                    <p class="mb-1"><strong>Matrícula:</strong> TIC-310036</p>
-                    <p class="mb-1"><strong>Grupo:</strong> IDGS-84</p>
-                    <p class="mb-1"><strong>Carrera:</strong> Ingeniería en desarrollo de software</p>
-                    <p class="mb-0"><strong>Status académico:</strong> bueno</p>
+                    <p class="mb-1"><strong>Matrícula:</strong> {{ $alumno->matricula }}</p>
+                    <p class="mb-1"><strong>Grupo:</strong> {{ $alumno->grupo->nombre ?? 'Sin grupo' }}</p>
+                    <p class="mb-1"><strong>Carrera:</strong> {{ $alumno->carrera->nombre ?? 'Sin carrera' }}</p>
+                    <p class="mb-0"><strong>Status académico:</strong>
+                        {{ $alumno->status_academico ?? 'No registrado' }}
+                    </p>
                 </div>
             </div>
 
@@ -29,9 +35,21 @@
             <div class="col-md-6">
                 <div class="bg-light p-3 rounded-3 h-100">
                     <h5 class="fw-semibold mb-3">Últimas asesorías</h5>
+                    @if($ultimasSesiones->isEmpty())
+                    <p class="text-muted mb-0">Sin asesorías registradas aún.</p>
+                    @else
                     <ul class="list-unstyled mb-0">
-                        <li class="mb-2">• <strong>10/03/2026</strong> – Estructura de base de datos (acuerdo: ejercicios prácticos)</li>
+                        @foreach($ultimasSesiones as $sesion)
+                        <li class="mb-2">
+                            • <strong>{{ \Carbon\Carbon::parse($sesion->fecha_inicio)->format('d/m/Y') }}</strong>
+                            – {{ $sesion->tema }}
+                            @if($sesion->acuerdos->first())
+                            (acuerdo: {{ Str::limit($sesion->acuerdos->first()->acuerdo, 40) }})
+                            @endif
+                        </li>
+                        @endforeach
                     </ul>
+                    @endif
                 </div>
             </div>
         </div>
@@ -44,17 +62,17 @@
         <div class="card shadow-sm border-0 rounded-4 h-100">
             <div class="card-body">
                 <h5 class="fw-semibold mb-3">Materias reprobadas</h5>
+                @if($materiasReprobadas->isEmpty())
+                <p class="text-muted">Sin materias reprobadas registradas.</p>
+                @else
                 <ul class="list-group list-group-flush">
+                    @foreach($materiasReprobadas as $historial)
                     <li class="list-group-item d-flex justify-content-between align-items-center">
-                        Matematicas para ingenieria II
+                        {{ $historial->materia->nombre }}
                     </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        Estructura de base de datos
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        Inglés I
-                    </li>
+                    @endforeach
                 </ul>
+                @endif
             </div>
         </div>
     </div>
@@ -62,11 +80,17 @@
         <div class="card shadow-sm border-0 rounded-4 h-100">
             <div class="card-body">
                 <h5 class="fw-semibold mb-3">Temas que no domina</h5>
+                @if($temasNoDominados->isEmpty())
+                <p class="text-muted">Sin temas registrados.</p>
+                @else
                 <ul class="list-group list-group-flush">
-                    <li class="list-group-item">• Consultas SQL complejas</li>
-                    <li class="list-group-item">• Diseño responsive con CSS</li>
-                    <li class="list-group-item">• Derivada de la place</li>
+                    @foreach($temasNoDominados as $historial)
+                    @foreach(explode(',', $historial->temas_no_dominados) as $tema)
+                    <li class="list-group-item">• {{ trim($tema) }}</li>
+                    @endforeach
+                    @endforeach
                 </ul>
+                @endif
             </div>
         </div>
     </div>
@@ -82,6 +106,7 @@
                     <tr>
                         <th>Tipo</th>
                         <th>Grupo / Nombre</th>
+                        <th>Motivo</th>
                         <th>Tema tratado</th>
                         <th>Modalidad</th>
                         <th>Acuerdos / Resultados</th>
@@ -89,37 +114,46 @@
                     </tr>
                 </thead>
                 <tbody>
+                    @forelse($sesiones as $sesion)
+                    @php
+                    $esGrupo = $sesion->alumnos->count() > 1;
+                    $reporte = optional($sesion->reporte)->first();
+                    @endphp
                     <tr>
-                        <td>Individual</td>
-                        <td>Gutiérrez Zepeda Yorel</td>
-                        <td>Derivadas e integrales</td>
-                        <td>Presencial</td>
-                        <td>Resolver 10 ejercicios para próxima clase</td>
-                        <td><a href="#" class="btn-secundario">Ver</a></td>
+                        <td>{{ $esGrupo ? 'Grupo' : 'Individual' }}</td>
+                        <td>
+                            @if($esGrupo)
+                            {{ $alumno->grupo->nombre ?? 'Grupo' }}
+                            @else
+                            {{ $alumno->user->apellido_paterno }} {{ $alumno->user->nombres }}
+                            @endif
+                        </td>
+                        <td>{{ $sesion->motivo ?? '—' }}</td>
+                        <td>{{ $sesion->tema }}</td>
+                        <td>{{ ucfirst($sesion->modalidad) }}</td>
+                        <td>{{ $sesion->acuerdos->first()->acuerdo ?? '—' }}</td>
+                        <td>
+                            @if($reporte)
+                            <a href="{{ route('reporte.ver', $reporte->id) }}" target="_blank" class="btn-secundario">Ver</a>
+                            @else
+                            <span class="text-muted">Sin PDF</span>
+                            @endif
+                        </td>
                     </tr>
+                    @empty
                     <tr>
-                        <td>Grupo</td>
-                        <td>IDGS-84</td>
-                        <td>Modelo relacional</td>
-                        <td>Virtual</td>
-                        <td>Avance del 80% en proyecto</td>
-                        <td><a href="#" class="btn-secundario">Ver</a></td>
+                        <td colspan="6" class="text-center text-muted py-3">
+                            Sin asesorías registradas para este alumno.
+                        </td>
                     </tr>
-                    <tr>
-                        <td>Individual</td>
-                        <td>Gutiérrez Zepeda Yorel</td>
-                        <td>Flexbox y Grid</td>
-                        <td>Presencial</td>
-                        <td>Revisión de layout responsive</td>
-                        <td><a href="#" class="btn-secundario">Ver</a></td>
-                    </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
     </div>
 </div>
 
-<!-- Botón de regreso (opcional) -->
+<!-- Botón de regreso -->
 <a href="{{ route('alumnos') }}" class="btn-principal"><- Regresar al listado</a>
 
-@endsection()
+        @endsection

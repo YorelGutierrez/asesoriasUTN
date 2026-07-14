@@ -9,17 +9,20 @@ class sesiones_asesoria extends Model
 {
     use HasFactory;
 
+    protected $table = 'sesiones_asesoria';
+
     protected $fillable = [
-    'docente_id',
-    'solicitud_id',
-    'tema',
-    'fecha_inicio',
-    'fecha_fin',
-    'modalidad',
-    'lugar',
-    'estado',
-    'observaciones',
-];
+        'docente_id',
+        'solicitud_id',
+        'tema',
+        'tipo_asesoria',
+        'fecha_inicio',
+        'fecha_fin',
+        'modalidad',
+        'lugar',
+        'estado',
+        'motivo',
+    ];
 
     public function docente()
     {
@@ -34,6 +37,16 @@ class sesiones_asesoria extends Model
     public function alumnos()
     {
         return $this->belongsToMany(User::class, 'sesion_alumno', 'sesion_id', 'alumno_id')
-                    ->withTimestamps();
+            ->withTimestamps();
+    }
+
+    public function acuerdos()
+    {
+        return $this->hasMany(acuerdos_asesoria::class, 'sesion_id');
+    }
+
+    public function reporte()
+    {
+        return $this->hasOne(reportes_asesoria::class, 'sesion_id');
     }
 }
