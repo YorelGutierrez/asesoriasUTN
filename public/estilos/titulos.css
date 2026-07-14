@@ -8,3 +8,38 @@
     margin-bottom: 20px;
     padding: 10px;
 }
+
+/* ===== Sobrescribir table-light con degradado verde ===== */
+.table-light {
+    --bs-table-bg: transparent !important;
+    background: linear-gradient(to left, #00937f, #2c9f49) !important;
+    color: #fff !important;
+}
+
+.table-light th {
+    color: #fff !important;
+    font-weight: 600;
+    border-bottom: none !important;
+}
+
+/* Opcional: redondear las esquinas de los th */
+.table-light th:first-child {
+    border-top-left-radius: 10px;
+}
+
+.table-light th:last-child {
+    border-top-right-radius: 10px;
+}
+
+/* Alternativa: si quieres mantener el efecto solo en tablas dentro de cards */
+.card .table-light {
+    --bs-table-bg: transparent !important;
+    background: linear-gradient(to left, #00937f, #2c9f49) !important;
+    color: #fff !important;
+}
+
+.card .table-light th {
+    color: #fff !important;
+    font-weight: 600;
+    border-bottom: none !important;
+}

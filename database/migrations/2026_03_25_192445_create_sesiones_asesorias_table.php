@@ -13,12 +13,13 @@ return new class extends Migration
             $table->foreignId('docente_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('solicitud_id')->nullable()->constrained('solicitudes_asesoria')->onDelete('set null');
             $table->string('tema')->nullable();
+            $table->string('tipo_asesoria');
             $table->dateTime('fecha_inicio');
             $table->dateTime('fecha_fin');
             $table->enum('modalidad', ['virtual', 'presencial'])->default('presencial');
             $table->string('lugar')->nullable();
             $table->enum('estado', ['programada', 'realizada', 'cancelada'])->default('programada');
-            $table->text('observaciones')->nullable();
+            $table->text('motivo');
             $table->timestamps();
         });
     }
