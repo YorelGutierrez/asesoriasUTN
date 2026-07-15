@@ -14,7 +14,7 @@
     <div class="col-md-4">
         <div class="card shadow-sm border-0 rounded-4 h-100">
             <div class="card-header bg-white border-0 pt-4">
-                <h5 class="fw-semibold mb-0">PRÓXIMA ASESORÍA</h5>
+                <h5 class="fw-semibold mb-0 titulo-borde-verde">PRÓXIMA ASESORÍA</h5>
             </div>
             <div class="card-body">
                 <div class="d-flex align-items-center gap-3">
@@ -30,7 +30,7 @@
     <div class="col-md-4">
         <div class="card shadow-sm border-0 rounded-4 h-100">
             <div class="card-header bg-white border-0 pt-4">
-                <h5 class="fw-semibold mb-0">ASESORÍAS AGENDADAS</h5>
+                <h5 class="fw-semibold mb-0 titulo-borde-verde">ASESORÍAS AGENDADAS</h5>
             </div>
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-end">
@@ -43,7 +43,7 @@
     <div class="col-md-4">
         <div class="card shadow-sm border-0 rounded-4 h-100">
             <div class="card-header bg-white border-0 pt-4">
-                <h5 class="fw-semibold mb-0">ASESORÍAS COMPLETADAS</h5>
+                <h5 class="fw-semibold mb-0 titulo-borde-verde">ASESORÍAS COMPLETADAS</h5>
             </div>
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-end">
@@ -118,7 +118,7 @@
     <div class="card shadow-sm border-0 rounded-4 mb-4">
         <div class="card-body p-4">
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 class="fw-semibold mb-0">Asesorías realizadas</h5>
+                <h5 class="fw-semibold mb-0 titulo-borde-verde">Asesorías realizadas</h5>
             </div>
             <div class="table-responsive">
                 <table class="table table-hover align-middle">

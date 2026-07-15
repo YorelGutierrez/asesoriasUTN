@@ -14,7 +14,7 @@
     <div class="col-md-4">
         <div class="card shadow-sm border-0 rounded-4 h-100">
             <div class="card-header bg-white border-0 pt-4">
-                <h5 class="fw-semibold mb-0">PRÓXIMA ASESORÍA</h5>
+                <h5 class="fw-semibold mb-0 titulo-borde-verde">PRÓXIMA ASESORÍA</h5>
             </div>
             <div class="card-body">
                 <div class="d-flex align-items-center gap-3">
@@ -30,7 +30,7 @@
     <div class="col-md-4">
         <div class="card shadow-sm border-0 rounded-4 h-100">
             <div class="card-header bg-white border-0 pt-4">
-                <h5 class="fw-semibold mb-0">ALUMNOS TOTALES</h5>
+                <h5 class="fw-semibold mb-0 titulo-borde-verde">ALUMNOS TOTALES</h5>
             </div>
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-end">
@@ -43,7 +43,7 @@
     <div class="col-md-4">
         <div class="card shadow-sm border-0 rounded-4 h-100">
             <div class="card-header bg-white border-0 pt-4">
-                <h5 class="fw-semibold mb-0">GRUPOS ACTIVOS</h5>
+                <h5 class="fw-semibold mb-0 titulo-borde-verde">GRUPOS ACTIVOS</h5>
             </div>
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-end">

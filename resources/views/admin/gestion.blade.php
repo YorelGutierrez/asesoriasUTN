@@ -12,7 +12,7 @@
 <!-- filtrados comunes -->
 <div class="card shadow-sm mb-4 border-0">
     <div class="card-body p-4">
-        <h5 class="fw-semibold mb-3">Filtros de búsqueda</h5>
+        <h5 class="fw-semibold mb-3 titulo-borde-verde">Filtros de búsqueda</h5>
         <div class="row g-3 align-items-end">
             <div class="col-md-4">
                 <label class="form-label fw-semibold">Buscar por nombre / matrícula / empleado</label>
@@ -72,7 +72,7 @@
         <div class="card shadow-sm border-0">
             <div class="card-body p-4">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="fw-semibold mb-0">Listado de grupos</h5>
+                    <h5 class="fw-semibold mb-0 titulo-borde-verde">Listado de grupos</h5>
                     <div class="col-md-4">
                         <button class="btn-principal" data-bs-toggle="modal" data-bs-target="#modalGrupo">
                             <i class="bi bi-plus-circle"></i> Nuevo grupo
@@ -129,7 +129,7 @@
         <div class="card shadow-sm border-0">
             <div class="card-body p-4">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="fw-semibold mb-0">Listado de alumnos</h5>
+                    <h5 class="fw-semibold mb-0 titulo-borde-verde">Listado de alumnos</h5>
                     <div class="col-md-4">
                         <a href="{{ route('registro_alumnos') }}" class="btn-principal">
                             <i class="bi bi-plus-circle"></i> Nuevo alumno
@@ -195,7 +195,7 @@
         <div class="card shadow-sm border-0">
             <div class="card-body p-4">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="fw-semibold mb-0">Listado de docentes</h5>
+                    <h5 class="fw-semibold mb-0 titulo-borde-verde">Listado de docentes</h5>
                     <div class="col-md-4">
                         <a href="{{ route('registro_docente') }}" class="btn-principal">
                             <i class="bi bi-plus-circle"></i> Nuevo docente

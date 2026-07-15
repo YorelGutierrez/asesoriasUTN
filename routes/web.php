@@ -10,6 +10,7 @@ use App\Http\Controllers\AlumnoController;
 use App\Http\Controllers\CarreraController;
 use App\Http\Controllers\AsesoriaController;
 use App\Http\Controllers\GrupoController;
+use App\Http\Controllers\NotificacionController;
 use App\Http\Controllers\UserController;
 use App\Models\alumnos;
 use App\Models\docentes;
@@ -35,6 +36,40 @@ Route::post('/registro', [RegistroController::class, 'register'])->name('registr
 // Ruta AGENDA para TODOS los roles autenticados (ALUMNOS, DOCENTES, ADMIN)
 Route::middleware(['auth'])->group(function () {
     Route::get('/agenda', [AsesoriaController::class, 'agendar'])->name('agenda');
+    Route::post('/agenda', [AsesoriaController::class, 'storeAgenda'])->name('agenda.store');
+
+    // ===== NOTIFICACIONES =====
+    Route::get('/notificaciones', [NotificacionController::class, 'index'])->name('notificaciones.index');
+    Route::post('/notificaciones/{id}/leer', [NotificacionController::class, 'marcarLeida'])->name('notificaciones.leer');
+    Route::post('/notificaciones/leer-todas', [NotificacionController::class, 'marcarTodasLeidas'])->name('notificaciones.leerTodas');
+    Route::post('/notificaciones/{id}/confirmar', [NotificacionController::class, 'confirmar'])->name('notificaciones.confirmar');
+    Route::post('/notificaciones/{id}/rechazar', [NotificacionController::class, 'rechazar'])->name('notificaciones.rechazar');
+
+    // ===== CALENDARIO (sesiones del mes) =====
+    Route::get('/calendario/sesiones', function () {
+        $user = auth()->user();
+        $mes = request('mes', now()->month);
+        $anio = request('anio', now()->year);
+
+        if ($user->rol === 'alumno') {
+            $sesiones = \App\Models\sesiones_asesoria::whereHas('alumnos', function ($q) use ($user) {
+                $q->where('sesion_alumno.alumno_id', $user->id);
+            })->whereMonth('fecha_inicio', $mes)
+                ->whereYear('fecha_inicio', $anio)
+                ->where('estado', '!=', 'cancelada')
+                ->pluck('fecha_inicio');
+        } else {
+            $sesiones = \App\Models\sesiones_asesoria::where('docente_id', $user->id)
+                ->whereMonth('fecha_inicio', $mes)
+                ->whereYear('fecha_inicio', $anio)
+                ->where('estado', '!=', 'cancelada')
+                ->pluck('fecha_inicio');
+        }
+
+        $dias = $sesiones->map(fn($f) => (int) date('j', strtotime($f)))->unique()->values();
+
+        return response()->json(['dias' => $dias, 'mes' => $mes, 'anio' => $anio]);
+    })->name('calendario.sesiones');
 });
 
 // Rutas protegidas para el admin
@@ -111,10 +146,6 @@ Route::middleware(['auth', 'rol:alumno'])->group(function () {
     Route::get('/alumno/dashboard', function () {
         return view('auth.alumnos.escritorioAlumno');
     })->name('alumno.dashboard');
-
-    Route::get('/solicitud', function () {
-        return view('auth.alumnos.solicitud_asesorias');
-    })->name('solicitud');
 });
 
 // Rutas compartidas (docentes y admin)

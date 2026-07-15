@@ -10,16 +10,19 @@ $routeLabels = [
 'alumno.dashboard' => 'Inicio',
 'grupos' => 'Grupos',
 'alumnos' => 'Alumnos',
-'agenda' => 'Agendar',
+'agenda' => Auth::user()->rol == 'alumno' ? 'Solicitar' : 'Agendar',
 'registro' => 'Registro de asesorías',
 'historial' => 'Historial',
 'roles_permisos' => 'Roles y permisos',
 'gestion' => 'Gestión admin.',
 'registro_alumnos' => 'Registro Alumnos',
 'registro_docente' => 'Registro Docentes',
-'solicitud' => 'Solicitud',
-'expedienteAlumnos' => 'Expediente', // ← Agregamos esta etiqueta
+'expedienteAlumnos' => 'Expediente',
 ];
+
+if (auth()->check()) {
+    $routeLabels['agenda'] = auth()->user()->rol === 'alumno' ? 'Solicitar' : 'Agendar';
+}
 
 // Rutas que requieren parámetros (NUNCA deben tener enlace en breadcrumb)
 $rutasConParametros = [
@@ -38,10 +41,14 @@ $rutasConParametros = [
 'asesoria.store',
 'asesoria.pdf',
 'agenda.store',
-'expedienteAlumnos', // ← ¡Agregamos esta!
+'expedienteAlumnos',
 'usuarios.toggleBlock',
 'bitacora.limpiar',
 'bitacora.eliminar',
+'notificaciones.confirmar',
+'notificaciones.rechazar',
+'notificaciones.leer',
+'notificaciones.leerTodas',
 ];
 
 // Filtrar rutas con parámetros del historial

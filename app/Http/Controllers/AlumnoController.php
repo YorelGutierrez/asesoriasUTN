@@ -72,10 +72,12 @@ class AlumnoController extends Controller
             ->get();
 
         // Asesorías del alumno: sesiones donde aparece en sesion_alumno
+        // Asesorías del alumno: solo las que están realizadas
         $sesiones = sesiones_asesoria::with(['docente', 'acuerdos', 'reporte'])
             ->whereHas('alumnos', function ($q) use ($alumno) {
                 $q->where('sesion_alumno.alumno_id', $alumno->user_id);
             })
+            ->where('estado', 'realizada') // 🔥 FILTRO: solo realizadas
             ->orderBy('fecha_inicio', 'desc')
             ->get();
 

@@ -10,7 +10,7 @@
 <div class="mt-4">
     <div class="card shadow-sm border-0 rounded-4 mb-4">
         <div class="card-header bg-white border-0 pt-4">
-            <h4 class="fw-semibold mb-0"> Formulario de Asesoría</h4>
+            <h4 class="fw-semibold mb-0 titulo-borde-verde"> Formulario de Asesoría</h4>
         </div>
         <div class="card-body p-4">
 
