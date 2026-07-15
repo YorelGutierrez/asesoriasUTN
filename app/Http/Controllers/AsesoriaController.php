@@ -10,6 +10,7 @@ use App\Models\sesiones_asesoria;
 use App\Models\User;
 use App\Models\archivos_asesoria;
 use App\Models\docentes;
+use App\Models\notificaciones;
 use App\Models\reportes_asesoria;
 use App\Models\sesion_alumno;
 use Illuminate\Http\Request;
@@ -47,6 +48,169 @@ class AsesoriaController extends Controller
 
         return view('auth.agendar', compact('carreras', 'materias', 'alumnos', 'docentes', 'tipoVista'));
     }
+
+    /**
+     * Guarda una asesoría agendada desde la vista pública (todos los roles).
+     * - Alumno: selecciona un docente, la sesión queda pendiente de confirmación.
+     * - Docente: selecciona un alumno, la sesión queda programada directamente.
+     * - Admin: selecciona un alumno (o docente), similar a docente.
+     */
+    public function storeAgenda(Request $request)
+    {
+        // Validación base
+        $request->validate([
+            'tema'              => 'required|string|max:255',
+            'fecha'             => 'required|date|after_or_equal:today',
+            'hora_inicio'       => 'required|date_format:H:i',
+            'modalidad'         => 'required|in:presencial,virtual',
+            'destinatario_id'   => 'required|integer',
+            'tipo_destinatario' => 'required|in:docente,alumno',
+            'pregunta_objetivo' => 'nullable|string|max:500',
+            'pregunta_conocimiento' => 'nullable|boolean',
+            'pregunta_material' => 'nullable|boolean',
+            'pregunta_ejercicios' => 'nullable|boolean',
+        ]);
+
+        $user = auth()->user();
+
+        try {
+            DB::beginTransaction();
+
+            // Determinar docente_id y alumno_id según rol y tipo_destinatario
+            $docenteId = null;
+            $alumnoId = null;
+            $estado = 'programada';
+
+            if ($user->rol === 'alumno') {
+                $docenteId = $request->destinatario_id;
+                $alumnoId = $user->id;
+            } elseif ($user->rol === 'docente') {
+                $docenteId = $user->id;
+                $alumnoId = $request->destinatario_id;
+            } elseif ($user->rol === 'admin') {
+                $docenteId = $user->id;
+                $alumnoId = $request->destinatario_id;
+            } else {
+                throw new \Exception('Rol no válido para agendar.');
+            }
+
+            // Validar que el destinatario exista y tenga el rol correcto
+            if ($request->tipo_destinatario === 'docente') {
+                $docente = User::find($docenteId);
+                if (!$docente || $docente->rol !== 'docente') {
+                    throw new \Exception('El docente seleccionado no es válido.');
+                }
+            } elseif ($request->tipo_destinatario === 'alumno') {
+                $alumno = User::find($alumnoId);
+                if (!$alumno || $alumno->rol !== 'alumno') {
+                    throw new \Exception('El alumno seleccionado no es válido.');
+                }
+            }
+
+            // Construir fecha_hora
+            $fechaInicio = $request->fecha . ' ' . $request->hora_inicio . ':00';
+            $fechaFin = $request->fecha . ' ' . $request->hora_inicio . ':00';
+
+            // Crear la sesión
+            $sesion = sesiones_asesoria::create([
+                'docente_id'    => $docenteId,
+                'tema'          => $request->tema,
+                'tipo_asesoria' => 'individual', // 👈 Agregado
+                'fecha_inicio'  => $fechaInicio,
+                'fecha_fin'     => $fechaFin,
+                'modalidad'     => $request->modalidad,
+                'estado'        => $estado,
+                'motivo'        => $request->pregunta_objetivo ?? 'Sin objetivo específico.',
+                'observaciones' => null,
+            ]);
+
+            // Asociar el alumno (si existe)
+            if ($alumnoId) {
+                sesion_alumno::create([
+                    'sesion_id' => $sesion->id,
+                    'alumno_id' => $alumnoId,
+                ]);
+            }
+
+            // ---- NOTIFICACIONES ----
+            $fechaFormato = date('d/m/Y', strtotime($request->fecha));
+            $horaFormato = $request->hora_inicio;
+
+            if ($user->rol === 'alumno') {
+                // Alumno → notificar al docente
+                $nombreAlumno = $user->nombres . ' ' . $user->apellido_paterno;
+                notificaciones::crear(
+                    $docenteId,
+                    'solicitud_asesoria',
+                    "El alumno {$nombreAlumno} ha solicitado una asesoría sobre \"{$request->tema}\" para el {$fechaFormato} a las {$horaFormato} — {$request->modalidad}." .
+                        ($request->pregunta_objetivo ? " Objetivo: {$request->pregunta_objetivo}" : ''),
+                    [
+                        'sesion_id' => $sesion->id,
+                        'alumno_user_id' => $user->id,
+                        'alumno_nombre' => $nombreAlumno,
+                        'fecha' => $fechaFormato,
+                        'hora' => $horaFormato,
+                        'modalidad' => $request->modalidad,
+                        'objetivo' => $request->pregunta_objetivo ?? '',
+                        'tema' => $request->tema,
+                    ]
+                );
+
+                // Notificar al alumno (confirmación de envío)
+                notificaciones::crear(
+                    $user->id,
+                    'recordatorio',
+                    "Tu solicitud de asesoría sobre \"{$request->tema}\" fue enviada al docente. Espera su confirmación.",
+                    ['sesion_id' => $sesion->id]
+                );
+            } elseif ($user->rol === 'docente' || $user->rol === 'admin') {
+                // Docente/Admin → notificar al alumno
+                $nombreDocente = $user->nombres . ' ' . $user->apellido_paterno;
+                notificaciones::crear(
+                    $alumnoId,
+                    'solicitud_asesoria',
+                    "El docente {$nombreDocente} ha agendado una asesoría contigo sobre \"{$request->tema}\" para el {$fechaFormato} a las {$horaFormato} — {$request->modalidad}." .
+                        ($request->pregunta_objetivo ? " Objetivo: {$request->pregunta_objetivo}" : ''),
+                    [
+                        'sesion_id' => $sesion->id,
+                        'docente_id' => $user->id,
+                        'docente_nombre' => $nombreDocente,
+                        'fecha' => $fechaFormato,
+                        'hora' => $horaFormato,
+                        'modalidad' => $request->modalidad,
+                        'objetivo' => $request->pregunta_objetivo ?? '',
+                        'tema' => $request->tema,
+                    ]
+                );
+
+                // Notificar al docente (confirmación de agendado)
+                notificaciones::crear(
+                    $user->id,
+                    'recordatorio',
+                    "Has agendado una asesoría con el alumno para el {$fechaFormato} a las {$horaFormato}.",
+                    ['sesion_id' => $sesion->id]
+                );
+            }
+
+            DB::commit();
+
+            registrar_log('CREAR', 'Asesoría agendada: ' . $request->tema, 'asesorias');
+
+            // Redirigir según rol
+            $dashboard = match ($user->rol) {
+                'admin' => 'admin.dashboard',
+                'docente' => 'docente.dashboard',
+                default => 'alumno.dashboard'
+            };
+
+            return redirect()->route($dashboard)
+                ->with('success', 'Asesoría agendada correctamente. ' . ($user->rol === 'alumno' ? 'El docente recibirá tu solicitud.' : ''));
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Error al agendar: ' . $e->getMessage());
+        }
+    }
+
     public function create()
     {
         $carreras = carreras::all();

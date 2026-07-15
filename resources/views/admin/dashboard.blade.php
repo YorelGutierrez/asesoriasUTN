@@ -13,7 +13,7 @@
     <div class="col-md-4">
         <div class="card shadow-sm border-0 rounded-4 h-100">
             <div class="card-body p-4">
-                <h5 class="fw-semibold mb-3">Total de usuarios</h5>
+                <h5 class="fw-semibold mb-3 titulo-borde-verde">Total de usuarios</h5>
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item d-flex justify-content-between align-items-start">
                         <div class="fw-semibold">Administradores</div>
@@ -40,7 +40,7 @@
     <div class="col-md-8">
         <div class="card shadow-sm border-0 rounded-4 h-100">
             <div class="card-body p-4">
-                <h5 class="fw-semibold mb-4">Respaldos del sistema</h5>
+                <h5 class="fw-semibold mb-4 titulo-borde-verde">Respaldos del sistema</h5>
 
                 @if($ultimo)
                 <p><strong>Último respaldo:</strong> {{ $ultimo['fecha'] }}</p>
@@ -83,7 +83,7 @@
         <div class="card shadow-sm border-0 rounded-4 h-100">
             <div class="card-body p-4 d-flex flex-column">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="fw-semibold mb-0">Bitácora de actividad</h5>
+                    <h5 class="fw-semibold mb-0 titulo-borde-verde">Bitácora de actividad</h5>
                     <button id="btnLimpiarLogs" class="btn btn-danger btn-sm rounded-pill">Limpiar todo</button>
                 </div>
                 <div id="bitacora" class="flex-grow-1 pe-2" style="max-height: 220px; overflow-y: auto;">
@@ -96,7 +96,7 @@
     <div class="col-md-6">
         <div class="card shadow-sm border-0 rounded-4 h-100">
             <div class="card-body p-4">
-                <h5 class="fw-semibold mb-4">Gestión del sistema | Acciones rapidas</h5>
+                <h5 class="fw-semibold mb-4 titulo-borde-verde">Gestión del sistema | Acciones rapidas</h5>
                 <div class="d-grid gap-2">
                     <a href="{{ route('gestion', ['tab' => 'alumnos']) }}" class="btn-principal">Gestionar alumnos</a>
                     <a href="{{ route('gestion', ['tab' => 'grupos']) }}" class="btn-principal">Gestionar grupos</a>
@@ -110,7 +110,7 @@
 <!-- ASIGNACIÓN ACADÉMICA -->
 <div class="card shadow-sm border-0 rounded-4">
     <div class="card-body">
-        <h5 class="fw-semibold mb-4">Asignación académica | Asignaciones actuales</h5>
+        <h5 class="fw-semibold mb-4 titulo-borde-verde">Asignación académica | Asignaciones actuales</h5>
 
         <div class="table-responsive">
             <table class="table table-hover align-middle">

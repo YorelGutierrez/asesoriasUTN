@@ -2,46 +2,22 @@
 
 document.addEventListener('DOMContentLoaded', function () {
 
-    // ===== PASOS =====
-    const steps      = document.querySelectorAll('.step');
-    const step1Card  = document.getElementById('step1-card');
-    const step2Card  = document.getElementById('step2-card');
-    const step3Card  = document.getElementById('step3-card');
-
-    function setActiveStep(index) {
-        steps.forEach((s, i) => s.classList.toggle('active', i === index));
-    }
-
-    function updateActiveStep() {
-        if (!step1Card) return;
-        const scroll = window.scrollY + 100;
-        const top3   = step3Card ? step3Card.offsetTop : Infinity;
-        const top2   = step2Card ? step2Card.offsetTop : Infinity;
-
-        if (scroll >= top3)      setActiveStep(2);
-        else if (scroll >= top2) setActiveStep(1);
-        else                     setActiveStep(0);
-    }
-
-    window.addEventListener('scroll', updateActiveStep);
-    updateActiveStep();
-
     // ===== SELECCIÓN DE PERSONA =====
     document.querySelectorAll('.asesor-item').forEach(item => {
         item.addEventListener('click', function () {
             document.querySelectorAll('.asesor-item').forEach(a => a.classList.remove('selected'));
             this.classList.add('selected');
-            document.getElementById('destinatario_id').value  = this.dataset.id;
+            document.getElementById('destinatario_id').value = this.dataset.id;
             document.getElementById('tipo_destinatario').value = this.dataset.tipo;
             document.getElementById('docenteError').textContent = '';
         });
     });
 
-    // Búsqueda de persona
+    // ===== BUSCADOR =====
     document.getElementById('searchAsesor')?.addEventListener('input', function () {
         const term = this.value.toLowerCase();
         document.querySelectorAll('.asesor-item').forEach(item => {
-            item.style.display = item.dataset.nombre.toLowerCase().includes(term) ? 'flex' : 'none';
+            item.style.display = item.dataset.nombre.includes(term) ? 'flex' : 'none';
         });
     });
 
@@ -49,26 +25,27 @@ document.addEventListener('DOMContentLoaded', function () {
     let currentDate = new Date();
 
     function renderCalendar() {
-        const year      = currentDate.getFullYear();
-        const month     = currentDate.getMonth();
-        const firstDay  = new Date(year, month, 1);
-        const lastDay   = new Date(year, month + 1, 0);
-        const meses     = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+        const firstDay = new Date(year, month, 1);
+        const lastDay = new Date(year, month + 1, 0);
+        const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
 
         document.getElementById('currentMonth').textContent = meses[month] + ' ' + year;
 
         const startOffset = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1;
-        const today       = new Date(); today.setHours(0, 0, 0, 0);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
 
         let html = '';
         for (let i = 0; i < startOffset; i++) html += '<div></div>';
 
         for (let i = 1; i <= lastDay.getDate(); i++) {
             const cellDate = new Date(year, month, i);
-            const isPast   = cellDate < today;
+            const isPast = cellDate < today;
             const isWeekend = cellDate.getDay() === 0 || cellDate.getDay() === 6;
-            const dateStr  = year + '-' + String(month + 1).padStart(2, '0') + '-' + String(i).padStart(2, '0');
-            const cls      = isPast ? 'past' : isWeekend ? 'weekend' : '';
+            const dateStr = year + '-' + String(month + 1).padStart(2, '0') + '-' + String(i).padStart(2, '0');
+            let cls = isPast ? 'past' : isWeekend ? 'weekend' : '';
             html += `<div class="calendar-day ${cls}" data-date="${dateStr}">${i}</div>`;
         }
 
@@ -78,8 +55,8 @@ document.addEventListener('DOMContentLoaded', function () {
             day.addEventListener('click', function () {
                 document.querySelectorAll('.calendar-day').forEach(d => d.classList.remove('selected'));
                 this.classList.add('selected');
-                document.getElementById('fechaSeleccionada').value  = this.dataset.date;
-                document.getElementById('fechaError').textContent   = '';
+                document.getElementById('fechaSeleccionada').value = this.dataset.date;
+                document.getElementById('fechaError').textContent = '';
             });
         });
     }
@@ -96,36 +73,56 @@ document.addEventListener('DOMContentLoaded', function () {
 
     renderCalendar();
 
-    // ===== SLOTS DE HORA =====
-    document.querySelectorAll('.time-slot').forEach(slot => {
-        slot.addEventListener('click', function () {
-            document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
-            this.classList.add('selected');
-            document.getElementById('horaSeleccionada').value = this.dataset.time;
-            document.getElementById('horaError').textContent  = '';
-        });
-    });
+    // ===== BOTÓN DE ENVÍO: VALIDACIÓN Y LOADING =====
+    document.getElementById('btnAgendar')?.addEventListener('click', function (e) {
+        const destinatario = document.getElementById('destinatario_id').value;
+        const fecha = document.getElementById('fechaSeleccionada').value;
+        const hora = document.getElementById('horaSeleccionada').value;
+        const tema = document.querySelector('textarea[name="tema"]')?.value;
 
-    // ===== VALIDACIÓN =====
-    document.getElementById('asesoriaForm')?.addEventListener('submit', function (e) {
-        let valid = true;
+        let errors = [];
 
-        if (!document.getElementById('destinatario_id').value) {
+        if (!destinatario) {
             document.getElementById('docenteError').textContent = 'Por favor, selecciona una persona.';
-            valid = false;
-        }
-        if (!document.getElementById('fechaSeleccionada').value) {
-            document.getElementById('fechaError').textContent = 'Por favor, selecciona una fecha.';
-            valid = false;
-        }
-        if (!document.getElementById('horaSeleccionada').value) {
-            document.getElementById('horaError').textContent = 'Por favor, selecciona una hora.';
-            valid = false;
+            errors.push('Debes seleccionar una persona.');
+        } else {
+            document.getElementById('docenteError').textContent = '';
         }
 
-        if (!valid) {
+        if (!fecha) {
+            document.getElementById('fechaError').textContent = 'Por favor, selecciona una fecha.';
+            errors.push('Debes seleccionar una fecha.');
+        } else {
+            document.getElementById('fechaError').textContent = '';
+        }
+
+        if (!hora) {
+            document.getElementById('horaError').textContent = 'Por favor, selecciona una hora.';
+            errors.push('Debes seleccionar una hora.');
+        } else {
+            document.getElementById('horaError').textContent = '';
+        }
+
+        if (!tema) {
+            errors.push('Debes escribir el tema de la asesoría.');
+        }
+
+        if (errors.length > 0) {
             e.preventDefault();
-            Swal.fire({ icon: 'error', title: 'Campos incompletos', text: 'Completa todos los campos requeridos.', confirmButtonColor: '#d33' });
+            Swal.fire({
+                icon: 'error',
+                title: 'Campos incompletos',
+                html: errors.join('<br>'),
+                confirmButtonColor: '#d33'
+            });
+        } else {
+            // Mostrar loading antes de enviar
+            Swal.fire({
+                title: 'Procesando...',
+                allowOutsideClick: false,
+                didOpen: () => Swal.showLoading()
+            });
+            // El formulario se envía automáticamente
         }
     });
 });

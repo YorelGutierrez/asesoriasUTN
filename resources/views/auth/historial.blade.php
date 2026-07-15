@@ -11,7 +11,7 @@
 <!-- Filtros principales -->
 <div class="card shadow-sm border-0 rounded-4 mb-4">
     <div class="card-body p-4">
-        <h5 class="fw-semibold mb-3">Filtrado de búsqueda</h5>
+        <h5 class="fw-semibold mb-3 titulo-borde-verde">Filtrado de búsqueda</h5>
         <div class="row g-3 align-items-end">
             <div class="col-md-3">
                 <label class="form-label fw-semibold">Cuatrimestre</label>
@@ -56,7 +56,7 @@
 <div class="card shadow-sm border-0 rounded-4 mb-4">
     <div class="card-body p-4">
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 class="fw-semibold mb-0">Asesorías realizadas</h5>
+            <h5 class="fw-semibold mb-0 titulo-borde-verde">Asesorías realizadas</h5>
             <div class="col-md-4">
                 <button class="btn-principal">Generar reporte cuatrimestral</button>
             </div>

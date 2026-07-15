@@ -5,6 +5,8 @@
     <!-- Metadatos -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="user-rol" content="{{ auth()->user()->rol ?? '' }}">
     <title>@yield('titulo', 'Asesorias-UTN')</title>
 
     <!-- Bootstrap -->
@@ -46,8 +48,16 @@
 
                 <!-- Perfil: lado derecho del nav -->
                 <div class="nav-left">
-                    <li class="ExtrasMenu"><i class="bi bi-calendar-event-fill"></i></li>
-                    <li class="ExtrasMenu"><i class="bi bi-bell-fill"></i></li>
+                    <!-- Icono Calendario -->
+                    <li class="ExtrasMenu" id="icono-cal" style="cursor:pointer; position:relative;">
+                        <i class="bi bi-calendar-event-fill"></i>
+                    </li>
+
+                    <!-- Icono Notificaciones con badge -->
+                    <li class="ExtrasMenu" id="icono-notif" style="cursor:pointer; position:relative;">
+                        <i class="bi bi-bell-fill"></i>
+                        <span class="notif-badge" id="notif-badge" style="display:none; position:absolute; top:-4px; right:-4px; background:#ef4444; color:white; border-radius:50%; width:16px; height:16px; font-size:10px; font-weight:700; text-align:center; line-height:16px;">0</span>
+                    </li>
                     <li class="perfil">
                         <a style="color: white;">
                             {{ Auth::user()->nombres . ' ' . Auth::user()->apellido_paterno . ' ' . Auth::user()->apellido_materno }}
@@ -57,6 +67,40 @@
                 </div>
             </ul>
         </nav>
+
+        <!-- ===== Dropdown Notificaciones ===== -->
+        <div class="notif-dropdown" id="notif-dropdown" style="display:none; position:fixed; top:60px; right:260px; background:white; border-radius:12px; box-shadow:0 4px 16px rgba(0,0,0,.15); width:320px; z-index:999; overflow:hidden;">
+            <div class="notif-header" style="background:linear-gradient(to left, #00937f, #2c9f49); padding:12px 16px; color:white; display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-weight:700; font-size:14px;"><i class="bi bi-bell-fill me-1"></i> Notificaciones</span>
+                <button id="btn-todas-leidas" style="background:rgba(255,255,255,.2); border:none; color:white; font-size:11px; padding:3px 8px; border-radius:6px; cursor:pointer;">Marcar todas como leídas</button>
+            </div>
+            <div class="notif-lista" id="notif-lista" style="max-height:340px; overflow-y:auto;">
+                <div class="notif-vacia" style="text-align:center; padding:30px; color:#9ca3af; font-size:13px;">Cargando...</div>
+            </div>
+        </div>
+
+        <!-- ===== Dropdown Calendario ===== -->
+        <div class="cal-dropdown" id="cal-dropdown" style="display:none; position:fixed; top:60px; right:310px; background:white; border-radius:12px; box-shadow:0 4px 16px rgba(0,0,0,.15); width:260px; z-index:999; overflow:hidden; padding:14px;">
+            <div class="cal-header-mini" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <button id="cal-prev" style="background:none; border:none; cursor:pointer; font-size:14px;">◀</button>
+                <span id="cal-mini-titulo" style="font-weight:700; font-size:13px; color:#2d3748;"></span>
+                <button id="cal-next" style="background:none; border:none; cursor:pointer; font-size:14px;">▶</button>
+            </div>
+            <div class="cal-mini-weekdays" style="display:grid; grid-template-columns:repeat(7,1fr); text-align:center; font-size:10px; font-weight:700; color:#9ca3af; margin-bottom:4px;">
+                <div>L</div>
+                <div>M</div>
+                <div>M</div>
+                <div>J</div>
+                <div>V</div>
+                <div>S</div>
+                <div>D</div>
+            </div>
+            <div class="cal-mini-days" id="cal-mini-days" style="display:grid; grid-template-columns:repeat(7,1fr); gap:2px;"></div>
+            <p style="font-size:11px; color:#9ca3af; text-align:center; margin-top:8px; margin-bottom:0;">
+                <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:linear-gradient(135deg,#2c9f49,#00937f); margin-right:4px;"></span>
+                Días con asesoría
+            </p>
+        </div>
 
         <!-- Contenido de cada vista -->
         <section>
@@ -83,9 +127,9 @@
         <b>{{ Auth::user()->nombres }}</b>
 
         @if(in_array(auth()->user()->rol, ['admin', 'docente']))
-            <a href="{{ route('historial') }}">
-                <i class="bi bi-clock-history"></i> {{ __('Historial') }}
-            </a>
+        <a href="{{ route('historial') }}">
+            <i class="bi bi-clock-history"></i> {{ __('Historial') }}
+        </a>
         @endif
 
         <form method="POST" action="{{ route('logout') }}">
@@ -114,57 +158,54 @@
 
         {{-- Menú exclusivo del alumno --}}
         @if(auth()->user()->rol === 'alumno')
-            <a href="{{ route('solicitud') }}" class="{{ request()->routeIs('solicitud') ? 'activo' : '' }}">
-                <i class="bi bi-calendar-plus-fill" style="font-size: 18px;"></i> {{ __('Solicitud') }}
-            </a>
-            <a href="{{ route('agenda') }}" class="{{ request()->routeIs('agenda') ? 'activo' : '' }}">
-                <i class="bi bi-calendar-plus-fill" style="font-size: 18px;"></i> {{ __('Agendar') }}
-            </a>
+        <a href="{{ route('agenda') }}" class="{{ request()->routeIs('agenda') ? 'activo' : '' }}">
+            <i class="bi bi-calendar-plus-fill" style="font-size: 18px;"></i> {{ __('Solicitar') }}
+        </a>
         @endif
 
         {{-- Menú compartido: admin y docente --}}
         @if(in_array(auth()->user()->rol, ['admin', 'docente']))
-            <a href="{{ route('grupos') }}" class="{{ request()->routeIs('grupos') ? 'activo' : '' }}">
-                <i class="bi bi-people-fill"></i> {{ __('Grupos') }}
-            </a>
-            <a href="{{ route('alumnos') }}" class="{{ request()->routeIs('alumnos') ? 'activo' : '' }}">
-                <i class="bi bi-person-vcard-fill" style="font-size: 18px;"></i> {{ __('Alumnos') }}
-            </a>
-            <a href="{{ route('agenda') }}" class="{{ request()->routeIs('agenda') ? 'activo' : '' }}">
-                <i class="bi bi-calendar-plus-fill" style="font-size: 18px;"></i> {{ __('Agendar') }}
-            </a>
+        <a href="{{ route('grupos') }}" class="{{ request()->routeIs('grupos') ? 'activo' : '' }}">
+            <i class="bi bi-people-fill"></i> {{ __('Grupos') }}
+        </a>
+        <a href="{{ route('alumnos') }}" class="{{ request()->routeIs('alumnos') ? 'activo' : '' }}">
+            <i class="bi bi-person-vcard-fill" style="font-size: 18px;"></i> {{ __('Alumnos') }}
+        </a>
+        <a href="{{ route('agenda') }}" class="{{ request()->routeIs('agenda') ? 'activo' : '' }}">
+            <i class="bi bi-calendar-plus-fill" style="font-size: 18px;"></i> {{ __('Agendar') }}
+        </a>
         @endif
 
         {{-- Menú exclusivo del docente --}}
         @if(auth()->user()->rol === 'docente')
-            <a href="{{ route('registro') }}" class="{{ request()->routeIs('registro') ? 'activo' : '' }}">
-                <i class="bi bi-calendar-plus-fill" style="font-size: 18px;"></i> {{ __('Registro de asesorias') }}
-            </a>
+        <a href="{{ route('registro') }}" class="{{ request()->routeIs('registro') ? 'activo' : '' }}">
+            <i class="bi bi-calendar-plus-fill" style="font-size: 18px;"></i> {{ __('Registro de asesorias') }}
+        </a>
         @endif
 
         {{-- Menú exclusivo del admin --}}
         @if(auth()->user()->rol === 'admin')
-            <a href="{{ route('roles_permisos') }}" class="{{ request()->routeIs('roles_permisos') ? 'activo' : '' }}">
-                <i class="bi bi-clipboard2-check-fill" style="font-size: 18px;"></i> {{ __('Roles y permisos') }}
-            </a>
-            <a href="{{ route('gestion') }}" class="{{ request()->routeIs('gestion') ? 'activo' : '' }}">
-                <i class="bi bi-person-workspace" style="font-size: 18px;"></i> {{ __('Gestión admin') }}
-            </a>
+        <a href="{{ route('roles_permisos') }}" class="{{ request()->routeIs('roles_permisos') ? 'activo' : '' }}">
+            <i class="bi bi-clipboard2-check-fill" style="font-size: 18px;"></i> {{ __('Roles y permisos') }}
+        </a>
+        <a href="{{ route('gestion') }}" class="{{ request()->routeIs('gestion') ? 'activo' : '' }}">
+            <i class="bi bi-person-workspace" style="font-size: 18px;"></i> {{ __('Gestión admin') }}
+        </a>
 
-            <div class="menu-seccion">
-                <a href="#" class="menu-principal">
-                    <span><i class="bi bi-person-fill-add" style="font-size: 18px;"></i> {{ __('Registros') }}</span>
-                    <i class="bi bi-chevron-compact-down"></i>
+        <div class="menu-seccion">
+            <a href="#" class="menu-principal">
+                <span><i class="bi bi-person-fill-add" style="font-size: 18px;"></i> {{ __('Registros') }}</span>
+                <i class="bi bi-chevron-compact-down"></i>
+            </a>
+            <div class="subseccion">
+                <a href="{{ route('registro_alumnos') }}" class="{{ request()->routeIs('registro_alumnos') ? 'activo' : '' }}">
+                    {{ __('Registro Alumnos') }}
                 </a>
-                <div class="subseccion">
-                    <a href="{{ route('registro_alumnos') }}" class="{{ request()->routeIs('registro_alumnos') ? 'activo' : '' }}">
-                        {{ __('Registro Alumnos') }}
-                    </a>
-                    <a href="{{ route('registro_docente') }}" class="{{ request()->routeIs('registro_docente') ? 'activo' : '' }}">
-                        {{ __('Registro Docentes') }}
-                    </a>
-                </div>
+                <a href="{{ route('registro_docente') }}" class="{{ request()->routeIs('registro_docente') ? 'activo' : '' }}">
+                    {{ __('Registro Docentes') }}
+                </a>
             </div>
+        </div>
         @endif
     </aside>
 
@@ -172,23 +213,24 @@
 
     {{-- Burbuja flotante: grupo activo en sesión --}}
     @if(in_array(auth()->user()->rol, ['admin', 'docente']) && session('grupo_activo_id'))
-        <div class="grupo-activo-bubble" title="Grupo activo en sesión">
-            <i class="bi bi-people-fill"></i>
-            <div class="grupo-activo-info">
-                <span class="grupo-activo-label">Grupo activo</span>
-                <span class="grupo-activo-nombre">{{ session('grupo_activo_nombre') }}</span>
-            </div>
-            <form method="POST" action="{{ route('grupos.limpiar') }}" class="grupo-activo-cambiar">
-                @csrf
-                <button type="submit" title="Cambiar grupo">
-                    <i class="bi bi-arrow-left-right"></i>
-                </button>
-            </form>
+    <div class="grupo-activo-bubble" title="Grupo activo en sesión">
+        <i class="bi bi-people-fill"></i>
+        <div class="grupo-activo-info">
+            <span class="grupo-activo-label">Grupo activo</span>
+            <span class="grupo-activo-nombre">{{ session('grupo_activo_nombre') }}</span>
         </div>
+        <form method="POST" action="{{ route('grupos.limpiar') }}" class="grupo-activo-cambiar">
+            @csrf
+            <button type="submit" title="Cambiar grupo">
+                <i class="bi bi-arrow-left-right"></i>
+            </button>
+        </form>
+    </div>
     @endif
 
     <script src="{{ asset('js/menu-lateral.js') }}"></script>
     <script src="{{ asset('js/perfil-dropdown.js') }}"></script>
+    <script src="{{ asset('js/notificaciones.js') }}"></script>
 
     @yield('scripts')
 

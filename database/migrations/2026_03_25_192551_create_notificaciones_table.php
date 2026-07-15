@@ -11,9 +11,11 @@ return new class extends Migration
         Schema::create('notificaciones', function (Blueprint $table) {
             $table->id();
             $table->foreignId('usuario_id')->constrained('users')->onDelete('cascade');
-            $table->string('tipo');
+            $table->enum('tipo', ['solicitud_asesoria', 'confirmacion', 'rechazo', 'recordatorio']);
             $table->text('mensaje');
             $table->boolean('leido')->default(false);
+            $table->json('datos')->nullable();
+            $table->enum('accion', ['pendiente', 'confirmada', 'rechazada'])->default('pendiente');
             $table->timestamps();
         });
     }

@@ -43,3 +43,15 @@
     font-weight: 600;
     border-bottom: none !important;
 }
+
+:root {
+    --verde-principal: #10b981;
+}
+
+.titulo-borde-verde {
+    border-left: 4px solid var(--verde-principal);
+    padding-left: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}

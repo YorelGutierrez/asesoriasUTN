@@ -11,7 +11,7 @@
 
 <div class="card shadow-sm border-0 rounded-4 mb-4">
     <div class="card-body p-4">
-        <h2 class="h4 fw-bold mb-3">Expediente del alumno:
+        <h2 class="h4 fw-bold mb-3 titulo-borde-verde">Expediente del alumno:
             <span style="color: #2c9f49;">
                 {{ $alumno->user->apellido_paterno }} {{ $alumno->user->apellido_materno }} {{ $alumno->user->nombres }}
             </span>
@@ -61,7 +61,7 @@
     <div class="col-md-6">
         <div class="card shadow-sm border-0 rounded-4 h-100">
             <div class="card-body">
-                <h5 class="fw-semibold mb-3">Materias reprobadas</h5>
+                <h5 class="fw-semibold mb-3 titulo-borde-verde">Materias reprobadas</h5>
                 @if($materiasReprobadas->isEmpty())
                 <p class="text-muted">Sin materias reprobadas registradas.</p>
                 @else
@@ -79,7 +79,7 @@
     <div class="col-md-6">
         <div class="card shadow-sm border-0 rounded-4 h-100">
             <div class="card-body">
-                <h5 class="fw-semibold mb-3">Temas que no domina</h5>
+                <h5 class="fw-semibold mb-3 titulo-borde-verde">Temas que no domina</h5>
                 @if($temasNoDominados->isEmpty())
                 <p class="text-muted">Sin temas registrados.</p>
                 @else
@@ -99,7 +99,7 @@
 <!-- Tabla de asesorías -->
 <div class="card shadow-sm border-0 rounded-4 mb-4">
     <div class="card-body p-4">
-        <h5 class="fw-semibold mb-3">Historial de asesorías</h5>
+        <h5 class="fw-semibold mb-3 titulo-borde-verde">Historial de asesorías</h5>
         <div class="table-responsive">
             <table class="table table-hover align-middle">
                 <thead class="table-light">
