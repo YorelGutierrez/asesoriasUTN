@@ -134,7 +134,7 @@
                         <td>{{ $sesion->acuerdos->first()->acuerdo ?? '—' }}</td>
                         <td>
                             @if($reporte)
-                            <a href="{{ route('reporte.ver', $reporte->id) }}" target="_blank" class="btn-secundario">Ver</a>
+                            <a href="{{ route('reporte.ver', $reporte->id) }}" target="_blank" class="btn-secundario"><i class="bi bi-eye me-1"></i>Ver</a>
                             @else
                             <span class="text-muted">Sin PDF</span>
                             @endif
@@ -154,6 +154,6 @@
 </div>
 
 <!-- Botón de regreso -->
-<a href="{{ route('alumnos') }}" class="btn-principal"><- Regresar al listado</a>
+<a href="{{ route('alumnos') }}" class="btn-principal"><i class="bi bi-arrow-left me-1"></i>Regresar al listado</a>
 
         @endsection

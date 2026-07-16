@@ -14,6 +14,85 @@ use Illuminate\Support\Facades\Storage;
 
 class AlumnoController extends Controller
 {
+    //Dashboard del alumno.
+    public function dashboardAlumno()
+    {
+        $user = auth()->user();
+        $alumno = $user->alumno;
+
+        // Próxima asesoría (más cercana en el futuro)
+        $proximaAsesoria = sesiones_asesoria::whereHas('alumnos', function ($q) use ($user) {
+            $q->where('sesion_alumno.alumno_id', $user->id);
+        })
+            ->whereIn('estado', ['programada', 'pendiente'])
+            ->where('fecha_inicio', '>=', now())
+            ->orderBy('fecha_inicio', 'asc')
+            ->first();
+
+        // Asesorías agendadas
+        $agendadas = sesiones_asesoria::whereHas('alumnos', function ($q) use ($user) {
+            $q->where('sesion_alumno.alumno_id', $user->id);
+        })
+            ->whereIn('estado', ['programada', 'pendiente'])
+            ->count();
+
+        // Asesorías completadas
+        $completadas = sesiones_asesoria::whereHas('alumnos', function ($q) use ($user) {
+            $q->where('sesion_alumno.alumno_id', $user->id);
+        })
+            ->where('estado', 'realizada')
+            ->count();
+
+        // Últimas 5 asesorías realizadas
+        $ultimasSesiones = sesiones_asesoria::with(['docente', 'acuerdos', 'reporte'])
+            ->whereHas('alumnos', function ($q) use ($user) {
+                $q->where('sesion_alumno.alumno_id', $user->id);
+            })
+            ->where('estado', 'realizada')
+            ->orderBy('fecha_inicio', 'desc')
+            ->take(5)
+            ->get();
+
+        // ===== 🔥 NUEVO: 3 docentes aleatorios del grupo con sus materias =====
+        $docentesAleatorios = [];
+
+        if ($alumno && $alumno->grupo) {
+            // Obtener materias del grupo (IDs)
+            $materiasGrupoIds = $alumno->grupo->materias->pluck('id')->toArray();
+
+            // Obtener docentes del grupo
+            $docentesDelGrupo = $alumno->grupo->docentes;
+
+            // Construir array con docente y materias que imparte en este grupo
+            $docentesConMaterias = [];
+            foreach ($docentesDelGrupo as $docente) {
+                $materiasDocenteIds = $docente->materias->pluck('id')->toArray();
+                $materiasComunes = array_intersect($materiasGrupoIds, $materiasDocenteIds);
+
+                if (!empty($materiasComunes)) {
+                    // Obtener nombres de las materias comunes
+                    $materiasNombres = \App\Models\materias::whereIn('id', $materiasComunes)->pluck('nombre')->toArray();
+                    $docentesConMaterias[] = [
+                        'docente' => $docente,
+                        'materias' => $materiasNombres,
+                    ];
+                }
+            }
+
+            // Mezclar y tomar 3 aleatorios
+            shuffle($docentesConMaterias);
+            $docentesAleatorios = array_slice($docentesConMaterias, 0, 3);
+        }
+
+        return view('auth.alumnos.escritorioAlumno', compact(
+            'proximaAsesoria',
+            'agendadas',
+            'completadas',
+            'ultimasSesiones',
+            'alumno',
+            'docentesAleatorios' // 👈 Nueva variable
+        ));
+    }
     /**
      * Lista los alumnos del grupo activo en sesión.
      * - Docente: solo alumnos del grupo que seleccionó.

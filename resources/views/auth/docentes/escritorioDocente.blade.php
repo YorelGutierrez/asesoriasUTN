@@ -17,13 +17,25 @@
                 <h5 class="fw-semibold mb-0 titulo-borde-verde">PRÓXIMA ASESORÍA</h5>
             </div>
             <div class="card-body">
-                <div class="d-flex align-items-center gap-3">
-                    <i class="bi bi-calendar-event-fill fs-1 text-success"></i>
-                    <div>
-                        <p class="mb-0 fw-bold">Mañana</p>
-                        <span class="text-muted">17:00 h</span>
+                @if($proximaAsesoria)
+                    <div class="d-flex align-items-center gap-3">
+                        <i class="bi bi-calendar-event-fill fs-1 text-success"></i>
+                        <div>
+                            <p class="mb-0 fw-bold">{{ $proximaAsesoria->tema }}</p>
+                            <span class="text-muted">
+                                {{ \Carbon\Carbon::parse($proximaAsesoria->fecha_inicio)->format('d/m/Y H:i') }} h
+                            </span>
+                        </div>
                     </div>
-                </div>
+                @else
+                    <div class="d-flex align-items-center gap-3">
+                        <i class="bi bi-calendar-event-fill fs-1 text-secondary"></i>
+                        <div>
+                            <p class="mb-0 fw-bold text-muted">Sin asesorías próximas</p>
+                            <span class="text-muted">Agenda una desde <a href="{{ route('agenda') }}">Agendar</a></span>
+                        </div>
+                    </div>
+                @endif
             </div>
         </div>
     </div>
@@ -34,7 +46,7 @@
             </div>
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-end">
-                    <h1 class="display-4 fw-bold text-success">125</h1>
+                    <h1 class="display-4 fw-bold text-success">{{ $totalAlumnos }}</h1>
                     <span class="text-muted">atendidos</span>
                 </div>
             </div>
@@ -47,7 +59,7 @@
             </div>
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-end">
-                    <h1 class="display-4 fw-bold text-success">4</h1>
+                    <h1 class="display-4 fw-bold text-success">{{ $gruposActivos }}</h1>
                     <i class="bi bi-exclamation-triangle-fill text-warning fs-3"></i>
                 </div>
             </div>
@@ -64,60 +76,61 @@
     </div>
 
     <div class="row">
-        <div class="col-md-4 col-sm-12 mb-4">
-            <div class="card-itid">
-                <div class="card-left">
-                    <img src="https://www.utnay.edu.mx/assets/ITIID-DDH-gJkG.png" alt="Logo carrera" class="logo">
-                </div>
-                <div class="card-right">
-                    <div class="card-bg-decoration"></div>
+        @forelse($gruposRecientes as $grupo)
+            <div class="col-md-4 col-sm-12 mb-4">
+                <div class="card-itid">
+                    <div class="card-left">
+                        <img src="{{ asset($grupo->carrera->logo ?? 'img/carreras/ITIID-DDH-gJkG.png') }}" alt="Logo carrera" class="logo">
+                    </div>
+                    <div class="card-right">
+                        <div class="card-bg-decoration"></div>
 
-                    <div class="card-content-wrapper">
-                        <h3>Grupo: <span>IDGS - 81</span></h3>
-                        <div class="stats-row">
-                            <i class="bi bi-people-fill"></i> <span>: 25</span>
+                        <div class="card-content-wrapper">
+                            <h3>Grupo: <span>{{ $grupo->nombre }}</span></h3>
+                            <div class="stats-row">
+                                <i class="bi bi-people-fill"></i> <span>: {{ $grupo->alumnos->count() }}</span>
+                            </div>
+                            <form method="POST" action="{{ route('grupos.seleccionar', $grupo->id) }}">
+                                @csrf
+                                <button type="submit" class="btn-principal">Seleccionar grupo</button>
+                            </form>
                         </div>
-                        <button class="btn-principal">Seleccionar grupo</button>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="col-md-4 col-sm-12 mb-4">
-            <div class="card-itid">
-                <div class="card-left">
-                    <img src="https://www.utnay.edu.mx/assets/ITIID-DDH-gJkG.png" alt="Logo carrera" class="logo">
-                </div>
-                <div class="card-right">
-                    <div class="card-bg-decoration"></div>
-
-                    <div class="card-content-wrapper">
-                        <h3>Grupo: <span>IDGS - 84</span></h3>
-                        <div class="stats-row">
-                            <i class="bi bi-people-fill"></i> <span>: 25</span>
-                        </div>
-                        <button class="btn-principal">Seleccionar grupo</button>
-                    </div>
+        @empty
+            <div class="col-12">
+                <div class="alert alert-info text-center">
+                    <i class="bi bi-info-circle me-2"></i>
+                    No tienes grupos recientemente seleccionados.
                 </div>
             </div>
-        </div>
-        <div class="col-md-4 col-sm-12 mb-4">
-            <div class="card-itid">
-                <div class="card-left">
-                    <img src="https://www.utnay.edu.mx/assets/ITIID-DDH-gJkG.png" alt="Logo carrera" class="logo">
-                </div>
-                <div class="card-right">
-                    <div class="card-bg-decoration"></div>
-
-                    <div class="card-content-wrapper">
-                        <h3>Grupo: <span>IDGS - 83</span></h3>
-                        <div class="stats-row">
-                            <i class="bi bi-people-fill"></i> <span>: 25</span>
-                        </div>
-                        <button class="btn-principal">Seleccionar grupo</button>
-                    </div>
-                </div>
-            </div>
-        </div>
+        @endforelse
     </div>
+</div>
 
-    @endsection()
+@if(session('success'))
+<script>
+    Swal.fire({
+        icon: 'success',
+        title: '¡Bienvenido!',
+        text: '{{ session('success') }}',
+        confirmButtonColor: '#3085d6',
+        confirmButtonText: 'Aceptar'
+    });
+</script>
+@endif
+
+@if(session('error'))
+<script>
+    Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: '{{ session('error') }}',
+        confirmButtonColor: '#d33',
+        confirmButtonText: 'Aceptar'
+    });
+</script>
+@endif
+
+@endsection

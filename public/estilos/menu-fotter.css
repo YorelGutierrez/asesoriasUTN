@@ -209,6 +209,26 @@ section{
     padding: 0 1px;
 }
 
+/* ===== BREADCRUMBS RESPONSIVOS ===== */
+
+/* Ocultar breadcrumbs en móvil (pantallas menores a 768px) */
+@media (max-width: 767px) {
+    .breadcrumb-wrapper {
+        display: none !important;
+    }
+}
+
+/* Opcional: si quieres que se vean en tablets más grandes, mantenerlas */
+@media (min-width: 768px) and (max-width: 991px) {
+    .breadcrumb-wrapper {
+        /* Puedes reducir el tamaño del texto si quieres */
+        font-size: 0.8rem;
+    }
+    .custom-breadcrumb .separator {
+        font-size: 8px;
+    }
+}
+
 /* ===== Burbuja flotante: grupo activo ===== */
 .grupo-activo-bubble {
     position: fixed;
@@ -482,3 +502,104 @@ section{
 .cal-mini-day.weekend {
     color: #ef4444;
 }
+
+/* ===== PAGINACIÓN COMPACTA (global) ===== */
+
+.paginacion-tabla {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    background: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+    border-radius: 0 0 12px 12px;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+ 
+.paginacion-info {
+    font-size: 13px;
+    color: #6b7280;
+}
+ 
+.paginacion-controles {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+ 
+.paginacion-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    height: 32px;
+    padding: 0 8px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    color: #374151;
+    background: white;
+    border: 1px solid #e2e8f0;
+    transition: all .15s;
+    cursor: pointer;
+}
+ 
+.paginacion-btn:hover:not(.disabled):not(.activa) {
+    background: #ecfdf5;
+    border-color: #2c9f49;
+    color: #2c9f49;
+}
+ 
+.paginacion-btn.activa {
+    background: linear-gradient(to left, #00937f, #2c9f49);
+    color: white;
+    border-color: transparent;
+}
+ 
+.paginacion-btn.disabled {
+    opacity: .4;
+    cursor: not-allowed;
+}
+ 
+ 
+nav[role="navigation"] .w-5,
+nav[role="navigation"] .h-5 {
+    width: 0.9rem !important;
+    height: 0.9rem !important;
+}
+ 
+nav[role="navigation"] .rounded-l-md,
+nav[role="navigation"] .rounded-r-md,
+nav[role="navigation"] .rounded-md {
+    border-radius: 4px !important;
+}
+ 
+nav[role="navigation"] [class*="px-4"] {
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+}
+ 
+nav[role="navigation"] [class*="py-2"] {
+    padding-top: 0.15rem !important;
+    padding-bottom: 0.15rem !important;
+}
+ 
+nav[role="navigation"] [class*="text-sm"] {
+    font-size: 0.7rem !important;
+}
+ 
+nav[role="navigation"] .ml-3,
+nav[role="navigation"] .mr-3 {
+    margin-left: 0.25rem !important;
+    margin-right: 0.25rem !important;
+}
+ 
+/* Espaciado general del contenedor */
+nav[role="navigation"] > div {
+    gap: 2px !important;
+}
+/* Elimina espacio entre tabla y paginador */
+.table-responsive { margin-bottom: 0 !important; }
+ 

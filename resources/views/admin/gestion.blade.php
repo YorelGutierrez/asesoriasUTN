@@ -9,40 +9,42 @@
     <h1>Gestión administrativa</h1>
 </div>
 
-<!-- filtrados comunes -->
+<!-- Filtros -->
 <div class="card shadow-sm mb-4 border-0">
     <div class="card-body p-4">
         <h5 class="fw-semibold mb-3 titulo-borde-verde">Filtros de búsqueda</h5>
-        <div class="row g-3 align-items-end">
-            <div class="col-md-4">
-                <label class="form-label fw-semibold">Buscar por nombre / matrícula / empleado</label>
-                <div class="input-group">
-                    <input type="text" class="form-control" id="search-input" placeholder="Escribe para buscar...">
-                    <button class="btn btn-outline-secondary" type="button">
-                        <i class="bi bi-search"></i>
+        <form method="GET" action="{{ route('gestion') }}" id="formFiltros">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Buscar por nombre / matrícula / empleado</label>
+                    <input type="text" class="form-control" name="buscar" placeholder="Escribe para buscar..." value="{{ request('buscar') }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Carrera</label>
+                    <select class="form-select" name="carrera">
+                        <option value="">Todas las carreras</option>
+                        @foreach($carreras as $carrera)
+                        <option value="{{ $carrera->id }}" {{ request('carrera') == $carrera->id ? 'selected' : '' }}>
+                            {{ $carrera->nombre }}
+                        </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label fw-semibold">Estado</label>
+                    <select class="form-select" name="estado">
+                        <option value="">Todos</option>
+                        <option value="activo" {{ request('estado') == 'activo' ? 'selected' : '' }}>Activo</option>
+                        <option value="inactivo" {{ request('estado') == 'inactivo' ? 'selected' : '' }}>Inactivo</option>
+                    </select>
+                </div>
+                <div class="col-md-3 d-flex gap-2">
+                    <button type="submit" class="btn-principal flex-grow-1">
+                        <i class="bi bi-funnel me-1"></i> Filtrar
                     </button>
                 </div>
             </div>
-            <div class="col-md-3">
-                <label class="form-label fw-semibold">Carrera</label>
-                <select class="form-select" id="carrera-filter">
-                    <option value="">Todas las carreras</option>
-                    <option>Ingeniería en Desarrollo de Software</option>
-                    <option>Ingeniería en Redes</option>
-                </select>
-            </div>
-            <div class="col-md-3">
-                <label class="form-label fw-semibold">Estado</label>
-                <select class="form-select" id="estado-filter">
-                    <option value="">Todos</option>
-                    <option>Activo</option>
-                    <option>Inactivo</option>
-                </select>
-            </div>
-            <div class="col-md-2">
-                <button class="btn-principal w-100" id="filtrar-btn">Filtrar</button>
-            </div>
-        </div>
+        </form>
     </div>
 </div>
 
@@ -102,13 +104,13 @@
                                 <td>
                                     <div class="d-flex gap-2">
                                         <button class="btn btn-sm btn-outline-warning editar-grupo" data-id="{{ $grupo->id }}" data-nombre="{{ $grupo->nombre }}" data-carrera_id="{{ $grupo->carrera_id }}" data-cuatrimestre="{{ $grupo->cuatrimestre }}">
-                                             Editar
+                                            Editar
                                         </button>
                                         <button class="btn btn-sm btn-outline-danger eliminar-grupo" data-id="{{ $grupo->id }}" data-nombre="{{ $grupo->nombre }}">
-                                             Eliminar
+                                            Eliminar
                                         </button>
                                     </div>
-                                </tr>
+                            </tr>
                             @empty
                             <tr>
                                 <td colspan="6" class="text-center">No hay grupos registrados</td>
@@ -118,7 +120,7 @@
                     </table>
                 </div>
                 <div class="mt-3">
-                    {{ $grupos->links() }}
+                    {{ $grupos->appends(request()->query())->links() }}
                 </div>
             </div>
         </div>
@@ -159,9 +161,9 @@
                                 <td>{{ $alumno->user->email }}</td>
                                 <td>
                                     @if($alumno->user->estado ?? true)
-                                        <span class="badge bg-success">Activo</span>
+                                    <span class="badge bg-success">Activo</span>
                                     @else
-                                        <span class="badge bg-danger">Inactivo</span>
+                                    <span class="badge bg-danger">Inactivo</span>
                                     @endif
                                 </td>
                                 <td>
@@ -184,7 +186,7 @@
                     </table>
                 </div>
                 <div class="mt-3">
-                    {{ $alumnos->links() }}
+                    {{ $alumnos->appends(request()->query())->links() }}
                 </div>
             </div>
         </div>
@@ -223,18 +225,18 @@
                                 <td>{{ $docente->user->email }}</td>
                                 <td>
                                     @if($docente->user->estado ?? true)
-                                        <span class="badge bg-success">Activo</span>
+                                    <span class="badge bg-success">Activo</span>
                                     @else
-                                        <span class="badge bg-danger">Inactivo</span>
+                                    <span class="badge bg-danger">Inactivo</span>
                                     @endif
                                 </td>
                                 <td>
                                     <div class="d-flex gap-2">
                                         <a href="{{ route('docentes.edit', $docente->id) }}" class="btn btn-sm btn-outline-warning">
-                                             Editar
+                                            Editar
                                         </a>
                                         <button class="btn btn-sm btn-outline-danger eliminar-docente" data-id="{{ $docente->id }}" data-nombre="{{ $docente->user->nombres }}">
-                                             Eliminar
+                                            Eliminar
                                         </button>
                                     </div>
                                 </td>
@@ -248,7 +250,7 @@
                     </table>
                 </div>
                 <div class="mt-3">
-                    {{ $docentes->links() }}
+                    {{ $docentes->appends(request()->query())->links() }}
                 </div>
             </div>
         </div>
@@ -267,7 +269,7 @@
         btn.addEventListener('click', function() {
             const id = this.dataset.id;
             const nombre = this.dataset.nombre;
-            
+
             Swal.fire({
                 title: '¿Eliminar alumno?',
                 text: `¿Estás seguro de eliminar a ${nombre}? Esta acción no se puede deshacer.`,
@@ -292,7 +294,7 @@
         btn.addEventListener('click', function() {
             const id = this.dataset.id;
             const nombre = this.dataset.nombre;
-            
+
             Swal.fire({
                 title: '¿Eliminar docente?',
                 text: `¿Estás seguro de eliminar a ${nombre}? Esta acción no se puede deshacer.`,
@@ -317,7 +319,7 @@
         btn.addEventListener('click', function() {
             const id = this.dataset.id;
             const nombre = this.dataset.nombre;
-            
+
             Swal.fire({
                 title: '¿Eliminar grupo?',
                 text: `¿Estás seguro de eliminar el grupo ${nombre}?`,
@@ -344,7 +346,8 @@
     Swal.fire({
         icon: 'success',
         title: '¡Éxito!',
-        text: '{{ session('success') }}',
+        text: '{{ session('
+        success ') }}',
         confirmButtonColor: '#3085d6',
         confirmButtonText: 'Aceptar'
     });
@@ -355,7 +358,8 @@
     Swal.fire({
         icon: 'error',
         title: 'Error',
-        text: '{{ session('error') }}',
+        text: '{{ session('
+        error ') }}',
         confirmButtonColor: '#d33',
         confirmButtonText: 'Aceptar'
     });

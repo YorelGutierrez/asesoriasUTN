@@ -40,7 +40,7 @@
     background-color: #00937f;
     color: #fff;
     border: none;
-    padding: 5px 10px;
+    padding: 10px 20px;
     border-radius: 50px;
     font-size: 1.0rem;
     font-weight: bold;
@@ -55,4 +55,21 @@
 
 .btn-secundario:hover{
     background-color: #025349;
+}
+
+.btn-restaurar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #10b981;
+    color: white;
+    border: none;
+    transition: all 0.3s;
+}
+.btn-restaurar:hover {
+    background: #059669;
+    transform: scale(1.05);
 }

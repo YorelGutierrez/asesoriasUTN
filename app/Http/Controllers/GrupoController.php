@@ -43,8 +43,8 @@ class GrupoController extends Controller
         // Docente: verificar que el grupo le pertenece
         if ($user->rol === 'docente') {
             $tieneAcceso = grupos::whereHas('docentes', function ($q) use ($user) {
-                    $q->where('docente_id', $user->id);
-                })->where('id', $id)->exists();
+                $q->where('docente_id', $user->id);
+            })->where('id', $id)->exists();
 
             if (!$tieneAcceso) {
                 return redirect()->route('grupos')
@@ -54,18 +54,35 @@ class GrupoController extends Controller
 
         $grupo = grupos::with('carrera')->findOrFail($id);
 
+        // Guardar grupo activo
         session([
             'grupo_activo_id'      => $grupo->id,
             'grupo_activo_nombre'  => $grupo->nombre,
             'grupo_activo_carrera' => $grupo->carrera->nombre ?? '',
         ]);
 
+        // ===== 🔥 NUEVO: Actualizar historial de grupos recientes =====
+        $recientes = session('grupos_recientes', []);
+
+        // Remover el grupo si ya estaba en el historial (para moverlo al inicio)
+        $recientes = array_filter($recientes, function ($item) use ($id) {
+            return $item !== $id;
+        });
+
+        // Agregar el grupo al inicio
+        array_unshift($recientes, $id);
+
+        // Limitar a 3 grupos
+        $recientes = array_slice($recientes, 0, 3);
+
+        // Guardar en sesión
+        session(['grupos_recientes' => $recientes]);
+
         $dashboard = $user->rol === 'admin' ? 'admin.dashboard' : 'docente.dashboard';
 
         return redirect()->route($dashboard)
             ->with('success', 'Grupo ' . $grupo->nombre . ' seleccionado.');
     }
-
     /**
      * Limpia el grupo activo de sesión.
      */
