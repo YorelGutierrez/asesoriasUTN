@@ -14,13 +14,12 @@ class MateriasSeeder extends Seeder
     public function run(): void
     {
         $materias = [
-            ['nombre' => 'Inglés VII', 'clave' => 'ING7'],
-            ['nombre' => 'Matemáticas para ingeniería II', 'clave' => 'MATII'],
-            ['nombre' => 'Administración de Base de Datos', 'clave' => 'BD'],
+            ['nombre' => 'Inglés VIII', 'clave' => 'ING8'],
+            ['nombre' => 'Desarrollo de equipos de alto rendimiento', 'clave' => 'DEAR'],
+            ['nombre' => 'Desarrollo para dispositivos Moviles', 'clave' => 'DDM'],
             ['nombre' => 'Desarrollo Web', 'clave' => 'WEB'],
-            ['nombre' => 'Seguridad de Aplicaciones', 'clave' => 'SEG'],
-            ['nombre' => 'Planificación y Organización de Trabajo', 'clave' => 'PYO'],
-            ['nombre' => 'Estructura de Datos', 'clave' => 'ED'],
+            ['nombre' => 'Administración de proyectos', 'clave' => 'ADMP'],
+            ['nombre' => 'Extracción de contenido en base de datos', 'clave' => 'EXBD'],
         ];
 
         foreach ($materias as $m) {

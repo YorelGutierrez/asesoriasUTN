@@ -27,24 +27,60 @@ class AsesoriaController extends Controller
         $carreras = carreras::all();
         $materias = materias::all();
         $user = auth()->user();
+        $grupoActivoId = session('grupo_activo_id');
 
-        // Cargar datos según el rol
-        if ($user->rol == 'alumno') {
-            // Alumno ve docentes
-            $docentes = docentes::with(['user', 'carrera'])->get();
-            $alumnos = collect(); // vacío
+        // ===== ALUMNO: solo docentes de su grupo =====
+        if ($user->rol === 'alumno') {
+            $alumno = $user->alumno;
+            $docentes = collect();
+
+            if ($alumno && $alumno->grupo) {
+                // Obtener IDs de los docentes (User) del grupo
+                $docenteIds = $alumno->grupo->docentes()->pluck('users.id')->toArray();
+
+                // Consultar el modelo docentes con sus relaciones
+                $docentes = docentes::with(['user', 'carrera'])
+                    ->whereIn('user_id', $docenteIds)
+                    ->get();
+            }
+
+            $alumnos = collect();
             $tipoVista = 'alumno';
-        } elseif ($user->rol == 'docente') {
-            // Docente ve alumnos
-            $alumnos = alumnos::with(['user', 'grupo'])->get();
-            $docentes = collect(); // vacío
-            $tipoVista = 'docente';
-        } else {
-            // Admin ve alumnos (por defecto)
-            $alumnos = alumnos::with(['user', 'grupo'])->get();
-            $docentes = collect(); // vacío
-            $tipoVista = 'admin';
+
+            return view('auth.agendar', compact('carreras', 'materias', 'alumnos', 'docentes', 'tipoVista'));
         }
+
+        // ===== DOCENTE: solo alumnos de su grupo activo =====
+        if ($user->rol === 'docente') {
+            $docentes = collect(); // vacío
+
+            if ($grupoActivoId) {
+                $alumnos = alumnos::with(['user', 'grupo', 'carrera'])
+                    ->where('grupo_id', $grupoActivoId)
+                    ->join('users', 'alumnos.user_id', '=', 'users.id')
+                    ->orderBy('users.apellido_paterno')
+                    ->orderBy('users.nombres')
+                    ->select('alumnos.*')
+                    ->get();
+            } else {
+                $alumnos = collect();
+            }
+
+            $tipoVista = 'docente';
+
+            return view('auth.agendar', compact('carreras', 'materias', 'alumnos', 'docentes', 'tipoVista'));
+        }
+
+        // ===== ADMIN: ve todos los alumnos =====
+        $alumnos = alumnos::with(['user', 'grupo', 'carrera'])
+            ->join('users', 'alumnos.user_id', '=', 'users.id')
+            ->orderBy('users.apellido_paterno')
+            ->orderBy('users.nombres')
+            ->select('alumnos.*')
+            ->get();
+
+        $docentes = collect();
+        $tipoVista = 'admin';
 
         return view('auth.agendar', compact('carreras', 'materias', 'alumnos', 'docentes', 'tipoVista'));
     }

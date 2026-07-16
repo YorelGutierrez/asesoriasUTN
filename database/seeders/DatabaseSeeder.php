@@ -12,12 +12,13 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call([
-            UserSeeder::class,    
+        $this->call([  
             CarrerasSeeder::class,        // primero carreras
             MateriasSeeder::class,        // después materias
             GruposSeeder::class,          // luego grupos (dependen de carreras)
             MateriaGrupoSeeder::class,    // finalmente relaciones (dependen de grupos y materias)
+            UserSeeder::class,   
+            DocenteSeeder::class, //Docentes
         ]);
     }
 }

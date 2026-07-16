@@ -14,7 +14,7 @@ class MateriaGrupoSeeder extends Seeder
         $materias = materias::all();
 
         // Obtener los grupos IDGS-81, 82, 83, 84 (usando sus nombres o IDs)
-        $grupos = grupos::whereIn('nombre', ['IDGS-81', 'IDGS-82', 'IDGS-83', 'IDGS-84'])->get();
+        $grupos = grupos::whereIn('nombre', ['IDGS-91', 'IDGS-92', 'IDGS-93', 'IDGS-94'])->get();
 
         if ($materias->isEmpty()) {
             $this->command->error('No hay materias. Ejecuta primero MateriasSeeder.');
@@ -22,7 +22,7 @@ class MateriaGrupoSeeder extends Seeder
         }
 
         if ($grupos->isEmpty()) {
-            $this->command->error('No se encontraron los grupos IDGS-81,82,83,84. Ejecuta primero GruposSeeder.');
+            $this->command->error('No se encontraron los grupos IDGS-91,92,93,94. Ejecuta primero GruposSeeder.');
             return;
         }
 
