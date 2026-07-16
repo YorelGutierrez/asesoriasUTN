@@ -22,10 +22,10 @@ class GruposSeeder extends Seeder
         }
 
         $grupos = [
-            ['nombre' => 'IDGS-81', 'cuatrimestre' => 8, 'carrera_id' => $carrera->id],
-            ['nombre' => 'IDGS-82', 'cuatrimestre' => 6, 'carrera_id' => $carrera->id],
-            ['nombre' => 'IDGS-83', 'cuatrimestre' => 4, 'carrera_id' => $carrera->id],
-            ['nombre' => 'IDGS-84', 'cuatrimestre' => 2, 'carrera_id' => $carrera->id],
+            ['nombre' => 'IDGS-91', 'cuatrimestre' => 9, 'carrera_id' => $carrera->id],
+            ['nombre' => 'IDGS-92', 'cuatrimestre' => 9, 'carrera_id' => $carrera->id],
+            ['nombre' => 'IDGS-93', 'cuatrimestre' => 9, 'carrera_id' => $carrera->id],
+            ['nombre' => 'IDGS-94', 'cuatrimestre' => 9, 'carrera_id' => $carrera->id],
         ];
 
         foreach ($grupos as $g) {

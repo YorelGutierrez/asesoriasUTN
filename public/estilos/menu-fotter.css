@@ -503,6 +503,51 @@ section{
     color: #ef4444;
 }
 
+/* ===== DROPDOWNS RESPONSIVOS (Móvil) ===== */
+
+@media (max-width: 767px) {
+    /* Notificaciones */
+    .notif-dropdown {
+        right: 10px !important;
+        left: auto !important;
+        width: 300px !important;
+        max-width: calc(100% - 20px) !important;
+        top: 55px !important;
+    }
+
+    /* Calendario */
+    .cal-dropdown {
+        right: 10px !important;
+        left: auto !important;
+        width: 260px !important;
+        max-width: calc(100% - 20px) !important;
+        top: 55px !important;
+    }
+
+    /* Ajustes de tamaño en móvil */
+    .notif-item {
+        font-size: 12px !important;
+        padding: 10px 12px !important;
+    }
+
+    .cal-mini-day {
+        font-size: 10px !important;
+    }
+}
+
+/* Para tablets pequeñas (entre 768px y 991px) */
+@media (min-width: 768px) and (max-width: 991px) {
+    .notif-dropdown {
+        right: 80px !important;
+        width: 300px !important;
+    }
+
+    .cal-dropdown {
+        right: 140px !important;
+        width: 240px !important;
+    }
+}
+
 /* ===== PAGINACIÓN COMPACTA (global) ===== */
 
 .paginacion-tabla {
