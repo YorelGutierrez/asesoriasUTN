@@ -179,12 +179,16 @@
         {{-- Menú exclusivo del docente --}}
         @if(auth()->user()->rol === 'docente')
         <a href="{{ route('registro') }}" class="{{ request()->routeIs('registro') ? 'activo' : '' }}">
-            <i class="bi bi-calendar-plus-fill" style="font-size: 18px;"></i> {{ __('Registro de asesorias') }}
+            <i class="bi bi-pass-fill" style="font-size: 18px;"></i> {{ __('Asesorias') }}
         </a>
         @endif
 
         {{-- Menú exclusivo del admin --}}
         @if(auth()->user()->rol === 'admin')
+        <a href="{{ route('admin.asignaciones') }}" class="{{ request()->routeIs('admin.asignaciones') ? 'activo' : '' }}">
+            <i class="bi bi-file-text-fill"></i> {{ __('Asignaciones') }}
+        </a>
+
         <a href="{{ route('roles_permisos') }}" class="{{ request()->routeIs('roles_permisos') ? 'activo' : '' }}">
             <i class="bi bi-clipboard2-check-fill" style="font-size: 18px;"></i> {{ __('Roles y permisos') }}
         </a>

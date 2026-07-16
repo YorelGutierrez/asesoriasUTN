@@ -26,7 +26,7 @@ class User extends Authenticatable implements JWTSubject
     ];
 
     protected $hidden = ['password', 'remember_token'];
-    
+
     protected $casts = [
         'email_verified_at' => 'datetime',
         'fecha_nacimiento' => 'date',
@@ -49,14 +49,14 @@ class User extends Authenticatable implements JWTSubject
     }
 
     // JWT
-    public function getJWTIdentifier() 
-    { 
-        return $this->getKey(); 
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
     }
-    
-    public function getJWTCustomClaims() 
-    { 
-        return []; 
+
+    public function getJWTCustomClaims()
+    {
+        return [];
     }
 
     // Accesor para obtener la URL de la foto de perfil
@@ -68,5 +68,17 @@ class User extends Authenticatable implements JWTSubject
         // Generar avatar con iniciales
         $nombre = urlencode($this->nombres . '+' . $this->apellido_paterno);
         return "https://ui-avatars.com/api/?name={$nombre}&background=0d6efd&color=fff";
+    }
+
+    public function materias()
+    {
+        return $this->belongsToMany(materias::class, 'docente_materias', 'docente_id', 'materia_id')
+            ->withTimestamps();
+    }
+
+    public function grupos()
+    {
+        return $this->belongsToMany(grupos::class, 'docente_grupos', 'docente_id', 'grupo_id')
+            ->withTimestamps();
     }
 }

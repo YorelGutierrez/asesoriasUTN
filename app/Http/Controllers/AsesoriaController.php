@@ -390,4 +390,71 @@ class AsesoriaController extends Controller
             'mensaje' => 'PDF generado correctamente'
         ]);
     }
+
+    /**
+     * Muestra el historial general de asesorías con filtros según el rol.
+     */
+    public function historial(Request $request)
+    {
+        $user = auth()->user();
+
+        // --- Construir consulta base ---
+        $query = sesiones_asesoria::with(['docente', 'alumnos', 'acuerdos', 'reporte'])
+            ->where('estado', 'realizada'); // Solo realizadas
+
+        // Filtrar por rol
+        if ($user->rol === 'docente') {
+            $query->where('docente_id', $user->id);
+        } elseif ($user->rol === 'alumno') {
+            $query->whereHas('alumnos', function ($q) use ($user) {
+                $q->where('sesion_alumno.alumno_id', $user->id);
+            });
+        }
+        // Admin: sin filtro
+
+        // --- Filtros GET ---
+
+        // 🔥 CUATRIMESTRE: filtrar sesiones que tengan alumnos con ese cuatrimestre
+        if ($request->filled('cuatrimestre')) {
+            $cuatrimestre = $request->cuatrimestre;
+            $query->whereHas('alumnos', function ($q) use ($cuatrimestre) {
+                $q->whereHas('alumno', function ($sub) use ($cuatrimestre) {
+                    $sub->where('cuatrimestre', $cuatrimestre);
+                });
+            });
+        }
+
+        // Materia (buscamos en el campo 'tema')
+        if ($request->filled('materia')) {
+            $query->where('tema', 'like', '%' . $request->materia . '%');
+        }
+
+        // Buscar alumno (por nombre o matrícula)
+        if ($request->filled('buscar_alumno')) {
+            $search = $request->buscar_alumno;
+            $query->whereHas('alumnos', function ($q) use ($search) {
+                $q->where('nombres', 'like', "%{$search}%")
+                    ->orWhere('apellido_paterno', 'like', "%{$search}%")
+                    ->orWhere('apellido_materno', 'like', "%{$search}%");
+            });
+        }
+
+        // Fecha (fecha_inicio)
+        if ($request->filled('fecha')) {
+            $query->whereDate('fecha_inicio', $request->fecha);
+        }
+
+        // --- Obtener datos para selects ---
+        // Materias: extraemos temas únicos de las sesiones del usuario (sin filtrar por estado)
+        $materias = sesiones_asesoria::where('estado', 'realizada')
+            ->distinct('tema')->pluck('tema')->filter()->values();
+
+        // Cuatrimestres: rango fijo 1-12 (o los que existan en la tabla alumnos)
+        $cuatrimestres = range(1, 12);
+
+        // --- Obtener sesiones con paginación (10 por página) ---
+        $sesiones = $query->orderBy('fecha_inicio', 'desc')->paginate(10);
+
+        return view('auth.historial', compact('sesiones', 'materias', 'cuatrimestres'));
+    }
 }

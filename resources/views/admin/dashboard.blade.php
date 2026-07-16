@@ -9,8 +9,8 @@
     <h1>Bienvenido <span id="nombreUsuario">...</span></h1>
 </div>
 
-<div class="row mb-4 align-items-stretch">
-    <div class="col-md-4">
+<div class="row align-items-stretch">
+    <div class="col-md-4 mb-4">
         <div class="card shadow-sm border-0 rounded-4 h-100">
             <div class="card-body p-4">
                 <h5 class="fw-semibold mb-3 titulo-borde-verde">Total de usuarios</h5>
@@ -37,16 +37,23 @@
     </div>
 
     <!-- RESPALDOS -->
-    <div class="col-md-8">
+    <div class="col-md-8 mb-4">
         <div class="card shadow-sm border-0 rounded-4 h-100">
             <div class="card-body p-4">
-                <h5 class="fw-semibold mb-4 titulo-borde-verde">Respaldos del sistema</h5>
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="fw-semibold mb-0 titulo-borde-verde">Respaldos del sistema</h5>
+                    <button class="btn-restaurar"
+                        onclick="mostrarListaRespaldos()"
+                        title="Restaurar respaldo">
+                        <i class="bi bi-arrow-counterclockwise fs-5"></i>
+                    </button>
+                </div>
 
                 @if($ultimo)
-                <p><strong>Último respaldo:</strong> {{ $ultimo['fecha'] }}</p>
+                <p class="mt-3"><strong>Último respaldo:</strong> {{ $ultimo['fecha'] }}</p>
                 <p><strong>Estado:</strong> <span class="text-success">Correcto</span></p>
                 @else
-                <p><strong>Último respaldo:</strong> No hay respaldos</p>
+                <p class="mt-3"><strong>Último respaldo:</strong> No hay respaldos</p>
                 <p><strong>Estado:</strong> <span class="text-danger">Sin respaldos</span></p>
                 @endif
 
@@ -78,8 +85,8 @@
     </div>
 </div>
 
-<div class="row mb-4 align-items-stretch">
-    <div class="col-md-6">
+<div class="row align-items-stretch">
+    <div class="col-md-6 mb-4">
         <div class="card shadow-sm border-0 rounded-4 h-100">
             <div class="card-body p-4 d-flex flex-column">
                 <div class="d-flex justify-content-between align-items-center mb-3">
@@ -93,7 +100,7 @@
         </div>
     </div>
     <!-- ACCIONES DE GESTIÓN -->
-    <div class="col-md-6">
+    <div class="col-md-6 mb-4">
         <div class="card shadow-sm border-0 rounded-4 h-100">
             <div class="card-body p-4">
                 <h5 class="fw-semibold mb-4 titulo-borde-verde">Gestión del sistema | Acciones rapidas</h5>
@@ -101,47 +108,9 @@
                     <a href="{{ route('gestion', ['tab' => 'alumnos']) }}" class="btn-principal">Gestionar alumnos</a>
                     <a href="{{ route('gestion', ['tab' => 'grupos']) }}" class="btn-principal">Gestionar grupos</a>
                     <a href="{{ route('gestion', ['tab' => 'docentes']) }}" class="btn-principal">Gestionar docentes</a>
+                    <a href="{{ route('admin.asignaciones') }}" class="btn-principal">Asingaciones academicas</a>
                 </div>
             </div>
-        </div>
-    </div>
-</div>
-
-<!-- ASIGNACIÓN ACADÉMICA -->
-<div class="card shadow-sm border-0 rounded-4">
-    <div class="card-body">
-        <h5 class="fw-semibold mb-4 titulo-borde-verde">Asignación académica | Asignaciones actuales</h5>
-
-        <div class="table-responsive">
-            <table class="table table-hover align-middle">
-                <thead class="table-light">
-                    <tr>
-                        <th>Docente</th>
-                        <th>Clave</th>
-                        <th>Carreras</th>
-                        <th>Materias</th>
-                        <th>Grupos</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Juan Manuel Tovar Sanchez</td>
-                        <td>19cJICP</td>
-                        <td>Ingenieria en desarrollo de software</td>
-                        <td>Programación</td>
-                        <td>IDGS-84</td>
-                        <td>
-                            <button class="btn btn-outline-warning btn-sm">Editar</button>
-                            <button class="btn btn-outline-danger btn-sm">Eliminar</button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <div class="mt-3 d-flex justify-content-end">
-            <button class="btn-principal">+ Nueva asignación</button>
         </div>
     </div>
 </div>
@@ -152,7 +121,8 @@
     Swal.fire({
         icon: 'success',
         title: '¡Bienvenido!',
-        text: '{{ session('login_success') }}',
+        text: '{{ session('
+        login_success ') }}',
         confirmButtonColor: '#3085d6',
         confirmButtonText: 'Aceptar'
     });
@@ -165,7 +135,8 @@
     Swal.fire({
         icon: 'success',
         title: '¡Respaldo completado!',
-        text: '{{ session('respaldo_success') }}',
+        text: '{{ session('
+        respaldo_success ') }}',
         confirmButtonColor: '#3085d6',
         confirmButtonText: 'Aceptar'
     });
@@ -178,7 +149,8 @@
     Swal.fire({
         icon: 'error',
         title: 'Error',
-        text: '{{ session('error') }}',
+        text: '{{ session('
+        error ') }}',
         confirmButtonColor: '#d33',
         confirmButtonText: 'Aceptar'
     });
@@ -253,6 +225,8 @@
 
 <script>
     window.respaldoAutomaticoUrl = "{{ route('respaldo.automatico.store') }}";
+    window.respaldoListarUrl = "{{ route('respaldo.listar') }}";
+    window.respaldoRestaurarUrl = "{{ route('respaldo.restaurar') }}";
     window.csrfToken = "{{ csrf_token() }}";
 </script>
 <script src="{{ asset('js/ajax-respaldos.js') }}"></script>
@@ -288,34 +262,36 @@
             Swal.fire('Error', 'Selecciona una fecha y hora', 'error');
             return;
         }
-        
+
         fetch(window.respaldoAutomaticoUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': window.csrfToken
-            },
-            body: JSON.stringify({ fecha: fecha })
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.success) {
-                Swal.fire({
-                    icon: 'success',
-                    title: '¡Programado!',
-                    text: data.message || 'Respaldo programado correctamente',
-                    confirmButtonColor: '#3085d6'
-                }).then(() => {
-                    cerrarCalendario();
-                    location.reload();
-                });
-            } else {
-                Swal.fire('Error', data.message || 'Error al programar', 'error');
-            }
-        })
-        .catch(err => {
-            Swal.fire('Error', 'Error de conexión', 'error');
-        });
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': window.csrfToken
+                },
+                body: JSON.stringify({
+                    fecha: fecha
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: '¡Programado!',
+                        text: data.message || 'Respaldo programado correctamente',
+                        confirmButtonColor: '#3085d6'
+                    }).then(() => {
+                        cerrarCalendario();
+                        location.reload();
+                    });
+                } else {
+                    Swal.fire('Error', data.message || 'Error al programar', 'error');
+                }
+            })
+            .catch(err => {
+                Swal.fire('Error', 'Error de conexión', 'error');
+            });
     }
 </script>
 

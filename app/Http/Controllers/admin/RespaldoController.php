@@ -118,7 +118,7 @@ class RespaldoController extends Controller
             'message' => 'Respaldo programado correctamente'
         ]);
     }
-    
+
     /**
      * Descargar respaldo
      */
@@ -134,5 +134,98 @@ class RespaldoController extends Controller
         registrar_log('DESCARGAR', 'Respaldo descargado: ' . $archivo, 'respaldos');
 
         return response()->download($ruta);
+    }
+
+    /**
+     * Lista los respaldos disponibles para restaurar.
+     */
+    public function listar()
+    {
+        $archivos = File::files(storage_path('app/respaldo'));
+        $respaldos = [];
+
+        foreach ($archivos as $archivo) {
+            $respaldos[] = [
+                'nombre' => $archivo->getFilename(),
+                'fecha' => Carbon::createFromTimestamp($archivo->getCTime())->format('d/m/Y H:i:s'),
+                'tamano' => $this->formatSizeUnits($archivo->getSize()),
+                'timestamp' => $archivo->getCTime(),
+            ];
+        }
+
+        // Ordenar por fecha descendente (más reciente primero)
+        usort($respaldos, function ($a, $b) {
+            return $b['timestamp'] - $a['timestamp'];
+        });
+
+        return response()->json($respaldos);
+    }
+
+    /**
+     * Restaura un respaldo seleccionado.
+     */
+    public function restaurar(Request $request)
+    {
+        $archivo = $request->archivo;
+        $ruta = storage_path('app/respaldo/' . $archivo);
+
+        if (!file_exists($ruta)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'El archivo de respaldo no existe.'
+            ], 404);
+        }
+
+        try {
+            // Configurar base de datos
+            $database = env('DB_DATABASE');
+            $user = env('DB_USERNAME');
+            $password = env('DB_PASSWORD');
+            $host = env('DB_HOST', '127.0.0.1');
+            $port = env('DB_PORT', '3306');
+
+            // Comando para restaurar (usando mysql)
+            $command = "mysql --host={$host} --port={$port} --user={$user} --password={$password} {$database} < {$ruta}";
+
+            system($command, $resultado);
+
+            if ($resultado === 0) {
+                registrar_log('RESTAURAR', 'Respaldo restaurado: ' . $archivo, 'respaldos');
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Base de datos restaurada correctamente desde: ' . $archivo
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error al restaurar la base de datos. Código: ' . $resultado
+                ]);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * Formatea el tamaño de un archivo en unidades legibles.
+     */
+    private function formatSizeUnits($bytes)
+    {
+        if ($bytes >= 1073741824) {
+            return number_format($bytes / 1073741824, 2) . ' GB';
+        } elseif ($bytes >= 1048576) {
+            return number_format($bytes / 1048576, 2) . ' MB';
+        } elseif ($bytes >= 1024) {
+            return number_format($bytes / 1024, 2) . ' KB';
+        } elseif ($bytes > 1) {
+            return $bytes . ' bytes';
+        } elseif ($bytes == 1) {
+            return '1 byte';
+        } else {
+            return '0 bytes';
+        }
     }
 }

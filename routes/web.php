@@ -9,6 +9,7 @@ use App\Http\Controllers\DocenteController;
 use App\Http\Controllers\AlumnoController;
 use App\Http\Controllers\CarreraController;
 use App\Http\Controllers\AsesoriaController;
+use App\Http\Controllers\GestionController;
 use App\Http\Controllers\GrupoController;
 use App\Http\Controllers\NotificacionController;
 use App\Http\Controllers\UserController;
@@ -78,10 +79,7 @@ Route::middleware(['auth', 'rol:admin'])->group(function () {
     Route::get('/admin/dashboard', [RespaldoController::class, 'dashboard'])->name('admin.dashboard');
 
     // ========== ROLES Y PERMISOS ==========
-    Route::get('/roles_permisos', function () {
-        $usuarios = App\Models\User::with(['docente', 'alumno'])->get();
-        return view('admin.rolesPermisos', compact('usuarios'));
-    })->name('roles_permisos');
+    Route::get('/roles_permisos', [UserController::class, 'rolesPermisos'])->name('roles_permisos');
 
     // ========== RUTAS DE ALUMNOS ==========
     Route::get('/registro/alumno', [AlumnoController::class, 'create'])->name('registro_alumnos');
@@ -116,25 +114,30 @@ Route::middleware(['auth', 'rol:admin'])->group(function () {
     Route::post('/usuarios/bloquear/{id}', [UserController::class, 'toggleBlock'])->name('usuarios.toggleBlock');
 
     // ========== RUTA GESTIÓN ==========
-    Route::get('/gestionar', function () {
-        $alumnos = alumnos::with(['user', 'carrera', 'grupo'])->paginate(10);
-        $docentes = docentes::with(['user', 'carrera'])->paginate(10);
-        $grupos = grupos::with(['carrera'])->withCount('alumnos')->paginate(10);
-        return view('admin.gestion', compact('alumnos', 'docentes', 'grupos'));
-    })->name('gestion');
+    Route::get('/gestionar', [GestionController::class, 'index'])->name('gestion');
 
-    // Rutas de respaldos
+    // ========== RESPALDOS =============
     Route::post('/respaldo/generar', [RespaldoController::class, 'generate'])->name('respaldo.generar');
     Route::get('/respaldo/automatico', [RespaldoController::class, 'automaticoForm'])->name('respaldo.automatico.form');
     Route::post('/respaldo/automatico', [RespaldoController::class, 'automatico'])->name('respaldo.automatico.store');
     Route::get('/respaldo/descargar/{archivo}', [RespaldoController::class, 'download'])->name('respaldo.descargar');
+    Route::post('/respaldo/restaurar', [RespaldoController::class, 'restaurar'])->name('respaldo.restaurar');
+    Route::get('/respaldo/listar', [RespaldoController::class, 'listar'])->name('respaldo.listar');
+
+    //========== RUTAS DE ASIGNACIONES ==========
+    Route::get('/admin/asignaciones', [\App\Http\Controllers\Admin\AsignacionController::class, 'index'])->name('admin.asignaciones');
+    Route::get('/admin/asignaciones/docentes', [\App\Http\Controllers\Admin\AsignacionController::class, 'docentesPorCarrera'])->name('admin.asignaciones.docentes');
+    Route::get('/admin/asignaciones/grupos', [\App\Http\Controllers\Admin\AsignacionController::class, 'gruposPorCarrera'])->name('admin.asignaciones.grupos');
+    Route::get('/admin/asignaciones/materias/{docenteId}', [\App\Http\Controllers\Admin\AsignacionController::class, 'materiasDocente'])->name('admin.asignaciones.materias');
+    Route::get('/admin/asignaciones/editar/{id}', [\App\Http\Controllers\Admin\AsignacionController::class, 'editar'])->name('admin.asignaciones.editar');
+    Route::post('/admin/asignaciones', [\App\Http\Controllers\Admin\AsignacionController::class, 'store'])->name('admin.asignaciones.store');
+    Route::put('/admin/asignaciones/{id}', [\App\Http\Controllers\Admin\AsignacionController::class, 'update'])->name('admin.asignaciones.update');
+    Route::delete('/admin/asignaciones/{id}', [\App\Http\Controllers\Admin\AsignacionController::class, 'destroy'])->name('admin.asignaciones.destroy');
 });
 
 // Rutas protegidas para docentes
 Route::middleware(['auth', 'rol:docente'])->group(function () {
-    Route::get('/docente/dashboard', function () {
-        return view('auth.docentes.escritorioDocente');
-    })->name('docente.dashboard');
+    Route::get('/docente/dashboard', [DocenteController::class, 'dashboardDocente'])->name('docente.dashboard');
 
     // RUTAS DE ASESORÍAS
     Route::get('/docente/asesoria', [AsesoriaController::class, 'create'])->name('registro');
@@ -143,9 +146,7 @@ Route::middleware(['auth', 'rol:docente'])->group(function () {
 
 // Rutas protegidas para alumnos
 Route::middleware(['auth', 'rol:alumno'])->group(function () {
-    Route::get('/alumno/dashboard', function () {
-        return view('auth.alumnos.escritorioAlumno');
-    })->name('alumno.dashboard');
+    Route::get('/alumno/dashboard', [AlumnoController::class, 'dashboardAlumno'])->name('alumno.dashboard');
 });
 
 // Rutas compartidas (docentes y admin)
@@ -157,9 +158,7 @@ Route::middleware(['auth', 'rol:admin,docente'])->group(function () {
     Route::get('/alumnos', [AlumnoController::class, 'listar'])->name('alumnos');
     Route::get('/alumnos/expediente/{id}', [AlumnoController::class, 'expediente'])->name('expedienteAlumnos');
 
-    Route::get('/historial', function () {
-        return view('auth.historial');
-    })->name('historial');
+    Route::get('/historial', [AsesoriaController::class, 'historial'])->name('historial');
 
     // Rutas para PDF
     Route::post('/docente/asesoria/reporte/generar', [AsesoriaController::class, 'generarReporte'])->name('asesoria.reporte.generar');

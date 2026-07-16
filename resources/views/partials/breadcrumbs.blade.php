@@ -14,14 +14,15 @@ $routeLabels = [
 'registro' => 'Registro de asesorías',
 'historial' => 'Historial',
 'roles_permisos' => 'Roles y permisos',
-'gestion' => 'Gestión admin.',
+'gestion' => 'Gestión admin',
 'registro_alumnos' => 'Registro Alumnos',
 'registro_docente' => 'Registro Docentes',
 'expedienteAlumnos' => 'Expediente',
+'admin.asignaciones' => 'Asignaciones académicas',
 ];
 
 if (auth()->check()) {
-    $routeLabels['agenda'] = auth()->user()->rol === 'alumno' ? 'Solicitar' : 'Agendar';
+$routeLabels['agenda'] = auth()->user()->rol === 'alumno' ? 'Solicitar' : 'Agendar';
 }
 
 // Rutas que requieren parámetros (NUNCA deben tener enlace en breadcrumb)
@@ -49,6 +50,26 @@ $rutasConParametros = [
 'notificaciones.rechazar',
 'notificaciones.leer',
 'notificaciones.leerTodas',
+'admin.asignaciones.editar',
+'admin.asignaciones.materias',
+'admin.asignaciones.grupos',
+'admin.asignaciones.docentes',
+'admin.asignaciones.grupos-docente',
+'admin.asignaciones.store',
+'admin.asignaciones.update',
+'admin.asignaciones.destroy',
+'notificaciones.index',
+'notificaciones.leer',
+'notificaciones.leerTodas',
+'notificaciones.confirmar',
+'notificaciones.rechazar',
+'calendario.sesiones',
+'respaldo.listar',
+'respaldo.restaurar',
+'respaldo.generar',
+'respaldo.automatico.form',
+'respaldo.automatico.store',
+'respaldo.descargar',
 ];
 
 // Filtrar rutas con parámetros del historial
@@ -58,13 +79,19 @@ fn($r) => !in_array($r, $rutasConParametros)
 );
 $navigationHistory = array_values($navigationHistory);
 
+// ===== LIMITAR BREADCRUMBS A 5 ELEMENTOS =====
+$maxBreadcrumbs = 4;
+
 // Construir breadcrumbs desde el historial de navegación
 if (!empty($navigationHistory)) {
-foreach ($navigationHistory as $index => $navRoute) {
+// Tomar solo los últimos $maxBreadcrumbs elementos (los más recientes)
+$historyToShow = array_slice($navigationHistory, -$maxBreadcrumbs);
+
+foreach ($historyToShow as $index => $navRoute) {
 $label = $routeLabels[$navRoute] ?? ucfirst(str_replace('_', ' ', $navRoute));
 
 // El último elemento es el actual (sin enlace)
-if ($index === count($navigationHistory) - 1) {
+if ($index === count($historyToShow) - 1) {
 $breadcrumbs[] = ['label' => $label];
 } else {
 $breadcrumbs[] = ['label' => $label, 'route' => $navRoute];
