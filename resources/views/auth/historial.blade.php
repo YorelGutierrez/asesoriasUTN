@@ -193,7 +193,7 @@
                 icon: 'info',
                 title: 'Reporte cuatrimestral',
                 text: 'Esta funcionalidad estará disponible próximamente.',
-                confirmButtonColor: '#2c9f49',
+                confirmButtonColor: '#2c9f49' ,
                 confirmButtonText: 'Aceptar'
             });
         });

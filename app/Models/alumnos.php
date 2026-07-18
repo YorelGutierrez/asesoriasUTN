@@ -9,6 +9,8 @@ class alumnos extends Model
 {
     use HasFactory;
 
+    protected $table = 'alumnos';
+
     protected $fillable = [
         'user_id',
         'matricula',
@@ -20,7 +22,7 @@ class alumnos extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function carrera()
@@ -40,7 +42,12 @@ class alumnos extends Model
 
     public function sesiones()
     {
-        return $this->belongsToMany(sesiones_asesoria::class, 'sesion_alumno', 'alumno_id', 'sesion_id', 'user_id')
+        return $this->belongsToMany(sesiones_asesoria::class, 'sesion_alumnos', 'alumno_id', 'sesion_id')
             ->withTimestamps();
+    }
+
+    public function solicitudes()
+    {
+        return $this->hasMany(solicitudes_asesoria::class, 'alumno_id');
     }
 }

@@ -4,6 +4,7 @@
 <link rel="stylesheet" href="{{ asset('estilos/botones.css') }}">
 <link rel="stylesheet" href="{{ asset('estilos/titulos.css') }}">
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <div class="titulo">
     <h1>Bienvenido <span id="nombreUsuario">...</span></h1>
@@ -114,16 +115,194 @@
         </div>
     </div>
 </div>
+<!--prueba de diseño de graficas-->
+<div class="row mt-4">
+    <!-- Gráfica 1: Solicitudes por estado -->
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm border-0 rounded-4 h-100">
+            <div class="card-body p-4">
+                <h5 class="fw-semibold mb-3 titulo-borde-verde">
+                    <i class="bi bi-clipboard-check me-2"></i>Solicitudes por estado
+                </h5>
+                <div style="height: 220px; position: relative;">
+                    <canvas id="chartSolicitudesEstado"></canvas>
+                </div>
+                <div class="mt-2 p-2 bg-light rounded">
+                    <small class="text-muted">
+                        <i class="bi bi-lightbulb text-warning me-1"></i>
+                        <strong>Toma de decisión:</strong> Permite priorizar solicitudes pendientes y asignar recursos según la demanda.
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráfica 2: Solicitudes por mes -->
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm border-0 rounded-4 h-100">
+            <div class="card-body p-4">
+                <h5 class="fw-semibold mb-3 titulo-borde-verde">
+                    <i class="bi bi-calendar3 me-2"></i>Solicitudes por mes
+                </h5>
+                <div style="height: 220px; position: relative;">
+                    <canvas id="chartSolicitudesMes"></canvas>
+                </div>
+                <div class="mt-2 p-2 bg-light rounded">
+                    <small class="text-muted">
+                        <i class="bi bi-lightbulb text-warning me-1"></i>
+                        <strong>Toma de decisión:</strong> Identifica picos de demanda (ej: antes de exámenes) para planificar recursos anticipadamente.
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- FILA 3: GRÁFICAS DE DETALLE                                 -->
+<!-- ============================================================ -->
+<div class="row mt-2">
+    <!-- Gráfica 3: Materias con más solicitudes -->
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm border-0 rounded-4 h-100">
+            <div class="card-body p-4">
+                <h5 class="fw-semibold mb-3 titulo-borde-verde">
+                    <i class="bi bi-book me-2"></i>Materias con más solicitudes
+                </h5>
+                <div style="height: 220px; position: relative;">
+                    <canvas id="chartSolicitudesMaterias"></canvas>
+                </div>
+                <div class="mt-2 p-2 bg-light rounded">
+                    <small class="text-muted">
+                        <i class="bi bi-lightbulb text-warning me-1"></i>
+                        <strong>Toma de decisión:</strong> Detecta materias con mayor dificultad para reforzar estrategias de enseñanza.
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráfica 4: Alumnos con más solicitudes -->
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm border-0 rounded-4 h-100">
+            <div class="card-body p-4">
+                <h5 class="fw-semibold mb-3 titulo-borde-verde">
+                    <i class="bi bi-person-lines-fill me-2"></i>Alumnos con más solicitudes
+                </h5>
+                <div style="height: 220px; position: relative;">
+                    <canvas id="chartSolicitudesAlumnos"></canvas>
+                </div>
+                <div class="mt-2 p-2 bg-light rounded">
+                    <small class="text-muted">
+                        <i class="bi bi-lightbulb text-warning me-1"></i>
+                        <strong>Toma de decisión:</strong> Identifica alumnos que requieren atención prioritaria o seguimiento personalizado.
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- FILA 4: GRÁFICAS DE OPERACIÓN                               -->
+<!-- ============================================================ -->
+<div class="row mt-2">
+    <!-- Gráfica 5: Docentes con más asesorías -->
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm border-0 rounded-4 h-100">
+            <div class="card-body p-4">
+                <h5 class="fw-semibold mb-3 titulo-borde-verde">
+                    <i class="bi bi-person-video2 me-2"></i>Docentes con más asesorías
+                </h5>
+                <div style="height: 220px; position: relative;">
+                    <canvas id="chartSolicitudesDocentes"></canvas>
+                </div>
+                <div class="mt-2 p-2 bg-light rounded">
+                    <small class="text-muted">
+                        <i class="bi bi-lightbulb text-warning me-1"></i>
+                        <strong>Toma de decisión:</strong> Permite equilibrar la carga de trabajo entre docentes y reconocer su desempeño.
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráfica 6: Solicitudes por día -->
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm border-0 rounded-4 h-100">
+            <div class="card-body p-4">
+                <h5 class="fw-semibold mb-3 titulo-borde-verde">
+                    <i class="bi bi-calendar-week me-2"></i>Solicitudes por día
+                </h5>
+                <div style="height: 220px; position: relative;">
+                    <canvas id="chartSolicitudesDia"></canvas>
+                </div>
+                <div class="mt-2 p-2 bg-light rounded">
+                    <small class="text-muted">
+                        <i class="bi bi-lightbulb text-warning me-1"></i>
+                        <strong>Toma de decisión:</strong> Optimiza la distribución de horarios de atención según los días de mayor demanda.
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- FILA 5: GRÁFICAS DE RESULTADOS                              -->
+<!-- ============================================================ -->
+<div class="row mt-2">
+    <!-- Gráfica 7: Resultados de asesorías -->
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm border-0 rounded-4 h-100">
+            <div class="card-body p-4">
+                <h5 class="fw-semibold mb-3 titulo-borde-verde">
+                    <i class="bi bi-check2-circle me-2"></i>Resultados de asesorías
+                </h5>
+                <div style="height: 220px; position: relative;">
+                    <canvas id="chartResultados"></canvas>
+                </div>
+                <div class="mt-2 p-2 bg-light rounded">
+                    <small class="text-muted">
+                        <i class="bi bi-lightbulb text-warning me-1"></i>
+                        <strong>Toma de decisión:</strong> Mide la efectividad de las asesorías y permite ajustar estrategias de apoyo académico.
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráfica 8: Tiempo promedio de atención -->
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm border-0 rounded-4 h-100">
+            <div class="card-body p-4">
+                <h5 class="fw-semibold mb-3 titulo-borde-verde">
+                    <i class="bi bi-clock-history me-2"></i>Tiempo promedio de atención (horas)
+                </h5>
+                <div style="height: 220px; position: relative;">
+                    <canvas id="chartTiempoAtencion"></canvas>
+                </div>
+                <div class="mt-2 p-2 bg-light rounded">
+                    <small class="text-muted">
+                        <i class="bi bi-lightbulb text-warning me-1"></i>
+                        <strong>Toma de decisión:</strong> Detecta cuellos de botella en el proceso de atención y optimiza tiempos de respuesta.
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 {{-- Alerta de bienvenida (solo después de login) --}}
-@if(session('login_success'))
+@if(session('success'))
 <script>
     Swal.fire({
         icon: 'success',
         title: '¡Bienvenido!',
         text: '{{ session('
-        login_success ') }}',
-        confirmButtonColor: '#3085d6',
+        success ') }}',
+        confirmButtonColor: '#2c9f49',
         confirmButtonText: 'Aceptar'
     });
 </script>
@@ -137,7 +316,7 @@
         title: '¡Respaldo completado!',
         text: '{{ session('
         respaldo_success ') }}',
-        confirmButtonColor: '#3085d6',
+        confirmButtonColor: '#2c9f49',
         confirmButtonText: 'Aceptar'
     });
 </script>
@@ -151,7 +330,7 @@
         title: 'Error',
         text: '{{ session('
         error ') }}',
-        confirmButtonColor: '#d33',
+        confirmButtonColor: '#2c9f49',
         confirmButtonText: 'Aceptar'
     });
 </script>
@@ -280,7 +459,7 @@
                         icon: 'success',
                         title: '¡Programado!',
                         text: data.message || 'Respaldo programado correctamente',
-                        confirmButtonColor: '#3085d6'
+                        confirmButtonColor: '#2c9f49'
                     }).then(() => {
                         cerrarCalendario();
                         location.reload();
@@ -294,5 +473,123 @@
             });
     }
 </script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Función para crear gráfica
+    function crearGrafica(elementId, labels, data, label, color, tipo = 'bar') {
+        const ctx = document.getElementById(elementId);
+        if (!ctx) return;
+
+        // Verificar si hay datos
+        if (!data || data.length === 0) {
+            ctx.parentElement.innerHTML = `
+                <div class="text-center text-muted py-4">
+                    <i class="bi bi-bar-chart-line fs-1"></i>
+                    <p class="mt-2">No hay datos disponibles</p>
+                </div>
+            `;
+            return;
+        }
+
+        const colores = ['#FF9800', '#2196F3', '#f44336', '#4CAF50', '#9C27B0', '#00BCD4', '#FF5722', '#8BC34A'];
+        const backgroundColors = tipo === 'doughnut' ? colores.slice(0, data.length) : color + '80';
+
+        new Chart(ctx, {
+            type: tipo,
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: label,
+                    data: data,
+                    backgroundColor: tipo === 'doughnut' ? backgroundColors : color + '80',
+                    borderColor: tipo === 'doughnut' ? backgroundColors : color,
+                    borderWidth: 2,
+                    borderRadius: 8,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: tipo === 'doughnut' ? 'bottom' : 'top',
+                        labels: {
+                            font: { size: 10 },
+                            boxWidth: 12
+                        }
+                    }
+                },
+                scales: tipo === 'doughnut' ? undefined : {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { stepSize: 1 }
+                    }
+                }
+            }
+        });
+    }
+
+    // ========== CREAR GRÁFICAS CON DATOS DE PHP ==========
+
+    // 1. Solicitudes por estado (Dona)
+    crearGrafica('chartSolicitudesEstado',
+        {!! json_encode($estadosLabels ?? []) !!},
+        {!! json_encode($estadosValues ?? []) !!},
+        'Solicitudes', '#4CAF50', 'doughnut'
+    );
+
+    // 2. Solicitudes por mes (Barras)
+    crearGrafica('chartSolicitudesMes',
+        {!! json_encode($mesesLabels ?? []) !!},
+        {!! json_encode($mesesValues ?? []) !!},
+        'Solicitudes', '#2196F3'
+    );
+
+    // 3. Materias con más solicitudes (Barras)
+    crearGrafica('chartSolicitudesMaterias',
+        {!! json_encode($materiasLabels ?? []) !!},
+        {!! json_encode($materiasValues ?? []) !!},
+        'Solicitudes', '#FF9800'
+    );
+
+    // 4. Alumnos con más solicitudes (Barras)
+    crearGrafica('chartSolicitudesAlumnos',
+        {!! json_encode($alumnosLabels ?? []) !!},
+        {!! json_encode($alumnosValues ?? []) !!},
+        'Solicitudes', '#9C27B0'
+    );
+
+    // 5. Docentes con más asesorías (Barras)
+    crearGrafica('chartSolicitudesDocentes',
+        {!! json_encode($docentesLabels ?? []) !!},
+        {!! json_encode($docentesValues ?? []) !!},
+        'Asesorías', '#00BCD4'
+    );
+
+    // 6. Solicitudes por día (Barras)
+    crearGrafica('chartSolicitudesDia',
+        {!! json_encode($diasLabels ?? []) !!},
+        {!! json_encode($diasValues ?? []) !!},
+        'Solicitudes', '#FF5722'
+    );
+
+    // 7. Resultados de asesorías (Dona)
+    crearGrafica('chartResultados',
+        {!! json_encode($resultadosLabels ?? []) !!},
+        {!! json_encode($resultadosValues ?? []) !!},
+        'Asesorías', '#8BC34A', 'doughnut'
+    );
+
+    // 8. Tiempo promedio de atención (Barras)
+    crearGrafica('chartTiempoAtencion',
+        {!! json_encode($tiemposLabels ?? []) !!},
+        {!! json_encode($tiemposValues ?? []) !!},
+        'Horas promedio', '#E91E63'
+    );
+});
+</script>
+
 
 @endsection

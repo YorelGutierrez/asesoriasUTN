@@ -57,6 +57,9 @@ class LoginController extends Controller
             };
 
             registrar_log('login', 'Inició sesión', 'auth');
+
+            session()->flash('success', $mensaje);
+            
             return redirect($dashboard)->cookie('jwt_token', $token, 60*24*7, null, null, false, false)->with('success', $mensaje);
         }
 

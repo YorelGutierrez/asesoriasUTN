@@ -13,6 +13,7 @@ use App\Http\Controllers\GestionController;
 use App\Http\Controllers\GrupoController;
 use App\Http\Controllers\NotificacionController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\GraficasController;
 use App\Models\alumnos;
 use App\Models\docentes;
 use App\Models\grupos;
@@ -184,3 +185,22 @@ Route::get('/reset-navigation', function () {
         }
     );
 })->name('reset.navigation');
+
+//rutas para las garficas
+// Ruta única para redirigir según rol
+Route::middleware(['auth'])->group(function () {
+    Route::get('/dashboard', [GraficasController::class, 'index'])->name('dashboard');
+});
+
+// Rutas específicas por rol
+Route::middleware(['auth', 'rol:admin'])->group(function () {
+    Route::get('/admin/dashboard', [GraficasController::class, 'index'])->name('admin.dashboard');
+});
+
+Route::middleware(['auth', 'rol:docente'])->group(function () {
+    Route::get('/docente/dashboard', [GraficasController::class, 'index'])->name('docente.dashboard');
+});
+
+Route::middleware(['auth', 'rol:alumno'])->group(function () {
+    Route::get('/alumno/dashboard', [GraficasController::class, 'index'])->name('alumno.dashboard');
+});

@@ -139,7 +139,7 @@
             icon: 'error',
             title: 'Cuenta bloqueada',
             text: '{{ session('error') }}',
-            confirmButtonColor: '#3FD4A4',
+            confirmButtonColor: '#2c9f49',
             confirmButtonText: 'Aceptar'
         });
     </script>
@@ -151,7 +151,7 @@
                 icon: 'warning',
                 title: 'Atención',
                 text: '{{ session('warning') }}',
-                confirmButtonColor: '#ffc107',
+                confirmButtonColor: '#ffc107', 
                 confirmButtonText: 'Entendido'
             });
         </script>
@@ -163,7 +163,7 @@
             icon: 'error',
             title: 'Error',
             text: '{{ $errors->first('email') }}',
-            confirmButtonColor: '#3FD4A4'
+            confirmButtonColor: '#2c9f49'
         });
     </script>
     @endif

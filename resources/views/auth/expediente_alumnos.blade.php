@@ -25,7 +25,7 @@
                     <p class="mb-1"><strong>Matrícula:</strong> {{ $alumno->matricula }}</p>
                     <p class="mb-1"><strong>Grupo:</strong> {{ $alumno->grupo->nombre ?? 'Sin grupo' }}</p>
                     <p class="mb-1"><strong>Carrera:</strong> {{ $alumno->carrera->nombre ?? 'Sin carrera' }}</p>
-                    <p class="mb-0"><strong>Status académico:</strong>
+                    <p class="mb-0"><strong>Estatus académico:</strong>
                         {{ $alumno->status_academico ?? 'No registrado' }}
                     </p>
                 </div>

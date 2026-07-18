@@ -246,7 +246,7 @@
             title: '¿Cancelar registro?',
             text: 'Los datos no se guardarán. ¿Estás seguro?',
             showCancelButton: true,
-            confirmButtonColor: '#3085d6',
+            confirmButtonColor: '#2c9f49',
             cancelButtonColor: '#d33',
             confirmButtonText: 'Sí, salir',
             cancelButtonText: 'No, quedarme'

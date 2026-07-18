@@ -165,7 +165,7 @@
         icon: 'success',
         title: '¡Registrado!',
         text: '{{ session('success') }}',
-        confirmButtonColor: '#3085d6',
+        confirmButtonColor: '#2c9f49',
         confirmButtonText: 'Aceptar'
     });
     @endif
