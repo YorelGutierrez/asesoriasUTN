@@ -4,12 +4,15 @@
 <link rel="stylesheet" href="{{ asset('estilos/botones.css') }}">
 <link rel="stylesheet" href="{{ asset('estilos/titulos.css') }}">
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <div class="titulo">
     <h1>Bienvenido {{ Auth::user()->nombres . ' ' . Auth::user()->apellido_paterno . ' ' . Auth::user()->apellido_materno }}!</h1>
 </div>
 
-<!-- Tarjetas de resumen -->
+<!-- ============================================================ -->
+<!-- TARJETAS DE RESUMEN                                          -->
+<!-- ============================================================ -->
 <div class="row g-4 mb-4">
     <div class="col-md-4">
         <div class="card shadow-sm border-0 rounded-4 h-100">
@@ -67,7 +70,96 @@
     </div>
 </div>
 
-<!-- Solicitar asesoría rápida -->
+<!-- ============================================================ -->
+<!-- GRÁFICAS DEL ALUMNO                                          -->
+<!-- ============================================================ -->
+<div class="row mt-4">
+    <!-- Gráfica 1: Mis sesiones por mes -->
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm border-0 rounded-4 h-100">
+            <div class="card-body p-4">
+                <h5 class="fw-semibold mb-3 titulo-borde-verde">
+                    <i class="bi bi-calendar2-week me-2"></i>Mis asesorías por mes
+                </h5>
+                <div style="height: 220px; position: relative;">
+                    <canvas id="chartMisAsesoriasAlumno"></canvas>
+                </div>
+                <div class="mt-2 p-2 bg-light rounded">
+                    <small class="text-muted">
+                        <i class="bi bi-lightbulb text-warning me-1"></i>
+                        <strong>Toma de decisión:</strong> Visualiza tu progreso académico en asesorías mes a mes.
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráfica 2: Mis sesiones por materia -->
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm border-0 rounded-4 h-100">
+            <div class="card-body p-4">
+                <h5 class="fw-semibold mb-3 titulo-borde-verde">
+                    <i class="bi bi-book me-2"></i>Asesorías por materia
+                </h5>
+                <div style="height: 220px; position: relative;">
+                    <canvas id="chartMateriasAlumno"></canvas>
+                </div>
+                <div class="mt-2 p-2 bg-light rounded">
+                    <small class="text-muted">
+                        <i class="bi bi-lightbulb text-warning me-1"></i>
+                        <strong>Toma de decisión:</strong> Identifica qué materias necesitan más atención o refuerzo.
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-2">
+    <!-- Gráfica 3: Docentes que me asesoran -->
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm border-0 rounded-4 h-100">
+            <div class="card-body p-4">
+                <h5 class="fw-semibold mb-3 titulo-borde-verde">
+                    <i class="bi bi-person-video2 me-2"></i>Docentes que me asesoran
+                </h5>
+                <div style="height: 220px; position: relative;">
+                    <canvas id="chartDocentesAlumno"></canvas>
+                </div>
+                <div class="mt-2 p-2 bg-light rounded">
+                    <small class="text-muted">
+                        <i class="bi bi-lightbulb text-warning me-1"></i>
+                        <strong>Toma de decisión:</strong> Identifica con qué docentes tienes mayor interacción académica.
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráfica 4: Estado de mis solicitudes -->
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm border-0 rounded-4 h-100">
+            <div class="card-body p-4">
+                <h5 class="fw-semibold mb-3 titulo-borde-verde">
+                    <i class="bi bi-pie-chart me-2"></i>Estado de mis solicitudes
+                </h5>
+                <div style="height: 220px; position: relative;">
+                    <canvas id="chartEstadoAlumno"></canvas>
+                </div>
+                <div class="mt-2 p-2 bg-light rounded">
+                    <small class="text-muted">
+                        <i class="bi bi-lightbulb text-warning me-1"></i>
+                        <strong>Toma de decisión:</strong> Conoce el estado de tus solicitudes y da seguimiento a las pendientes.
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SOLICITAR ASESORÍA RÁPIDA                                    -->
+<!-- ============================================================ -->
 <div class="mt-5 mb-3">
     <div class="titulo">
         <h3>Solicitar asesoría rápida</h3>
@@ -117,7 +209,9 @@
     @endforelse
 </div>
 
-<!-- Tabla de asesorías recientes -->
+<!-- ============================================================ -->
+<!-- TABLA DE ASESORÍAS RECIENTES                                 -->
+<!-- ============================================================ -->
 <div class="mt-5">
     <div class="card shadow-sm border-0 rounded-4 mb-4">
         <div class="card-body p-4">
@@ -170,13 +264,101 @@
     </div>
 </div>
 
+<!-- ============================================================ -->
+<!-- SCRIPTS PARA GRÁFICAS                                       -->
+<!-- ============================================================ -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Función para crear gráfica
+    function crearGrafica(elementId, labels, data, label, color, tipo = 'bar') {
+        const ctx = document.getElementById(elementId);
+        if (!ctx) return;
+
+        if (!data || data.length === 0) {
+            ctx.parentElement.innerHTML = `
+                <div class="text-center text-muted py-4">
+                    <i class="bi bi-bar-chart-line fs-1"></i>
+                    <p class="mt-2">No hay datos disponibles</p>
+                </div>
+            `;
+            return;
+        }
+
+        const colores = ['#4CAF50', '#2196F3', '#FF9800', '#9C27B0', '#00BCD4'];
+        const backgroundColors = tipo === 'doughnut' ? colores.slice(0, data.length) : color + '80';
+
+        new Chart(ctx, {
+            type: tipo,
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: label,
+                    data: data,
+                    backgroundColor: tipo === 'doughnut' ? backgroundColors : color + '80',
+                    borderColor: tipo === 'doughnut' ? backgroundColors : color,
+                    borderWidth: 2,
+                    borderRadius: 8,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: tipo === 'doughnut' ? 'bottom' : 'top',
+                        labels: { font: { size: 10 }, boxWidth: 12 }
+                    }
+                },
+                scales: tipo === 'doughnut' ? undefined : {
+                    y: { beginAtZero: true, ticks: { stepSize: 1 } }
+                }
+            }
+        });
+    }
+
+    // ========== CREAR GRÁFICAS CON DATOS DE PHP ==========
+
+    // 1. Mis asesorías por mes
+    crearGrafica('chartMisAsesoriasAlumno',
+        {!! json_encode($mesesLabels ?? []) !!},
+        {!! json_encode($mesesValues ?? []) !!},
+        'Asesorías', '#4CAF50'
+    );
+
+    // 2. Asesorías por materia
+    crearGrafica('chartMateriasAlumno',
+        {!! json_encode($materiasLabels ?? []) !!},
+        {!! json_encode($materiasValues ?? []) !!},
+        'Asesorías', '#FF9800'
+    );
+
+    // 3. Docentes que me asesoran
+    crearGrafica('chartDocentesAlumno',
+        {!! json_encode($docentesLabels ?? []) !!},
+        {!! json_encode($docentesValues ?? []) !!},
+        'Asesorías', '#2196F3'
+    );
+
+    // 4. Estado de mis solicitudes (Dona)
+    crearGrafica('chartEstadoAlumno',
+        {!! json_encode($solicitudesLabels ?? []) !!},
+        {!! json_encode($solicitudesValues ?? []) !!},
+        'Solicitudes', '#9C27B0', 'doughnut'
+    );
+});
+</script>
+
+<!-- ============================================================ -->
+<!-- ALERTAS DE SWEETALERT                                        -->
+<!-- ============================================================ -->
 @if(session('success'))
 <script>
     Swal.fire({
         icon: 'success',
-        title: '¡Bienvenido!',
+        title: '¡Éxito!',
         text: '{{ session('success') }}',
-        confirmButtonColor: '#3085d6',
+        confirmButtonColor: '#28a745',
         confirmButtonText: 'Aceptar'
     });
 </script>
@@ -188,7 +370,7 @@
         icon: 'error',
         title: 'Error',
         text: '{{ session('error') }}',
-        confirmButtonColor: '#d33',
+        confirmButtonColor: '#28a745',
         confirmButtonText: 'Aceptar'
     });
 </script>

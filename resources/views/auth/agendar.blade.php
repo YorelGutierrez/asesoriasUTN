@@ -279,8 +279,9 @@
             icon: 'error',
             title: 'Errores en el formulario',
             html: errores,
-            confirmButtonColor: '#d33',
-            confirmButtonText: 'Aceptar'
+            confirmButtonColor: '#2c9f49',  // Cambiado a verde
+            confirmButtonText: 'Aceptar',
+            cancelButtonColor: '#2c9f49',   // También verde (aunque no hay cancelar)
         });
     });
 </script>
@@ -292,9 +293,8 @@
         Swal.fire({
             icon: 'success',
             title: '¡Éxito!',
-            text: '{{ session('
-            success ') }}',
-            confirmButtonColor: '#2c9f49',
+            text: '{{ session('success') }}',  // Corregido
+            confirmButtonColor: '#2c9f49',     // Verde
             confirmButtonText: 'Aceptar'
         });
     });
@@ -307,9 +307,8 @@
         Swal.fire({
             icon: 'error',
             title: 'Error',
-            text: '{{ session('
-            error ') }}',
-            confirmButtonColor: '#d33',
+            text: '{{ session('error') }}',    // Corregido
+            confirmButtonColor: '#2c9f49',     // Cambiado a verde
             confirmButtonText: 'Aceptar'
         });
     });

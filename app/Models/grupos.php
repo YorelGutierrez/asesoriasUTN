@@ -12,31 +12,29 @@ class grupos extends Model
 {
     use HasFactory;
 
+    protected $table = 'grupos';
+
     protected $fillable = [
         'nombre',
         'carrera_id',
         'cuatrimestre',
     ];
 
-    // Relación con carrera
     public function carrera()
     {
-        return $this->belongsTo(carreras::class);
+        return $this->belongsTo(carreras::class, 'carrera_id');
     }
 
-    // Relación con alumnos - clave foránea correcta: grupo_id
     public function alumnos()
     {
         return $this->hasMany(alumnos::class, 'grupo_id');
     }
 
-    // Relación muchos a muchos con materias
     public function materias()
     {
         return $this->belongsToMany(materias::class, 'materia_grupos', 'grupo_id', 'materia_id');
     }
 
-    // Docentes asignados a este grupo (docente_grupos.docente_id → users.id)
     public function docentes()
     {
         return $this->belongsToMany(\App\Models\User::class, 'docente_grupos', 'grupo_id', 'docente_id')

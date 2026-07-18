@@ -10,6 +10,7 @@ class carreras extends Model
 {
     use HasFactory;
 
+    protected $table = 'carreras';
     protected $fillable = [
         'nombre',
         'clave',

@@ -4,27 +4,40 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\grupos;
 
 class materias extends Model
 {
     use HasFactory;
+
+    protected $table = 'materias';
 
     protected $fillable = [
         'nombre',
         'clave',
     ];
   
-    // Relación con docentes (muchos a muchos)
     public function docentes()
     {
         return $this->belongsToMany(docentes::class, 'docente_materias', 'materia_id', 'docente_id');
     }
   
-    // Relación muchos a muchos con grupos
     public function grupos()
     {
         return $this->belongsToMany(grupos::class, 'materia_grupos', 'materia_id', 'grupo_id');
     }
 
+    public function solicitudes()
+    {
+        return $this->hasMany(solicitudes_asesoria::class, 'materia_id');
+    }
+
+    public function sesiones()
+    {
+        return $this->hasMany(sesiones_asesoria::class, 'materia_id');
+    }
+
+    public function historialAcademico()
+    {
+        return $this->hasMany(historial_academico::class, 'materia_id');
+    }
 }

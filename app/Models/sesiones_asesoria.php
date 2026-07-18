@@ -49,4 +49,10 @@ class sesiones_asesoria extends Model
     {
         return $this->hasOne(reportes_asesoria::class, 'sesion_id');
     }
+
+    // Relación con materia (si existe en sesiones)
+    public function materia()
+    {
+        return $this->belongsTo(materias::class, 'materia_id');
+    }
 }
