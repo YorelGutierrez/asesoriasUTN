@@ -3,6 +3,60 @@
 @section('contenido')
 <link rel="stylesheet" href="{{ asset('estilos/botones.css') }}">
 <link rel="stylesheet" href="{{ asset('estilos/titulos.css') }}">
+
+<style>
+    .indicador-color {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 8px;
+        flex-shrink: 0;
+        border: 1px solid #e5e7eb;
+    }
+    .indicador-color.blanco {
+        background: #ffffff;
+        border-color: #d1d5db;
+    }
+    .indicador-color.naranja {
+        background: #f59e0b;
+        border-color: #f59e0b;
+    }
+    .indicador-color.rojo {
+        background: #ef4444;
+        border-color: #ef4444;
+    }
+    .badge-asesorias {
+        font-size: 11px;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-weight: 600;
+        background: #f3f4f6;
+        color: #6b7280;
+    }
+    .badge-asesorias.bg-naranja {
+        background: #fef3c7;
+        color: #92400e;
+    }
+    .badge-asesorias.bg-rojo {
+        background: #fecaca;
+        color: #991b1b;
+    }
+    .estado-texto {
+        font-size: 11px;
+        font-weight: 500;
+    }
+    .alumno-row {
+        transition: background 0.2s;
+    }
+    .alumno-row.alerta-naranja {
+        background: #fffbeb;
+    }
+    .alumno-row.alerta-rojo {
+        background: #fef2f2;
+    }
+</style>
+
 <div class="titulo">
     <h1>Registro de Asesorías</h1>
 </div>
@@ -113,7 +167,7 @@
                     </div>
                 </div>
 
-                {{-- Tabla de alumnos con filtro por grupos --}}
+                {{-- Tabla de alumnos con filtro por grupos e indicador de asesorías --}}
                 <div class="mt-4">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <label class="form-label fw-semibold mb-0">Lista de alumnos <span class="text-danger">*</span></label>
@@ -122,7 +176,7 @@
                         </span>
                     </div>
 
-                    {{-- Barra de herramientas: Todos, Ninguno y Buscador --}}
+                    {{-- Barra de herramientas --}}
                     <div class="card mb-3">
                         <div class="card-body py-2">
                             <div class="d-flex flex-wrap align-items-center gap-2">
@@ -155,19 +209,54 @@
                                             <th width="50">#</th>
                                             <th>Nombre del Alumno</th>
                                             <th width="150">Grupo</th>
+                                            <th width="120" class="text-center">Asesorías</th>
                                             <th width="100" class="text-center">Seleccionar</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @forelse($alumnos as $index => $alumno)
-                                        <tr class="alumno-row" data-id="{{ $alumno->id }}" data-grupo="{{ $alumno->grupo ? $alumno->grupo->nombre : 'Sin grupo' }}">
+                                        @php
+                                            $info = $coloresAlumnos[$alumno->id] ?? ['color' => 'blanco', 'total' => 0];
+                                            
+                                            $colorClase = 'blanco';
+                                            $badgeClase = '';
+                                            $estadoTexto = '';
+                                            $filaAlerta = '';
+                                            
+                                            if ($info['color'] === 'danger') {
+                                                $colorClase = 'rojo';
+                                                $badgeClase = 'bg-rojo';
+                                                $estadoTexto = '⚠️ Crítico';
+                                                $filaAlerta = 'alerta-rojo';
+                                            } elseif ($info['color'] === 'warning') {
+                                                $colorClase = 'naranja';
+                                                $badgeClase = 'bg-naranja';
+                                                $estadoTexto = '⚡ Alerta';
+                                                $filaAlerta = 'alerta-naranja';
+                                            }
+                                        @endphp
+                                        <tr class="alumno-row {{ $filaAlerta }}" data-id="{{ $alumno->id }}" data-grupo="{{ $alumno->grupo ? $alumno->grupo->nombre : 'Sin grupo' }}">
                                             <td>{{ $index + 1 }}</td>
                                             <td>
-                                                <i class="bi bi-person-circle me-2"></i>
-                                                {{ $alumno->user->nombres }} {{ $alumno->user->apellido_paterno }} {{ $alumno->user->apellido_materno }}
+                                                <div class="d-flex align-items-center">
+                                                    <span class="indicador-color {{ $colorClase }}"></span>
+                                                    <i class="bi bi-person-circle me-2"></i>
+                                                    {{ $alumno->user->nombres }} {{ $alumno->user->apellido_paterno }} {{ $alumno->user->apellido_materno }}
+                                                </div>
                                             </td>
                                             <td>
                                                 <span class="badge bg-secondary">{{ $alumno->grupo ? $alumno->grupo->nombre : 'Sin grupo' }}</span>
+                                            </td>
+                                            <td class="text-center">
+                                                <span class="badge-asesorias {{ $badgeClase }}">
+                                                    {{ $info['total'] }}
+                                                </span>
+                                                @if($info['color'] === 'danger' || $info['color'] === 'warning')
+                                                <br>
+                                                <span class="estado-texto" style="color: {{ $info['color'] === 'danger' ? '#991b1b' : '#92400e' }}">
+                                                    {{ $estadoTexto }}
+                                                </span>
+                                                @endif
                                             </td>
                                             <td class="text-center">
                                                 <input type="checkbox" class="form-check-input seleccionar-alumno" name="alumnos[]" value="{{ $alumno->id }}">
@@ -175,7 +264,7 @@
                                         </tr>
                                         @empty
                                         <tr>
-                                            <td colspan="4" class="text-center text-muted py-4">
+                                            <td colspan="5" class="text-center text-muted py-4">
                                                 @if(auth()->user()->rol === 'admin')
                                                 <i class="bi bi-inbox fs-1 d-block mb-2"></i>
                                                 <p class="mb-0">No hay alumnos registrados en el sistema.</p>
@@ -222,23 +311,23 @@
 
 {{-- 1. Lógica de selección de alumnos (checkbox, botones grupo, etc.) --}}
 <script src="{{ asset('js/asesoria.js') }}"></script>
-{{-- Alertas de error por sesión --}}
+
+{{-- 2. Alertas de error por sesión --}}
 @if(session('error'))
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         Swal.fire({
             icon: 'error',
             title: 'Error',
-            text: '{{ session('
-            error ') }}',
-            confirmButtonColor: '#d33',
+            text: '{{ session('error') }}',
+            confirmButtonColor: '#2c9f49',
             confirmButtonText: 'Aceptar'
         });
     });
 </script>
 @endif
 
-{{-- 3. Alerta de cancelación (al hacer clic en Cancelar) --}}
+{{-- 3. Alerta de cancelación --}}
 <script>
     document.querySelector('.btn-secundario')?.addEventListener('click', function(e) {
         Swal.fire({
@@ -257,6 +346,7 @@
         });
     });
 </script>
+
 <script>
     window.csrfToken = '{{ csrf_token() }}';
     window.rutas = {

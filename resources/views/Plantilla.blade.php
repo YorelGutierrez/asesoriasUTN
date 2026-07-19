@@ -130,6 +130,10 @@
         <img src="{{ Auth::user()->foto_url }}" alt="Perfil" class="perfil-foto">
         <b>{{ Auth::user()->nombres }}</b>
 
+        <a href="{{ route('perfil') }}">
+        <i class="bi bi-person-gear"></i> {{ __('Mi Perfil') }}
+        </a>
+
         @if(in_array(auth()->user()->rol, ['admin', 'docente']))
         <a href="{{ route('historial') }}">
             <i class="bi bi-clock-history"></i> {{ __('Historial') }}

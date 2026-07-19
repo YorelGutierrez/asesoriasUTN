@@ -13,8 +13,6 @@
     <h1>Bienvenido <span id="nombreUsuario">...</span></h1>
 </div>
 
-
-
 <!-- ============================================================ -->
 <!-- FILA 1: USUARIOS + RESPALDOS                                 -->
 <!-- ============================================================ -->
@@ -26,19 +24,19 @@
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item d-flex justify-content-between align-items-start">
                         <div class="fw-semibold">Administradores</div>
-                        <span class="badge rounded-pill text-bg-success"><i class="bi bi-person-fill"></i> {{ $totalAdministradores }}</span>
+                        <span class="badge rounded-pill text-bg-success"><i class="bi bi-person-fill"></i> {{ $totalAdministradores ?? 0 }}</span>
                     </li>
                     <li class="list-group-item d-flex justify-content-between align-items-start">
                         <div class="fw-semibold">Docentes</div>
-                        <span class="badge rounded-pill text-bg-success"><i class="bi bi-person-fill"></i> {{ $totalDocentes }}</span>
+                        <span class="badge rounded-pill text-bg-success"><i class="bi bi-person-fill"></i> {{ $totalDocentes ?? 0 }}</span>
                     </li>
                     <li class="list-group-item d-flex justify-content-between align-items-start">
                         <div class="fw-semibold">Tutores</div>
-                        <span class="badge rounded-pill text-bg-success"><i class="bi bi-person-fill"></i> {{ $totalTutores }}</span>
+                        <span class="badge rounded-pill text-bg-success"><i class="bi bi-person-fill"></i> {{ $totalTutores ?? 0 }}</span>
                     </li>
                     <li class="list-group-item d-flex justify-content-between align-items-start">
                         <div class="fw-semibold">Alumnos</div>
-                        <span class="badge rounded-pill text-bg-success"><i class="bi bi-person-fill"></i> {{ $totalAlumnos }}</span>
+                        <span class="badge rounded-pill text-bg-success"><i class="bi bi-person-fill"></i> {{ $totalAlumnos ?? 0 }}</span>
                     </li>
                 </ul>
             </div>
@@ -58,15 +56,15 @@
                     </button>
                 </div>
 
-                @if($ultimo)
-                <p class="mt-3"><strong>Último respaldo:</strong> {{ $ultimo['fecha'] }}</p>
-                <p><strong>Estado:</strong> <span class="text-success">Correcto</span></p>
+                @if($ultimo ?? false)
+                <p class="mt-3"><strong>Último respaldo:</strong> {{ $ultimo['fecha'] ?? 'N/A' }}</p>
+                <p><strong>Estado:</strong> <span class="text-success"> Correcto</span></p>
                 @else
                 <p class="mt-3"><strong>Último respaldo:</strong> No hay respaldos</p>
-                <p><strong>Estado:</strong> <span class="text-danger">Sin respaldos</span></p>
+                <p><strong>Estado:</strong> <span class="text-danger"> Sin respaldos</span></p>
                 @endif
 
-                @if($horaProgramada)
+                @if($horaProgramada ?? false)
                 <p><strong>Programado para:</strong> {{ $horaProgramada }}</p>
                 @endif
 
@@ -78,7 +76,7 @@
                         </form>
                     </div>
                     <div class="col d-flex">
-                        <button class="btn-secundario w-100 h-100" onclick="toggleCalendar()">Programar</button>
+                        <button class="btn-principal w-100 h-100" onclick="toggleCalendar()">Programar</button>
                     </div>
                 </div>
 
@@ -181,6 +179,7 @@
         </div>
     </div>
 </div>
+
 <!-- ============================================================ -->
 <!-- BOTONES DE SELECCIÓN E IMPRESIÓN                             -->
 <!-- ============================================================ -->
@@ -207,6 +206,7 @@
         </div>
     </div>
 </div>
+
 <!-- ============================================================ -->
 <!-- ALERTAS                                                     -->
 <!-- ============================================================ -->
@@ -231,6 +231,23 @@
             icon: 'success',
             title: '¡Respaldo completado!',
             text: '{{ session('respaldo_success') }}',
+            confirmButtonColor: '#2c9f49',
+            confirmButtonText: 'Aceptar'
+        });
+    });
+</script>
+@endif
+
+<!-- ============================================================ -->
+<!-- ALERTA PARA SELECCIÓN DE GRUPO                               -->
+<!-- ============================================================ -->
+@if(session('grupo_success'))
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        Swal.fire({
+            icon: 'success',
+            title: '¡Grupo Seleccionado!',
+            text: '{!! session('grupo_success') !!}',
             confirmButtonColor: '#2c9f49',
             confirmButtonText: 'Aceptar'
         });
@@ -286,6 +303,9 @@
             document.getElementById('nombreUsuario').innerText = 'Administrador';
         });
 
+    // ============================================================
+    // BITÁCORA - CARGAR LOGS DESDE API
+    // ============================================================
     function cargarLogs() {
         fetch('/api/logs', {
                 headers: {
@@ -293,11 +313,27 @@
                     'Accept': 'application/json'
                 }
             })
-            .then(res => res.json())
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error('Error al cargar logs: ' + res.status);
+                }
+                return res.json();
+            })
             .then(logs => {
                 const container = document.getElementById('bitacora');
                 if (!container) return;
                 container.innerHTML = '';
+                
+                if (!logs || logs.length === 0) {
+                    container.innerHTML = `
+                        <div class="text-center text-muted py-4">
+                            <i class="bi bi-inbox fs-3 d-block mb-2"></i>
+                            <p class="mb-0">No hay registros en la bitácora</p>
+                        </div>
+                    `;
+                    return;
+                }
+
                 const logsMostrar = logs.slice(0, 5);
                 logsMostrar.forEach(log => {
                     let nombreUsuario = 'Sistema';
@@ -338,12 +374,24 @@
                     container.appendChild(item);
                 });
             })
-            .catch(err => console.error(err));
+            .catch(err => {
+                console.error('Error al cargar logs:', err);
+                const container = document.getElementById('bitacora');
+                if (container) {
+                    container.innerHTML = `
+                        <div class="text-center text-muted py-4">
+                            <i class="bi bi-exclamation-triangle fs-3 d-block mb-2 text-warning"></i>
+                            <p class="mb-0">Error al cargar la bitácora</p>
+                        </div>
+                    `;
+                }
+            });
     }
 
     document.addEventListener('DOMContentLoaded', cargarLogs);
 
     function escapeHtml(text) {
+        if (!text) return '';
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
@@ -352,21 +400,35 @@
     function formatearFecha(fecha) {
         if (!fecha) return '';
         const d = new Date(fecha);
-        return d.toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+        return d.toLocaleDateString('es-MX', { 
+            day: '2-digit', 
+            month: 'short', 
+            year: 'numeric', 
+            hour: '2-digit', 
+            minute: '2-digit' 
+        });
     }
 
+    // ============================================================
+    // CALENDARIO
+    // ============================================================
     function toggleCalendar() {
         const box = document.getElementById('calendarBox');
-        box.classList.toggle('d-none');
+        if (box) {
+            box.classList.toggle('d-none');
+        }
     }
 
     function cerrarCalendario() {
-        document.getElementById('calendarBox').classList.add('d-none');
+        const box = document.getElementById('calendarBox');
+        if (box) {
+            box.classList.add('d-none');
+        }
     }
 
     function guardarProgramacion() {
-        const fecha = document.getElementById('fechaHora').value;
-        if (!fecha) {
+        const fecha = document.getElementById('fechaHora');
+        if (!fecha || !fecha.value) {
             Swal.fire('Error', 'Selecciona una fecha y hora', 'error');
             return;
         }
@@ -376,7 +438,7 @@
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': window.csrfToken
                 },
-                body: JSON.stringify({ fecha: fecha })
+                body: JSON.stringify({ fecha: fecha.value })
             })
             .then(res => res.json())
             .then(data => {
@@ -395,12 +457,140 @@
                 }
             })
             .catch(err => {
+                console.error('Error:', err);
                 Swal.fire('Error', 'Error de conexión', 'error');
             });
     }
 
+    // ============================================================
+    // LISTA DE RESPALDOS
+    // ============================================================
     function mostrarListaRespaldos() {
-        Swal.fire('Lista de respaldos', 'Función en desarrollo', 'info');
+        fetch(window.respaldoListarUrl, {
+            headers: {
+                'Authorization': 'Bearer ' + getCookie('jwt_token'),
+                'Accept': 'application/json'
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error al cargar respaldos: ' + response.status);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (!data || data.length === 0) {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Sin respaldos',
+                    text: 'No hay respaldos disponibles para restaurar.',
+                    confirmButtonColor: '#28a745',
+                    confirmButtonText: 'Aceptar'
+                });
+                return;
+            }
+
+            let html = '<div style="max-height: 300px; overflow-y: auto;">';
+            html += '<table class="table table-sm table-hover">';
+            html += '<thead><tr><th>Archivo</th><th>Fecha</th><th>Tamaño</th><th>Acción</th></tr></thead>';
+            html += '<tbody>';
+
+            data.forEach(respaldo => {
+                html += `<tr>
+                    <td><i class="bi bi-file-earmark-zip"></i> ${respaldo.nombre}</td>
+                    <td>${respaldo.fecha}</td>
+                    <td>${respaldo.tamano}</td>
+                    <td>
+                        <button class="btn btn-sm btn-success" onclick="restaurarRespaldo('${respaldo.nombre}')">
+                            <i class="bi bi-arrow-counterclockwise"></i> Restaurar
+                        </button>
+                    </td>
+                </tr>`;
+            });
+
+            html += '</tbody></table></div>';
+
+            Swal.fire({
+                title: 'Lista de Respaldos',
+                html: html,
+                confirmButtonColor: '#28a745',
+                confirmButtonText: 'Cerrar',
+                width: '700px'
+            });
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'No se pudieron cargar los respaldos.',
+                confirmButtonColor: '#28a745',
+                confirmButtonText: 'Aceptar'
+            });
+        });
+    }
+
+    function restaurarRespaldo(archivo) {
+        Swal.fire({
+            icon: 'warning',
+            title: '¿Restaurar respaldo?',
+            text: `¿Estás seguro de restaurar el archivo "${archivo}"? Esta acción sobrescribirá la base de datos actual.`,
+            showCancelButton: true,
+            confirmButtonColor: '#28a745',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, restaurar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: 'Restaurando...',
+                    text: 'Por favor espera',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                fetch(window.respaldoRestaurarUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': window.csrfToken
+                    },
+                    body: JSON.stringify({ archivo: archivo })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: '¡Restaurado!',
+                            text: data.message,
+                            confirmButtonColor: '#28a745',
+                            confirmButtonText: 'Aceptar'
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: data.message || 'Error al restaurar el respaldo',
+                            confirmButtonColor: '#28a745',
+                            confirmButtonText: 'Aceptar'
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Error al restaurar el respaldo. Intenta nuevamente.',
+                        confirmButtonColor: '#28a745',
+                        confirmButtonText: 'Aceptar'
+                    });
+                });
+            }
+        });
     }
 </script>
 
@@ -413,7 +603,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const ctx = document.getElementById(elementId);
         if (!ctx) return;
 
-        if (!data || data.length === 0) {
+        if (!data || data.length === 0 || data.every(v => v === 0)) {
             ctx.parentElement.innerHTML = `
                 <div class="text-center text-muted py-4">
                     <i class="bi bi-bar-chart-line fs-1"></i>

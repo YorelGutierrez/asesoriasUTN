@@ -91,6 +91,88 @@
         outline: none;
         box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
     }
+
+    /* ============================================================ */
+    /* ESTILOS PARA INDICADORES DE ASESORÍAS                       */
+    /* ============================================================ */
+    .badge-asesorias {
+        font-size: 11px;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-weight: 600;
+        background: #f3f4f6;
+        color: #6b7280;
+    }
+    .badge-asesorias.bg-naranja {
+        background: #fef3c7;
+        color: #92400e;
+    }
+    .badge-asesorias.bg-rojo {
+        background: #fecaca;
+        color: #991b1b;
+    }
+
+    .indicador-color {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 6px;
+        flex-shrink: 0;
+        border: 1px solid #e5e7eb;
+    }
+    .indicador-color.naranja {
+        background: #f59e0b;
+        border-color: #f59e0b;
+    }
+    .indicador-color.rojo {
+        background: #ef4444;
+        border-color: #ef4444;
+    }
+    .indicador-color.blanco {
+        background: #ffffff;
+        border-color: #d1d5db;
+    }
+
+    .asesor-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 14px;
+        border-radius: 8px;
+        margin-bottom: 4px;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: 2px solid transparent;
+    }
+
+    .asesor-item:hover {
+        background: #f3f4f6;
+    }
+
+    .asesor-item.seleccionado {
+        border-color: #10b981;
+        background: #ecfdf5;
+    }
+
+    .asesor-item .info-asesorias {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+    }
+
+    .asesor-item .total-asesorias {
+        font-weight: 600;
+        font-size: 13px;
+        min-width: 30px;
+        text-align: center;
+    }
+
+    .asesor-item .estado-texto {
+        font-size: 11px;
+        font-weight: 500;
+    }
 </style>
 @endsection
 
@@ -126,7 +208,7 @@
                         <input type="text" id="searchAsesor" placeholder="Buscar por nombre..." style="width: 100%; padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px;">
                     </div>
 
-                    <!-- Lista de personas (máximo 5 visibles, scroll) -->
+                    <!-- Lista de personas -->
                     <div class="asesores-list" id="asesoresList">
                         @if(Auth::user()->rol == 'alumno')
                         {{-- Alumno: ver docentes --}}
@@ -143,8 +225,9 @@
                         @else
                         <div class="alert-info">No hay docentes registrados. Contacta al administrador.</div>
                         @endif
+
                         @else
-                        {{-- Docente/Admin: ver alumnos --}}
+                        {{-- Docente/Admin: ver alumnos con indicador de color --}}
                         @if(!session('grupo_activo_id') && Auth::user()->rol == 'docente')
                         <div class="alert-info">
                             <i class="bi bi-exclamation-triangle me-1"></i>
@@ -153,12 +236,43 @@
                         @else
                         @if(isset($alumnos) && $alumnos->count() > 0)
                         @foreach($alumnos as $alumno)
+                        @php
+                            $info = $coloresAlumnos[$alumno->id] ?? ['color' => 'blanco', 'total' => 0, 'estado' => 'Normal'];
+                            
+                            $colorClase = 'blanco';
+                            $badgeClase = '';
+                            $estadoTexto = 'Normal';
+                            
+                            if ($info['color'] === 'danger') {
+                                $colorClase = 'rojo';
+                                $badgeClase = 'bg-rojo';
+                                $estadoTexto = '⚠️ Crítico';
+                            } elseif ($info['color'] === 'warning') {
+                                $colorClase = 'naranja';
+                                $badgeClase = 'bg-naranja';
+                                $estadoTexto = '⚡ Alerta';
+                            }
+                        @endphp
                         <div class="asesor-item" data-id="{{ $alumno->user_id }}" data-nombre="{{ strtolower($alumno->user->apellido_paterno . ' ' . $alumno->user->nombres) }}" data-tipo="alumno">
                             <div class="asesor-info">
-                                <h4>{{ $alumno->user->nombres }} {{ $alumno->user->apellido_paterno }}</h4>
-                                <p style="font-size: 13px; color: #6b7280;">{{ $alumno->matricula }}</p>
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="indicador-color {{ $colorClase }}"></span>
+                                    <div>
+                                        <h4>{{ $alumno->user->nombres }} {{ $alumno->user->apellido_paterno }}</h4>
+                                        <p style="font-size: 13px; color: #6b7280;">{{ $alumno->matricula }}</p>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="badge-disponible">Disponible</div>
+                            <div class="info-asesorias">
+                                <span class="badge-asesorias {{ $badgeClase }}">
+                                    {{ $info['total'] }} asesoría(s)
+                                </span>
+                                @if($info['color'] === 'danger' || $info['color'] === 'warning')
+                                <span class="estado-texto" style="color: {{ $info['color'] === 'danger' ? '#991b1b' : '#92400e' }}">
+                                    {{ $estadoTexto }}
+                                </span>
+                                @endif
+                            </div>
                         </div>
                         @endforeach
                         @else
@@ -257,7 +371,7 @@
                         <div class="error-message" id="horaError"></div>
                     </div>
 
-                    <!-- Botón de acción (sin Cancelar) -->
+                    <!-- Botón de acción -->
                     <div class="action-buttons" style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; padding-top: 15px; border-top: 1px solid #e2e8f0; flex-wrap: wrap;">
                         <button type="submit" class="btn-principal" id="btnAgendar">
                             <i class="bi bi-{{ Auth::user()->rol == 'alumno' ? 'send' : 'calendar-check' }} me-1"></i>
@@ -279,9 +393,8 @@
             icon: 'error',
             title: 'Errores en el formulario',
             html: errores,
-            confirmButtonColor: '#2c9f49',  // Cambiado a verde
-            confirmButtonText: 'Aceptar',
-            cancelButtonColor: '#2c9f49',   // También verde (aunque no hay cancelar)
+            confirmButtonColor: '#2c9f49',
+            confirmButtonText: 'Aceptar'
         });
     });
 </script>
@@ -293,8 +406,8 @@
         Swal.fire({
             icon: 'success',
             title: '¡Éxito!',
-            text: '{{ session('success') }}',  // Corregido
-            confirmButtonColor: '#2c9f49',     // Verde
+            text: '{{ session('success') }}',
+            confirmButtonColor: '#2c9f49',
             confirmButtonText: 'Aceptar'
         });
     });
@@ -307,8 +420,8 @@
         Swal.fire({
             icon: 'error',
             title: 'Error',
-            text: '{{ session('error') }}',    // Corregido
-            confirmButtonColor: '#2c9f49',     // Cambiado a verde
+            text: '{{ session('error') }}',
+            confirmButtonColor: '#2c9f49',
             confirmButtonText: 'Aceptar'
         });
     });
