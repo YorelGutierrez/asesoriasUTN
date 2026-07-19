@@ -187,7 +187,10 @@ Route::get('/reset-navigation', function () {
 })->name('reset.navigation');
 
 //rutas para las garficas
-// Ruta única para redirigir según rol
+
+// Rutas para PDF de gráficas
+Route::post('/imprimir-graficas-admin-pdf', [GraficasController::class, 'imprimirPDFAdmin'])->name('imprimir.graficas.admin.pdf');
+Route::post('/imprimir-graficas-docente-pdf', [GraficasController::class, 'imprimirPDFDocente'])->name('imprimir.graficas.docente.pdf');// Ruta única para redirigir según rol
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [GraficasController::class, 'index'])->name('dashboard');
 });
@@ -195,6 +198,7 @@ Route::middleware(['auth'])->group(function () {
 // Rutas específicas por rol
 Route::middleware(['auth', 'rol:admin'])->group(function () {
     Route::get('/admin/dashboard', [GraficasController::class, 'index'])->name('admin.dashboard');
+
 });
 
 Route::middleware(['auth', 'rol:docente'])->group(function () {

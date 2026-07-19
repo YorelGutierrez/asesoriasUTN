@@ -4,12 +4,17 @@
 <link rel="stylesheet" href="{{ asset('estilos/botones.css') }}">
 <link rel="stylesheet" href="{{ asset('estilos/titulos.css') }}">
 <link rel="stylesheet" href="{{ asset('estilos/grupos.css') }}">
+<link rel="stylesheet" href="{{ asset('estilos/impresion.css') }}">
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{{ asset('js/impresion.js') }}"></script>
 
 <div class="titulo">
     <h1>Bienvenido {{ Auth::user()->nombres . ' ' . Auth::user()->apellido_paterno . ' ' . Auth::user()->apellido_materno }}!</h1>
 </div>
+
+
 
 <!-- ============================================================ -->
 <!-- TARJETAS DE RESUMEN                                          -->
@@ -116,7 +121,7 @@
 </div>
 
 <!-- ============================================================ -->
-<!-- GRÁFICAS DEL DOCENTE                                         -->
+<!-- GRÁFICAS DEL DOCENTE (SOLO 2)                               -->
 <!-- ============================================================ -->
 <div class="row mt-5">
     <div class="col-12">
@@ -126,56 +131,19 @@
     </div>
 </div>
 
-<div class="row mt-3">
-    <!-- Gráfica 1: Mis sesiones por mes -->
-    <div class="col-md-6 mb-4">
-        <div class="card shadow-sm border-0 rounded-4 h-100">
-            <div class="card-body p-4">
-                <h5 class="fw-semibold mb-3 titulo-borde-verde">
-                    <i class="bi bi-calendar-check me-2"></i>Mis asesorías por mes
-                </h5>
-                <div style="height: 220px; position: relative;">
-                    <canvas id="chartMisAsesorias"></canvas>
-                </div>
-                <div class="mt-2 p-2 bg-light rounded">
-                    <small class="text-muted">
-                        <i class="bi bi-lightbulb text-warning me-1"></i>
-                        <strong>Toma de decisión:</strong> Visualiza tu carga de trabajo mensual y planifica tu tiempo.
-                    </small>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Gráfica 2: Asesorías por materia -->
-    <div class="col-md-6 mb-4">
-        <div class="card shadow-sm border-0 rounded-4 h-100">
-            <div class="card-body p-4">
-                <h5 class="fw-semibold mb-3 titulo-borde-verde">
-                    <i class="bi bi-bar-chart me-2"></i>Asesorías por materia
-                </h5>
-                <div style="height: 220px; position: relative;">
-                    <canvas id="chartMateriasDocente"></canvas>
-                </div>
-                <div class="mt-2 p-2 bg-light rounded">
-                    <small class="text-muted">
-                        <i class="bi bi-lightbulb text-warning me-1"></i>
-                        <strong>Toma de decisión:</strong> Identifica qué materias requieren más atención de tu parte.
-                    </small>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
 <div class="row mt-2">
-    <!-- Gráfica 3: Mis alumnos más frecuentes -->
+    <!-- Gráfica 1: Mis alumnos más frecuentes -->
     <div class="col-md-6 mb-4">
-        <div class="card shadow-sm border-0 rounded-4 h-100">
+        <div class="card shadow-sm border-0 rounded-4 h-100 grafica-card" id="grafica-docente-1">
             <div class="card-body p-4">
-                <h5 class="fw-semibold mb-3 titulo-borde-verde">
-                    <i class="bi bi-person-lines-fill me-2"></i>Mis alumnos más frecuentes
-                </h5>
+                <div class="d-flex justify-content-between align-items-start">
+                    <h5 class="fw-semibold mb-3 titulo-borde-verde">
+                        <i class="bi bi-person-lines-fill me-2"></i>Mis alumnos más frecuentes
+                    </h5>
+                    <div class="form-check no-print">
+                        <input class="form-check-input seleccion-grafica" type="checkbox" value="grafica-docente-1" id="check-docente-1" onchange="actualizarContador()">
+                    </div>
+                </div>
                 <div style="height: 220px; position: relative;">
                     <canvas id="chartMisAlumnos"></canvas>
                 </div>
@@ -189,13 +157,18 @@
         </div>
     </div>
 
-    <!-- Gráfica 4: Estado de mis solicitudes -->
+    <!-- Gráfica 2: Estado de mis solicitudes -->
     <div class="col-md-6 mb-4">
-        <div class="card shadow-sm border-0 rounded-4 h-100">
+        <div class="card shadow-sm border-0 rounded-4 h-100 grafica-card" id="grafica-docente-2">
             <div class="card-body p-4">
-                <h5 class="fw-semibold mb-3 titulo-borde-verde">
-                    <i class="bi bi-pie-chart me-2"></i>Estado de mis solicitudes
-                </h5>
+                <div class="d-flex justify-content-between align-items-start">
+                    <h5 class="fw-semibold mb-3 titulo-borde-verde">
+                        <i class="bi bi-pie-chart me-2"></i>Estado de mis solicitudes
+                    </h5>
+                    <div class="form-check no-print">
+                        <input class="form-check-input seleccion-grafica" type="checkbox" value="grafica-docente-2" id="check-docente-2" onchange="actualizarContador()">
+                    </div>
+                </div>
                 <div style="height: 220px; position: relative;">
                     <canvas id="chartEstadoDocente"></canvas>
                 </div>
@@ -204,6 +177,32 @@
                         <i class="bi bi-lightbulb text-warning me-1"></i>
                         <strong>Toma de decisión:</strong> Conoce el estado de tus asesorías y prioriza las pendientes.
                     </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- ============================================================ -->
+<!-- BOTONES DE SELECCIÓN E IMPRESIÓN                             -->
+<!-- ============================================================ -->
+<div class="row mb-4 no-print">
+    <div class="col-12">
+        <div class="card shadow-sm border-0 rounded-4">
+            <div class="card-body p-3 d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="fw-semibold me-3">Selecciona gráficas para imprimir:</span>
+                    <button class="btn btn-outline-success btn-sm me-2" onclick="seleccionarTodas()">
+                        <i class="bi bi-check-all"></i> Todas
+                    </button>
+                    <button class="btn btn-outline-secondary btn-sm" onclick="deseleccionarTodas()">
+                        <i class="bi bi-x"></i> Ninguna
+                    </button>
+                </div>
+                <div>
+                    <button class="btn-principal" onclick="imprimirSeleccionadas()">
+                        <i class="bi bi-printer me-2"></i>Generar PDF
+                    </button>
+                    <span id="contadorSeleccionadas" class="badge bg-success ms-2">0 seleccionadas</span>
                 </div>
             </div>
         </div>
@@ -296,30 +295,14 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // ========== CREAR GRÁFICAS CON DATOS DE PHP ==========
-
-    // 1. Mis asesorías por mes
-    crearGrafica('chartMisAsesorias',
-        {!! json_encode($mesesLabels ?? []) !!},
-        {!! json_encode($mesesValues ?? []) !!},
-        'Asesorías', '#4CAF50'
-    );
-
-    // 2. Asesorías por materia
-    crearGrafica('chartMateriasDocente',
-        {!! json_encode($materiasLabels ?? []) !!},
-        {!! json_encode($materiasValues ?? []) !!},
-        'Asesorías', '#FF9800'
-    );
-
-    // 3. Mis alumnos más frecuentes
+    // 1. Mis alumnos más frecuentes
     crearGrafica('chartMisAlumnos',
         {!! json_encode($alumnosLabels ?? []) !!},
         {!! json_encode($alumnosValues ?? []) !!},
         'Asesorías', '#2196F3'
     );
 
-    // 4. Estado de mis solicitudes (Dona)
+    // 2. Estado de mis solicitudes (Dona)
     crearGrafica('chartEstadoDocente',
         {!! json_encode($solicitudesLabels ?? []) !!},
         {!! json_encode($solicitudesValues ?? []) !!},
