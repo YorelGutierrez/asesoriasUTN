@@ -80,9 +80,13 @@ class GrupoController extends Controller
 
         $dashboard = $user->rol === 'admin' ? 'admin.dashboard' : 'docente.dashboard';
 
+        // ============================================================
+        // ✅ CAMBIAR: Usar 'grupo_success' en lugar de 'success'
+        // ============================================================
         return redirect()->route($dashboard)
-            ->with('success', 'Grupo ' . $grupo->nombre . ' seleccionado.');
+            ->with('grupo_success', 'Has seleccionado el grupo "' . $grupo->nombre . '"');
     }
+
     /**
      * Limpia el grupo activo de sesión.
      */

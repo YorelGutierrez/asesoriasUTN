@@ -35,10 +35,7 @@ class AsesoriaController extends Controller
             $docentes = collect();
 
             if ($alumno && $alumno->grupo) {
-                // Obtener IDs de los docentes (User) del grupo
                 $docenteIds = $alumno->grupo->docentes()->pluck('users.id')->toArray();
-
-                // Consultar el modelo docentes con sus relaciones
                 $docentes = docentes::with(['user', 'carrera'])
                     ->whereIn('user_id', $docenteIds)
                     ->get();
@@ -46,13 +43,14 @@ class AsesoriaController extends Controller
 
             $alumnos = collect();
             $tipoVista = 'alumno';
+            $coloresAlumnos = [];
 
-            return view('auth.agendar', compact('carreras', 'materias', 'alumnos', 'docentes', 'tipoVista'));
+            return view('auth.agendar', compact('carreras', 'materias', 'alumnos', 'docentes', 'tipoVista', 'coloresAlumnos'));
         }
 
         // ===== DOCENTE: solo alumnos de su grupo activo =====
         if ($user->rol === 'docente') {
-            $docentes = collect(); // vacío
+            $docentes = collect();
 
             if ($grupoActivoId) {
                 $alumnos = alumnos::with(['user', 'grupo', 'carrera'])
@@ -62,13 +60,41 @@ class AsesoriaController extends Controller
                     ->orderBy('users.nombres')
                     ->select('alumnos.*')
                     ->get();
+
+                // ============================================================
+                // CONTAR ASESORÍAS POR ALUMNO Y ASIGNAR COLOR
+                // ============================================================
+                $coloresAlumnos = [];
+                
+                foreach ($alumnos as $alumno) {
+                    // Contar asesorías realizadas del alumno
+                    $totalAsesorias = sesion_alumno::where('alumno_id', $alumno->user_id)
+                        ->join('sesiones_asesoria', 'sesion_alumno.sesion_id', '=', 'sesiones_asesoria.id')
+                        ->where('sesiones_asesoria.estado', 'realizada')
+                        ->count();
+
+                    // Asignar color según cantidad
+                    if ($totalAsesorias >= 5) {
+                        $color = 'danger'; // Rojo
+                    } elseif ($totalAsesorias >= 3) {
+                        $color = 'warning'; // Naranja
+                    } else {
+                        $color = 'blanco'; // Blanco (normal)
+                    }
+
+                    $coloresAlumnos[$alumno->id] = [
+                        'color' => $color,
+                        'total' => $totalAsesorias,
+                    ];
+                }
             } else {
                 $alumnos = collect();
+                $coloresAlumnos = [];
             }
 
             $tipoVista = 'docente';
 
-            return view('auth.agendar', compact('carreras', 'materias', 'alumnos', 'docentes', 'tipoVista'));
+            return view('auth.agendar', compact('carreras', 'materias', 'alumnos', 'docentes', 'tipoVista', 'coloresAlumnos'));
         }
 
         // ===== ADMIN: ve todos los alumnos =====
@@ -79,17 +105,39 @@ class AsesoriaController extends Controller
             ->select('alumnos.*')
             ->get();
 
+        // ============================================================
+        // CONTAR ASESORÍAS POR ALUMNO Y ASIGNAR COLOR (para ADMIN)
+        // ============================================================
+        $coloresAlumnos = [];
+        
+        foreach ($alumnos as $alumno) {
+            $totalAsesorias = sesion_alumno::where('alumno_id', $alumno->user_id)
+                ->join('sesiones_asesoria', 'sesion_alumno.sesion_id', '=', 'sesiones_asesoria.id')
+                ->where('sesiones_asesoria.estado', 'realizada')
+                ->count();
+
+            if ($totalAsesorias >= 5) {
+                $color = 'danger'; // Rojo
+            } elseif ($totalAsesorias >= 3) {
+                $color = 'warning'; // Naranja
+            } else {
+                $color = 'blanco'; // Blanco (normal)
+            }
+
+            $coloresAlumnos[$alumno->id] = [
+                'color' => $color,
+                'total' => $totalAsesorias,
+            ];
+        }
+
         $docentes = collect();
         $tipoVista = 'admin';
 
-        return view('auth.agendar', compact('carreras', 'materias', 'alumnos', 'docentes', 'tipoVista'));
+        return view('auth.agendar', compact('carreras', 'materias', 'alumnos', 'docentes', 'tipoVista', 'coloresAlumnos'));
     }
 
     /**
      * Guarda una asesoría agendada desde la vista pública (todos los roles).
-     * - Alumno: selecciona un docente, la sesión queda pendiente de confirmación.
-     * - Docente: selecciona un alumno, la sesión queda programada directamente.
-     * - Admin: selecciona un alumno (o docente), similar a docente.
      */
     public function storeAgenda(Request $request)
     {
@@ -112,7 +160,6 @@ class AsesoriaController extends Controller
         try {
             DB::beginTransaction();
 
-            // Determinar docente_id y alumno_id según rol y tipo_destinatario
             $docenteId = null;
             $alumnoId = null;
             $estado = 'programada';
@@ -130,7 +177,6 @@ class AsesoriaController extends Controller
                 throw new \Exception('Rol no válido para agendar.');
             }
 
-            // Validar que el destinatario exista y tenga el rol correcto
             if ($request->tipo_destinatario === 'docente') {
                 $docente = User::find($docenteId);
                 if (!$docente || $docente->rol !== 'docente') {
@@ -143,15 +189,13 @@ class AsesoriaController extends Controller
                 }
             }
 
-            // Construir fecha_hora
             $fechaInicio = $request->fecha . ' ' . $request->hora_inicio . ':00';
             $fechaFin = $request->fecha . ' ' . $request->hora_inicio . ':00';
 
-            // Crear la sesión
             $sesion = sesiones_asesoria::create([
                 'docente_id'    => $docenteId,
                 'tema'          => $request->tema,
-                'tipo_asesoria' => 'individual', // 👈 Agregado
+                'tipo_asesoria' => 'individual',
                 'fecha_inicio'  => $fechaInicio,
                 'fecha_fin'     => $fechaFin,
                 'modalidad'     => $request->modalidad,
@@ -160,7 +204,6 @@ class AsesoriaController extends Controller
                 'observaciones' => null,
             ]);
 
-            // Asociar el alumno (si existe)
             if ($alumnoId) {
                 sesion_alumno::create([
                     'sesion_id' => $sesion->id,
@@ -168,12 +211,10 @@ class AsesoriaController extends Controller
                 ]);
             }
 
-            // ---- NOTIFICACIONES ----
             $fechaFormato = date('d/m/Y', strtotime($request->fecha));
             $horaFormato = $request->hora_inicio;
 
             if ($user->rol === 'alumno') {
-                // Alumno → notificar al docente
                 $nombreAlumno = $user->nombres . ' ' . $user->apellido_paterno;
                 notificaciones::crear(
                     $docenteId,
@@ -192,7 +233,6 @@ class AsesoriaController extends Controller
                     ]
                 );
 
-                // Notificar al alumno (confirmación de envío)
                 notificaciones::crear(
                     $user->id,
                     'recordatorio',
@@ -200,7 +240,6 @@ class AsesoriaController extends Controller
                     ['sesion_id' => $sesion->id]
                 );
             } elseif ($user->rol === 'docente' || $user->rol === 'admin') {
-                // Docente/Admin → notificar al alumno
                 $nombreDocente = $user->nombres . ' ' . $user->apellido_paterno;
                 notificaciones::crear(
                     $alumnoId,
@@ -219,7 +258,6 @@ class AsesoriaController extends Controller
                     ]
                 );
 
-                // Notificar al docente (confirmación de agendado)
                 notificaciones::crear(
                     $user->id,
                     'recordatorio',
@@ -232,7 +270,6 @@ class AsesoriaController extends Controller
 
             registrar_log('CREAR', 'Asesoría agendada: ' . $request->tema, 'asesorias');
 
-            // Redirigir según rol
             $dashboard = match ($user->rol) {
                 'admin' => 'admin.dashboard',
                 'docente' => 'docente.dashboard',
@@ -255,7 +292,6 @@ class AsesoriaController extends Controller
         $grupoActivoId = session('grupo_activo_id');
 
         if ($user->rol === 'admin') {
-            // Admin: ve todos los alumnos (sin importar grupo)
             $alumnos = alumnos::with(['user', 'grupo'])
                 ->join('users', 'alumnos.user_id', '=', 'users.id')
                 ->orderBy('users.apellido_paterno')
@@ -263,7 +299,6 @@ class AsesoriaController extends Controller
                 ->select('alumnos.*')
                 ->get();
         } else {
-            // Docente: solo alumnos del grupo activo
             if ($grupoActivoId) {
                 $alumnos = alumnos::with(['user', 'grupo'])
                     ->where('grupo_id', $grupoActivoId)
@@ -273,8 +308,7 @@ class AsesoriaController extends Controller
                     ->select('alumnos.*')
                     ->get();
             } else {
-                // Docente sin grupo activo → lista vacía
-                $alumnos = collect(); // colección vacía
+                $alumnos = collect();
             }
         }
 
@@ -342,7 +376,6 @@ class AsesoriaController extends Controller
 
             registrar_log('CREAR', 'Asesoría registrada: ' . $request->tema, 'asesorias');
 
-            // Devolver JSON para que el frontend maneje el flujo
             return response()->json([
                 'success' => true,
                 'sesion_id' => $sesion->id,
@@ -368,7 +401,6 @@ class AsesoriaController extends Controller
 
         $sesion = sesiones_asesoria::with(['docente', 'alumnos'])->findOrFail($request->sesion_id);
 
-        // Determinar carrera
         $carreraNombre = 'No especificada';
         if ($sesion->docente && $sesion->docente->carrera) {
             $carreraNombre = $sesion->docente->carrera->nombre;
@@ -404,7 +436,6 @@ class AsesoriaController extends Controller
         $pdf = Pdf::loadView('pdf.asesoria', ['data' => $data]);
         $pdfContent = $pdf->output();
 
-        // Guardar en reportes_asesoria
         $nombreArchivo = 'reporte_' . $sesion->id . '_' . time() . '.pdf';
         $ruta = 'reportes/' . $nombreArchivo;
         Storage::disk('public')->put($ruta, $pdfContent);
@@ -415,7 +446,6 @@ class AsesoriaController extends Controller
             'ruta'           => $ruta,
         ]);
 
-        // Si se solicita descargar, devolver el PDF como descarga
         if ($request->descargar) {
             return response()->download(storage_path('app/public/' . $ruta), $nombreArchivo);
         }
@@ -434,11 +464,9 @@ class AsesoriaController extends Controller
     {
         $user = auth()->user();
 
-        // --- Construir consulta base ---
         $query = sesiones_asesoria::with(['docente', 'alumnos', 'acuerdos', 'reporte'])
-            ->where('estado', 'realizada'); // Solo realizadas
+            ->where('estado', 'realizada');
 
-        // Filtrar por rol
         if ($user->rol === 'docente') {
             $query->where('docente_id', $user->id);
         } elseif ($user->rol === 'alumno') {
@@ -446,11 +474,7 @@ class AsesoriaController extends Controller
                 $q->where('sesion_alumno.alumno_id', $user->id);
             });
         }
-        // Admin: sin filtro
 
-        // --- Filtros GET ---
-
-        // 🔥 CUATRIMESTRE: filtrar sesiones que tengan alumnos con ese cuatrimestre
         if ($request->filled('cuatrimestre')) {
             $cuatrimestre = $request->cuatrimestre;
             $query->whereHas('alumnos', function ($q) use ($cuatrimestre) {
@@ -460,12 +484,10 @@ class AsesoriaController extends Controller
             });
         }
 
-        // Materia (buscamos en el campo 'tema')
         if ($request->filled('materia')) {
             $query->where('tema', 'like', '%' . $request->materia . '%');
         }
 
-        // Buscar alumno (por nombre o matrícula)
         if ($request->filled('buscar_alumno')) {
             $search = $request->buscar_alumno;
             $query->whereHas('alumnos', function ($q) use ($search) {
@@ -475,20 +497,15 @@ class AsesoriaController extends Controller
             });
         }
 
-        // Fecha (fecha_inicio)
         if ($request->filled('fecha')) {
             $query->whereDate('fecha_inicio', $request->fecha);
         }
 
-        // --- Obtener datos para selects ---
-        // Materias: extraemos temas únicos de las sesiones del usuario (sin filtrar por estado)
         $materias = sesiones_asesoria::where('estado', 'realizada')
             ->distinct('tema')->pluck('tema')->filter()->values();
 
-        // Cuatrimestres: rango fijo 1-12 (o los que existan en la tabla alumnos)
         $cuatrimestres = range(1, 12);
 
-        // --- Obtener sesiones con paginación (10 por página) ---
         $sesiones = $query->orderBy('fecha_inicio', 'desc')->paginate(10);
 
         return view('auth.historial', compact('sesiones', 'materias', 'cuatrimestres'));
