@@ -7,6 +7,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="user-rol" content="{{ auth()->user()->rol ?? '' }}">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+<meta name="user-rol" content="{{ Auth::user()->rol }}">
     <title>@yield('titulo', 'Asesorias-UTN')</title>
 
     <!-- Bootstrap -->
@@ -23,6 +25,8 @@
     <link rel="stylesheet" href="{{ asset('estilos/menu-fotter.css') }}">
     <link rel="stylesheet" href="{{ asset('estilos/UserCard.css') }}">
     <link rel="stylesheet" href="{{ asset('estilos/menu-lateral.css') }}">
+
+    
 
     @yield('estilos')
 </head>
