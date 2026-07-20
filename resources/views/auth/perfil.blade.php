@@ -4,29 +4,6 @@
 <link rel="stylesheet" href="{{ asset('estilos/botones.css') }}">
 <link rel="stylesheet" href="{{ asset('estilos/titulos.css') }}">
 
-<style>
-    .btn-verde {
-        background-color: #2c9f49;
-        color: white;
-        border: none;
-        padding: 8px 24px;
-        border-radius: 8px;
-        font-size: 14px;
-        font-weight: 600;
-        transition: background-color 0.2s;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 6px;
-        min-width: 120px;
-    }
-    .btn-verde:hover {
-        background-color: #218838;
-        color: white;
-    }
-</style>
-
 <div class="container py-4">
     <div class="row justify-content-center">
         <div class="col-md-8">
@@ -193,10 +170,12 @@
                         {{-- BOTONES VERDES DEL MISMO TAMAÑO                           --}}
                         {{-- ============================================================ --}}
                         <div class="d-flex justify-content-end gap-3 mt-4">
-                            <a href="{{ route('dashboard') }}" class="btn-verde">
+                            <a href="@if(auth()->user()->rol === 'admin') {{ route('admin.dashboard') }}
+                                @elseif(auth()->user()->rol === 'docente') {{ route('docente.dashboard') }}
+                                @else {{ route('alumno.dashboard') }} @endif" class="btn-secundario">
                                 <i class="bi bi-arrow-left"></i> Volver
                             </a>
-                            <button type="submit" class="btn-verde">
+                            <button type="submit" class="btn-principal">
                                 <i class="bi bi-save"></i> Actualizar
                             </button>
                         </div>
