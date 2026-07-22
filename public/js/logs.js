@@ -25,6 +25,10 @@ function escapeHtml(str) {
     });
 }
 
+function getCsrfToken() {
+    return document.querySelector('meta[name="csrf-token"]')?.content || '';
+}
+
 function cargarLogs() {
     fetch('/api/logs', {
         headers: {
@@ -77,7 +81,8 @@ function cargarLogs() {
                     method: 'DELETE',
                     headers: {
                         'Authorization': 'Bearer ' + getCookie('jwt_token'),
-                        'Accept': 'application/json'
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
                     }
                 })
                 .then(res => {
@@ -103,7 +108,8 @@ document.getElementById('btnLimpiarLogs')?.addEventListener('click', function() 
             method: 'DELETE',
             headers: {
                 'Authorization': 'Bearer ' + getCookie('jwt_token'),
-                'Accept': 'application/json'
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': getCsrfToken()
             }
         })
         .then(res => {

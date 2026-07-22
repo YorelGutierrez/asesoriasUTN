@@ -54,24 +54,25 @@ Route::middleware(['auth'])->group(function () {
         $mes = request('mes', now()->month);
         $anio = request('anio', now()->year);
 
-        if ($user->rol === 'alumno') {
-            $sesiones = \App\Models\sesiones_asesoria::whereHas('alumnos', function ($q) use ($user) {
+        $query = \App\Models\sesiones_asesoria::where('estado', 'programada') // 👈 Solo programadas
+            ->where('fecha_inicio', '>=', now()) // 👈 Solo futuras
+            ->whereMonth('fecha_inicio', $mes)
+            ->whereYear('fecha_inicio', $anio);
+
+        if ($user->rol === 'docente') {
+            $query->where('docente_id', $user->id);
+        } elseif ($user->rol === 'alumno') {
+            $query->whereHas('alumnos', function ($q) use ($user) {
                 $q->where('sesion_alumno.alumno_id', $user->id);
-            })->whereMonth('fecha_inicio', $mes)
-                ->whereYear('fecha_inicio', $anio)
-                ->where('estado', '!=', 'cancelada')
-                ->pluck('fecha_inicio');
-        } else {
-            $sesiones = \App\Models\sesiones_asesoria::where('docente_id', $user->id)
-                ->whereMonth('fecha_inicio', $mes)
-                ->whereYear('fecha_inicio', $anio)
-                ->where('estado', '!=', 'cancelada')
-                ->pluck('fecha_inicio');
+            });
         }
 
-        $dias = $sesiones->map(fn($f) => (int) date('j', strtotime($f)))->unique()->values();
+        $dias = $query->pluck('fecha_inicio')
+            ->map(fn($f) => (int) date('j', strtotime($f)))
+            ->unique()
+            ->values();
 
-        return response()->json(['dias' => $dias, 'mes' => $mes, 'anio' => $anio]);
+        return response()->json(['dias' => $dias]);
     })->name('calendario.sesiones');
 
     // ===== PERFIL =====
@@ -108,7 +109,7 @@ Route::middleware(['auth', 'rol:admin'])->group(function () {
 
     // ========== RUTAS DE BITÁCORA ==========
     Route::delete('/bitacora/limpiar', function () {
-        logs::truncate();
+        logs::query()->delete();
         return redirect()->back()->with('success', 'Bitácora limpiada');
     })->name('bitacora.limpiar');
 
@@ -192,13 +193,13 @@ Route::post('/imprimir-graficas-docente-pdf', [GraficasController::class, 'impri
 Route::middleware(['auth'])->group(function () {
     Route::get('/api/logs', function () {
         $user = auth()->user();
-        
+
         if ($user->rol === 'admin') {
             $logs = App\Models\logs::with('user')->latest()->take(10)->get();
         } else {
             $logs = App\Models\logs::with('user')->where('user_id', $user->id)->latest()->take(10)->get();
         }
-        
+
         return response()->json($logs);
     });
 
