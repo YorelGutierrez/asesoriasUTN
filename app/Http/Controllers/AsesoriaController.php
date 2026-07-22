@@ -65,7 +65,7 @@ class AsesoriaController extends Controller
                 // CONTAR ASESORÍAS POR ALUMNO Y ASIGNAR COLOR
                 // ============================================================
                 $coloresAlumnos = [];
-                
+
                 foreach ($alumnos as $alumno) {
                     // Contar asesorías realizadas del alumno
                     $totalAsesorias = sesion_alumno::where('alumno_id', $alumno->user_id)
@@ -109,7 +109,7 @@ class AsesoriaController extends Controller
         // CONTAR ASESORÍAS POR ALUMNO Y ASIGNAR COLOR (para ADMIN)
         // ============================================================
         $coloresAlumnos = [];
-        
+
         foreach ($alumnos as $alumno) {
             $totalAsesorias = sesion_alumno::where('alumno_id', $alumno->user_id)
                 ->join('sesiones_asesoria', 'sesion_alumno.sesion_id', '=', 'sesiones_asesoria.id')
@@ -290,6 +290,7 @@ class AsesoriaController extends Controller
         $materias = materias::all();
         $user = auth()->user();
         $grupoActivoId = session('grupo_activo_id');
+        $coloresAlumnos = [];
 
         if ($user->rol === 'admin') {
             $alumnos = alumnos::with(['user', 'grupo'])
@@ -312,7 +313,27 @@ class AsesoriaController extends Controller
             }
         }
 
-        return view('auth.docentes.registro_asesorias', compact('carreras', 'materias', 'alumnos'));
+        foreach ($alumnos as $alumno) {
+            $totalAsesorias = sesion_alumno::where('alumno_id', $alumno->user_id)
+                ->join('sesiones_asesoria', 'sesion_alumno.sesion_id', '=', 'sesiones_asesoria.id')
+                ->where('sesiones_asesoria.estado', 'realizada')
+                ->count();
+
+            if ($totalAsesorias >= 5) {
+                $color = 'danger'; // Rojo
+            } elseif ($totalAsesorias >= 3) {
+                $color = 'warning'; // Naranja
+            } else {
+                $color = 'blanco'; // Blanco (normal)
+            }
+
+            $coloresAlumnos[$alumno->id] = [
+                'color' => $color,
+                'total' => $totalAsesorias,
+            ];
+        }
+
+        return view('auth.docentes.registro_asesorias', compact('carreras', 'materias', 'alumnos', 'coloresAlumnos'));
     }
 
     public function store(Request $request)
@@ -353,6 +374,23 @@ class AsesoriaController extends Controller
                 'estado'        => 'realizada',
                 'motivo'        => $request->motivo,
             ]);
+
+            // Obtener los user_id de los alumnos seleccionados
+            $alumnosIds = alumnos::whereIn('id', $request->alumnos)->pluck('user_id')->toArray();
+
+            // MARCAR COMO REALIZADAS LAS SESIONES AGENDADAS QUE COINCIDAN
+            $sesionesAgendadas = sesiones_asesoria::where('docente_id', auth()->id())
+                ->where('fecha_inicio', $fechaInicio)
+                ->where('estado', 'programada')
+                ->whereHas('alumnos', function ($q) use ($alumnosIds) {
+                    $q->whereIn('alumno_id', $alumnosIds);
+                })
+                ->get();
+
+            foreach ($sesionesAgendadas as $agendada) {
+                $agendada->alumnos()->detach();
+                $agendada->delete();
+            }
 
             foreach ($request->alumnos as $alumnoId) {
                 $alumno = alumnos::find($alumnoId);
