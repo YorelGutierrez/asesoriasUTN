@@ -272,6 +272,7 @@ class AsesoriaController extends Controller
         $materias = materias::all();
         $user = auth()->user();
         $grupoActivoId = session('grupo_activo_id');
+        $coloresAlumnos = [];
 
         if ($user->rol === 'admin') {
             $alumnos = alumnos::with(['user', 'grupo'])
@@ -340,6 +341,23 @@ class AsesoriaController extends Controller
                 'estado'        => 'realizada',
                 'motivo'        => $request->motivo,
             ]);
+
+            // Obtener los user_id de los alumnos seleccionados
+            $alumnosIds = alumnos::whereIn('id', $request->alumnos)->pluck('user_id')->toArray();
+
+            // MARCAR COMO REALIZADAS LAS SESIONES AGENDADAS QUE COINCIDAN
+            $sesionesAgendadas = sesiones_asesoria::where('docente_id', auth()->id())
+                ->where('fecha_inicio', $fechaInicio)
+                ->where('estado', 'programada')
+                ->whereHas('alumnos', function ($q) use ($alumnosIds) {
+                    $q->whereIn('alumno_id', $alumnosIds);
+                })
+                ->get();
+
+            foreach ($sesionesAgendadas as $agendada) {
+                $agendada->alumnos()->detach();
+                $agendada->delete();
+            }
 
             foreach ($request->alumnos as $alumnoId) {
                 $alumno = alumnos::find($alumnoId);

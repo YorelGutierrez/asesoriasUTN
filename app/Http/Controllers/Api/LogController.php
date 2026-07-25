@@ -41,9 +41,9 @@ class LogController extends Controller
     public function destroy($id)
     {
         $log = logs::findOrFail($id);
-        $log->delete();  // marca deleted_at
+        $log->delete();
 
-        return response()->json(['message' => 'Log eliminado (soft delete)']);
+        return response()->json(['message' => 'Log eliminado']);
     }
 
     // Eliminar físicamente todos los logs (solo admin)
@@ -54,7 +54,7 @@ class LogController extends Controller
             return response()->json(['error' => 'No autorizado'], 403);
         }
 
-        logs::truncate();  // elimina todos los registros de la tabla
+        logs::query()->delete();  // elimina todos los registros de la tabla
 
         return response()->json(['message' => 'Todos los logs eliminados permanentemente']);
     }
