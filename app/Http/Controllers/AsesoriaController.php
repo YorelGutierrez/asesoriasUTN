@@ -22,6 +22,36 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class AsesoriaController extends Controller
 {
+    /**
+     * Calcula el conteo de asesorías por alumno
+     */
+    private function calcularColoresAlumnos($alumnos)
+    {
+        $coloresAlumnos = [];
+        
+        foreach ($alumnos as $alumno) {
+            $totalAsesorias = sesion_alumno::where('alumno_id', $alumno->user_id)
+                ->join('sesiones_asesoria', 'sesion_alumno.sesion_id', '=', 'sesiones_asesoria.id')
+                ->whereIn('sesiones_asesoria.estado', ['realizada', 'completada', 'finalizada'])
+                ->count();
+
+            if ($totalAsesorias >= 5) {
+                $color = 'danger';
+            } elseif ($totalAsesorias >= 3) {
+                $color = 'warning';
+            } else {
+                $color = 'blanco';
+            }
+
+            $coloresAlumnos[$alumno->id] = [
+                'color' => $color,
+                'total' => $totalAsesorias,
+            ];
+        }
+        
+        return $coloresAlumnos;
+    }
+
     public function agendar()
     {
         $carreras = carreras::all();
@@ -61,32 +91,7 @@ class AsesoriaController extends Controller
                     ->select('alumnos.*')
                     ->get();
 
-                // ============================================================
-                // CONTAR ASESORÍAS POR ALUMNO Y ASIGNAR COLOR
-                // ============================================================
-                $coloresAlumnos = [];
-                
-                foreach ($alumnos as $alumno) {
-                    // Contar asesorías realizadas del alumno
-                    $totalAsesorias = sesion_alumno::where('alumno_id', $alumno->user_id)
-                        ->join('sesiones_asesoria', 'sesion_alumno.sesion_id', '=', 'sesiones_asesoria.id')
-                        ->where('sesiones_asesoria.estado', 'realizada')
-                        ->count();
-
-                    // Asignar color según cantidad
-                    if ($totalAsesorias >= 5) {
-                        $color = 'danger'; // Rojo
-                    } elseif ($totalAsesorias >= 3) {
-                        $color = 'warning'; // Naranja
-                    } else {
-                        $color = 'blanco'; // Blanco (normal)
-                    }
-
-                    $coloresAlumnos[$alumno->id] = [
-                        'color' => $color,
-                        'total' => $totalAsesorias,
-                    ];
-                }
+                $coloresAlumnos = $this->calcularColoresAlumnos($alumnos);
             } else {
                 $alumnos = collect();
                 $coloresAlumnos = [];
@@ -105,30 +110,7 @@ class AsesoriaController extends Controller
             ->select('alumnos.*')
             ->get();
 
-        // ============================================================
-        // CONTAR ASESORÍAS POR ALUMNO Y ASIGNAR COLOR (para ADMIN)
-        // ============================================================
-        $coloresAlumnos = [];
-        
-        foreach ($alumnos as $alumno) {
-            $totalAsesorias = sesion_alumno::where('alumno_id', $alumno->user_id)
-                ->join('sesiones_asesoria', 'sesion_alumno.sesion_id', '=', 'sesiones_asesoria.id')
-                ->where('sesiones_asesoria.estado', 'realizada')
-                ->count();
-
-            if ($totalAsesorias >= 5) {
-                $color = 'danger'; // Rojo
-            } elseif ($totalAsesorias >= 3) {
-                $color = 'warning'; // Naranja
-            } else {
-                $color = 'blanco'; // Blanco (normal)
-            }
-
-            $coloresAlumnos[$alumno->id] = [
-                'color' => $color,
-                'total' => $totalAsesorias,
-            ];
-        }
+        $coloresAlumnos = $this->calcularColoresAlumnos($alumnos);
 
         $docentes = collect();
         $tipoVista = 'admin';
@@ -312,7 +294,12 @@ class AsesoriaController extends Controller
             }
         }
 
-        return view('auth.docentes.registro_asesorias', compact('carreras', 'materias', 'alumnos'));
+        // ============================================================
+        // 🔥 CALCULAR ASESORÍAS POR ALUMNO Y ASIGNAR COLOR
+        // ============================================================
+        $coloresAlumnos = $this->calcularColoresAlumnos($alumnos);
+
+        return view('auth.docentes.registro_asesorias', compact('carreras', 'materias', 'alumnos', 'coloresAlumnos'));
     }
 
     public function store(Request $request)
@@ -399,23 +386,41 @@ class AsesoriaController extends Controller
             'descargar' => 'nullable|boolean',
         ]);
 
-        $sesion = sesiones_asesoria::with(['docente', 'alumnos'])->findOrFail($request->sesion_id);
+        $sesion = sesiones_asesoria::with(['docente'])->findOrFail($request->sesion_id);
+
+        // ============================================================
+        // OBTENER ALUMNOS CORRECTAMENTE DESDE sesion_alumno
+        // ============================================================
+        $alumnosDeLaSesion = DB::table('sesion_alumno')
+            ->join('users', 'sesion_alumno.alumno_id', '=', 'users.id')
+            ->leftJoin('alumnos', 'users.id', '=', 'alumnos.user_id')
+            ->leftJoin('grupos', 'alumnos.grupo_id', '=', 'grupos.id')
+            ->where('sesion_alumno.sesion_id', $request->sesion_id)
+            ->select(
+                'users.nombres',
+                'users.apellido_paterno',
+                'users.apellido_materno',
+                'alumnos.matricula',
+                'grupos.nombre as grupo_nombre'
+            )
+            ->get();
 
         $carreraNombre = 'No especificada';
         if ($sesion->docente && $sesion->docente->carrera) {
             $carreraNombre = $sesion->docente->carrera->nombre;
         } else {
-            $primerAlumno = $sesion->alumnos->first();
-            if ($primerAlumno && $primerAlumno->alumno && $primerAlumno->alumno->carrera) {
-                $carreraNombre = $primerAlumno->alumno->carrera->nombre;
+            $primerAlumno = $alumnosDeLaSesion->first();
+            if ($primerAlumno) {
+                $alumnoModel = alumnos::where('user_id', $primerAlumno->id ?? 0)->first();
+                if ($alumnoModel && $alumnoModel->carrera) {
+                    $carreraNombre = $alumnoModel->carrera->nombre;
+                }
             }
         }
 
-        $materiaNombre = 'No especificada';
-
         $data = [
             'carrera_nombre' => $carreraNombre,
-            'materia_nombre' => $materiaNombre,
+            'materia_nombre' => 'No especificada',
             'tipo_asesoria'  => $sesion->tipo_asesoria ?? 'individual',
             'tema'           => $sesion->tema,
             'fecha'          => \Carbon\Carbon::parse($sesion->fecha_inicio)->format('Y-m-d'),
@@ -426,10 +431,25 @@ class AsesoriaController extends Controller
             'alumnos'        => [],
         ];
 
-        foreach ($sesion->alumnos as $alumno) {
+        foreach ($alumnosDeLaSesion as $alumno) {
+            $nombreCompleto = trim(
+                ($alumno->nombres ?? '') . ' ' . 
+                ($alumno->apellido_paterno ?? '') . ' ' . 
+                ($alumno->apellido_materno ?? '')
+            );
+            
             $data['alumnos'][] = [
-                'nombre' => $alumno->nombres . ' ' . $alumno->apellido_paterno . ' ' . $alumno->apellido_materno,
-                'grupo'  => $alumno->alumno->grupo->nombre ?? 'N/A',
+                'nombre' => $nombreCompleto ?: 'Sin nombre',
+                'grupo'  => $alumno->grupo_nombre ?? 'N/A',
+                'matricula' => $alumno->matricula ?? 'N/A',
+            ];
+        }
+
+        if (empty($data['alumnos'])) {
+            $data['alumnos'][] = [
+                'nombre' => 'No hay alumnos registrados en esta sesión',
+                'grupo'  => 'N/A',
+                'matricula' => 'N/A',
             ];
         }
 
@@ -493,7 +513,8 @@ class AsesoriaController extends Controller
             $query->whereHas('alumnos', function ($q) use ($search) {
                 $q->where('nombres', 'like', "%{$search}%")
                     ->orWhere('apellido_paterno', 'like', "%{$search}%")
-                    ->orWhere('apellido_materno', 'like', "%{$search}%");
+                    ->orWhere('apellido_materno', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
             });
         }
 
@@ -509,5 +530,34 @@ class AsesoriaController extends Controller
         $sesiones = $query->orderBy('fecha_inicio', 'desc')->paginate(10);
 
         return view('auth.historial', compact('sesiones', 'materias', 'cuatrimestres'));
+    }
+
+    /**
+     * Obtiene las asesorías próximas para el dashboard (API)
+     */
+    public function getProximasAsesorias()
+    {
+        $user = auth()->user();
+        $proximas = [];
+
+        if ($user->rol === 'docente') {
+            $proximas = sesiones_asesoria::where('docente_id', $user->id)
+                ->whereIn('estado', ['programada', 'pendiente'])
+                ->where('fecha_inicio', '>=', now())
+                ->orderBy('fecha_inicio', 'asc')
+                ->take(5)
+                ->get();
+        } elseif ($user->rol === 'alumno') {
+            $proximas = sesiones_asesoria::whereHas('alumnos', function ($q) use ($user) {
+                $q->where('sesion_alumno.alumno_id', $user->id);
+            })
+            ->whereIn('estado', ['programada', 'pendiente'])
+            ->where('fecha_inicio', '>=', now())
+            ->orderBy('fecha_inicio', 'asc')
+            ->take(5)
+            ->get();
+        }
+
+        return response()->json($proximas);
     }
 }

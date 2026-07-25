@@ -1,6 +1,38 @@
 @extends('Plantilla')
 
 @section('contenido')
+@php
+    if (!isset($proximaAsesoria)) {
+        $proximaAsesoria = null;
+    }
+    if (!isset($agendadas)) {
+        $agendadas = 0;
+    }
+    if (!isset($completadas)) {
+        $completadas = 0;
+    }
+    if (!isset($totalAlumnos)) {
+        $totalAlumnos = 0;
+    }
+    if (!isset($gruposActivos)) {
+        $gruposActivos = 0;
+    }
+    if (!isset($gruposRecientes)) {
+        $gruposRecientes = collect();
+    }
+    if (!isset($alumnosLabels)) {
+        $alumnosLabels = [];
+    }
+    if (!isset($alumnosValues)) {
+        $alumnosValues = [];
+    }
+    if (!isset($solicitudesLabels)) {
+        $solicitudesLabels = [];
+    }
+    if (!isset($solicitudesValues)) {
+        $solicitudesValues = [];
+    }
+@endphp
 <link rel="stylesheet" href="{{ asset('estilos/botones.css') }}">
 <link rel="stylesheet" href="{{ asset('estilos/titulos.css') }}">
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

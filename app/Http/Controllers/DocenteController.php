@@ -78,10 +78,16 @@ class DocenteController extends Controller
                 $fotoPath = $request->file('foto_perfil')->store('fotos_perfil', 'public');
             }
 
+            $apellidoMaterno = $request->apellido_materno;
+            if (empty($apellidoMaterno)) {
+                $apellidoMaterno = '';
+            }
+
             $user = User::create([
                 'nombres' => $request->nombres,
                 'apellido_paterno' => $request->apellido_paterno,
-                'apellido_materno' => $request->apellido_materno,
+                'apellido_materno' => $apellidoMaterno,
+                'nickname' => null,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
                 'fecha_nacimiento' => $request->fecha_nacimiento,
@@ -113,72 +119,111 @@ class DocenteController extends Controller
         $carreras = carreras::all();
         $materias = materias::all();
 
-        // REGISTRAR LOG - ACCESO A EDICIÓN
         registrar_log('ACCESO', 'Accedió a edición del docente: ' . $docente->user->nombres . ' ' . $docente->user->apellido_paterno . ' | Núm. empleado: ' . $docente->numero_empleado, 'docentes');
 
         return view('admin.actualizarDocente', compact('docente', 'carreras', 'materias'));
     }
+
     public function update(Request $request, $id)
     {
-        $docente = docentes::findOrFail($id);
-        $user = $docente->user;
-
-        $request->validate([
-            'nombres' => 'required|string|max:255',
-            'apellido_paterno' => 'required|string|max:255',
-            'apellido_materno' => 'nullable|string|max:255',
-            'email' => 'required|email|ends_with:@utnay.edu.mx|unique:users,email,' . $user->id,
-            'fecha_nacimiento' => 'nullable|date|before:today',
-            'telefono' => 'nullable|string|regex:/^[0-9]{10}$/',
-            'numero_empleado' => 'required|string|unique:docentes,numero_empleado,' . $docente->id,
-            'carrera_id' => 'required|exists:carreras,id',
-            'foto_perfil' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'password' => 'nullable|string|min:6|confirmed',
-        ]);
-
         try {
+            $docente = docentes::with('user')->findOrFail($id);
+            $user = $docente->user;
+
+            $request->validate([
+                'nombres' => 'required|string|max:255',
+                'apellido_paterno' => 'required|string|max:255',
+                'apellido_materno' => 'nullable|string|max:255',
+                'email' => 'required|email|ends_with:@utnay.edu.mx|unique:users,email,' . $user->id,
+                'fecha_nacimiento' => 'nullable|date|before:today',
+                'telefono' => 'nullable|string|regex:/^[0-9]{10}$/',
+                'numero_empleado' => 'required|string|unique:docentes,numero_empleado,' . $docente->id,
+                'carrera_id' => 'required|exists:carreras,id',
+                'foto_perfil' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'password' => 'nullable|string|min:6|confirmed',
+            ]);
+
             DB::beginTransaction();
+
+            $apellidoMaterno = $request->input('apellido_materno');
+            if (empty($apellidoMaterno)) {
+                $apellidoMaterno = '';
+            }
+
+            $telefono = $request->input('telefono');
+            if (empty($telefono)) {
+                $telefono = '';
+            }
+
+            $fechaNacimiento = $request->input('fecha_nacimiento');
+            if (empty($fechaNacimiento)) {
+                $fechaNacimiento = null;
+            }
+
+            DB::update("UPDATE users SET 
+                nombres = ?,
+                apellido_paterno = ?,
+                apellido_materno = ?,
+                email = ?,
+                fecha_nacimiento = ?,
+                telefono = ?,
+                nickname = NULL,
+                updated_at = NOW()
+                WHERE id = ?", [
+                $request->input('nombres'),
+                $request->input('apellido_paterno'),
+                $apellidoMaterno,
+                $request->input('email'),
+                $fechaNacimiento,
+                $telefono,
+                $user->id
+            ]);
+
+            DB::table('docentes')
+                ->where('id', $id)
+                ->update([
+                    'numero_empleado' => $request->input('numero_empleado'),
+                    'carrera_id' => $request->input('carrera_id'),
+                    'updated_at' => now()
+                ]);
 
             if ($request->hasFile('foto_perfil')) {
                 if ($user->foto_perfil) {
                     Storage::disk('public')->delete($user->foto_perfil);
                 }
                 $fotoPath = $request->file('foto_perfil')->store('fotos_perfil', 'public');
-                $user->foto_perfil = $fotoPath;
+                DB::table('users')
+                    ->where('id', $user->id)
+                    ->update(['foto_perfil' => $fotoPath]);
             }
-
-            $user->update([
-                'nombres' => $request->nombres,
-                'apellido_paterno' => $request->apellido_paterno,
-                'apellido_materno' => $request->apellido_materno,
-                'email' => $request->email,
-                'fecha_nacimiento' => $request->fecha_nacimiento,
-                'telefono' => $request->telefono,
-            ]);
 
             if ($request->filled('password')) {
-                $user->password = Hash::make($request->password);
-                $user->save();
+                DB::table('users')
+                    ->where('id', $user->id)
+                    ->update(['password' => Hash::make($request->password)]);
             }
-
-            $docente->update([
-                'numero_empleado' => $request->numero_empleado,
-                'carrera_id' => $request->carrera_id,
-            ]);
 
             DB::commit();
 
-            // REGISTRAR LOG - EDITAR DOCENTE
-            registrar_log('EDITAR', 'Docente: ' . $user->nombres . ' ' . $user->apellido_paterno . ' | Núm. empleado: ' . $request->numero_empleado, 'docentes');
+            $userVerificado = DB::table('users')->where('id', $user->id)->first();
 
-            return redirect()->route('gestion', ['tab' => 'docentes'])->with('success', 'Docente actualizado correctamente');
+            registrar_log('EDITAR', 'Docente: ' . $userVerificado->nombres . ' ' . $userVerificado->apellido_paterno . ' | Núm. empleado: ' . $request->numero_empleado, 'docentes');
+
+            return redirect()->route('gestion', ['tab' => 'docentes'])
+                ->with('success', 'Docente actualizado correctamente. Nuevo nombre: ' . $userVerificado->nombres);
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return back()->withErrors($e->errors())->withInput();
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Error: ' . $e->getMessage());
+            \Log::error('Error al actualizar docente:', [
+                'mensaje' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return back()->with('error', 'Error al actualizar: ' . $e->getMessage())->withInput();
         }
     }
 
-    // Eliminar docente
     public function destroy($id)
     {
         try {
@@ -187,7 +232,6 @@ class DocenteController extends Controller
             $docente = docentes::with('user')->findOrFail($id);
             $user = $docente->user;
 
-            // REGISTRAR LOG - ELIMINAR DOCENTE (antes de eliminar)
             registrar_log('ELIMINAR', 'Docente: ' . $user->nombres . ' ' . $user->apellido_paterno . ' | Núm. empleado: ' . $docente->numero_empleado, 'docentes');
 
             $docente->materias()->detach();
@@ -209,21 +253,36 @@ class DocenteController extends Controller
     }
 
     /**
-     * Dashboard del docente con datos reales.
+     * Dashboard del docente con datos reales y gráficas.
      */
     public function dashboardDocente()
     {
         $user = auth()->user();
         $docente = $user->docente;
 
-        // Próxima asesoría
+        // ============================================
+        // PRÓXIMA ASESORÍA
+        // ============================================
         $proximaAsesoria = sesiones_asesoria::where('docente_id', $user->id)
             ->whereIn('estado', ['programada', 'pendiente'])
             ->where('fecha_inicio', '>=', now())
             ->orderBy('fecha_inicio', 'asc')
             ->first();
 
-        // Total de alumnos atendidos
+        // ============================================
+        // CONTAR ASESORÍAS AGENDADAS Y COMPLETADAS
+        // ============================================
+        $agendadas = sesiones_asesoria::where('docente_id', $user->id)
+            ->whereIn('estado', ['programada', 'pendiente'])
+            ->count();
+
+        $completadas = sesiones_asesoria::where('docente_id', $user->id)
+            ->where('estado', 'realizada')
+            ->count();
+
+        // ============================================
+        // TOTAL ALUMNOS ATENDIDOS
+        // ============================================
         $totalAlumnos = sesiones_asesoria::where('docente_id', $user->id)
             ->where('estado', 'realizada')
             ->with('alumnos')
@@ -233,31 +292,78 @@ class DocenteController extends Controller
             ->unique('id')
             ->count();
 
-        // Grupos activos (asignados al docente)
+        // ============================================
+        // GRUPOS ACTIVOS
+        // ============================================
         $gruposActivos = grupos::whereHas('docentes', function ($q) use ($user) {
             $q->where('docente_id', $user->id);
         })->count();
 
-        // Grupos recientes desde el historial de selección
+        // ============================================
+        // GRUPOS RECIENTES
+        // ============================================
         $recientesIds = session('grupos_recientes', []);
         $gruposRecientes = [];
 
         if (!empty($recientesIds)) {
-            // Obtener los grupos con sus relaciones
             $gruposRecientes = grupos::with(['carrera', 'alumnos'])
                 ->whereIn('id', $recientesIds)
                 ->get()
                 ->sortBy(function ($grupo) use ($recientesIds) {
-                    // Ordenar según el orden del historial (índice más bajo = más reciente)
                     return array_search($grupo->id, $recientesIds);
                 });
         }
 
+        // ============================================================
+        // 📊 DATOS PARA GRÁFICAS DEL DOCENTE
+        // ============================================================
+
+        // 1. Alumnos más frecuentes (Top 10)
+        $alumnos = DB::table('sesion_alumno')
+            ->join('alumnos', 'sesion_alumno.alumno_id', '=', 'alumnos.user_id')
+            ->join('users', 'alumnos.user_id', '=', 'users.id')
+            ->join('sesiones_asesoria', 'sesion_alumno.sesion_id', '=', 'sesiones_asesoria.id')
+            ->select(
+                DB::raw('CONCAT(users.nombres, " ", users.apellido_paterno) as nombre_completo'),
+                DB::raw('COUNT(*) as total')
+            )
+            ->where('sesiones_asesoria.docente_id', $user->id)
+            ->groupBy('users.nombres', 'users.apellido_paterno', 'users.id')
+            ->orderBy('total', 'DESC')
+            ->limit(10)
+            ->get();
+
+        $alumnosLabels = $alumnos->pluck('nombre_completo')->toArray();
+        $alumnosValues = $alumnos->pluck('total')->toArray();
+
+        // 2. Estado de mis sesiones
+        $solicitudes = sesiones_asesoria::select('estado', DB::raw('COUNT(*) as total'))
+            ->where('docente_id', $user->id)
+            ->groupBy('estado')
+            ->get();
+
+        $solicitudesLabels = $solicitudes->pluck('estado')->map(function($e) {
+            $map = [
+                'programada' => 'Programadas',
+                'realizada' => 'Realizadas',
+                'cancelada' => 'Canceladas',
+                'pendiente' => 'Pendientes'
+            ];
+            return $map[$e] ?? $e;
+        })->toArray();
+        $solicitudesValues = $solicitudes->pluck('total')->toArray();
+
         return view('auth.docentes.escritorioDocente', compact(
             'proximaAsesoria',
+            'agendadas',
+            'completadas',
             'totalAlumnos',
             'gruposActivos',
-            'gruposRecientes'
+            'gruposRecientes',
+            'alumnosLabels',
+            'alumnosValues',
+            'solicitudesLabels',
+            'solicitudesValues'
         ));
     }
 }

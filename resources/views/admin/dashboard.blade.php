@@ -304,7 +304,7 @@
         });
 
     // ============================================================
-    // BITÁCORA - CARGAR LOGS DESDE API
+    // BITÁCORA - CARGAR LOGS DESDE API (CORREGIDO)
     // ============================================================
     function cargarLogs() {
         fetch('/api/logs', {
@@ -337,16 +337,37 @@
                 const logsMostrar = logs.slice(0, 5);
                 logsMostrar.forEach(log => {
                     let nombreUsuario = 'Sistema';
-                    let fotoUrl = 'https://ui-avatars.com/api/?name=Sistema&background=e9ecef&color=343a40';
+                    let fotoUrl = 'https://ui-avatars.com/api/?name=Sistema&background=e9ecef&color=343a40&size=36';
+                    
                     if (log.user) {
                         const nombres = [log.user.nombres, log.user.apellido_paterno, log.user.apellido_materno].filter(Boolean).join(' ');
                         nombreUsuario = nombres || 'Usuario';
-                        fotoUrl = log.user.foto_perfil ? log.user.foto_perfil : `https://ui-avatars.com/api/?name=${encodeURIComponent(nombreUsuario)}&background=e9ecef&color=343a40`;
+                        
+                        // ============================================
+                        // 🔥 CORRECCIÓN: Construir URL correcta de la foto
+                        // ============================================
+                        if (log.user.foto_perfil) {
+                            // Si la ruta ya contiene 'storage/' no la dupliques
+                            if (log.user.foto_perfil.startsWith('storage/')) {
+                                fotoUrl = '/' + log.user.foto_perfil;
+                            } else if (log.user.foto_perfil.startsWith('/storage/')) {
+                                fotoUrl = log.user.foto_perfil;
+                            } else if (log.user.foto_perfil.startsWith('http')) {
+                                fotoUrl = log.user.foto_perfil;
+                            } else {
+                                // Ruta relativa: agregar /storage/
+                                fotoUrl = '/storage/' + log.user.foto_perfil;
+                            }
+                        } else {
+                            fotoUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(nombreUsuario)}&background=e9ecef&color=343a40&size=36`;
+                        }
                     }
+                    
                     const item = document.createElement('div');
                     item.className = "d-flex align-items-start mb-3 border-bottom pb-2";
                     item.innerHTML = `
-                        <img src="${fotoUrl}" class="rounded-circle me-3 mt-1" width="36" height="36">
+                        <img src="${fotoUrl}" class="rounded-circle me-3 mt-1" width="36" height="36" 
+                             onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(nombreUsuario)}&background=e9ecef&color=343a40&size=36'">
                         <div class="flex-grow-1">
                             <div class="d-flex justify-content-between align-items-center">
                                 <span class="fw-semibold" style="font-size: 0.9rem;">${escapeHtml(nombreUsuario)}</span>

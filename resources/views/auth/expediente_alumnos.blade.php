@@ -18,7 +18,6 @@
         </h2>
 
         <div class="row g-4">
-            <!-- Información académica -->
             <div class="col-md-6">
                 <div class="bg-light p-3 rounded-3 h-100">
                     <h5 class="fw-semibold mb-3">Información académica</h5>
@@ -31,7 +30,6 @@
                 </div>
             </div>
 
-            <!-- Últimas asesorías (resumen rápido) -->
             <div class="col-md-6">
                 <div class="bg-light p-3 rounded-3 h-100">
                     <h5 class="fw-semibold mb-3">Últimas asesorías</h5>
@@ -116,8 +114,8 @@
                 <tbody>
                     @forelse($sesiones as $sesion)
                     @php
-                    $esGrupo = $sesion->alumnos->count() > 1;
-                    $reporte = optional($sesion->reporte)->first();
+                        $esGrupo = $sesion->alumnos->count() > 1;
+                        $reporte = $sesion->reporte;
                     @endphp
                     <tr>
                         <td>{{ $esGrupo ? 'Grupo' : 'Individual' }}</td>
@@ -134,7 +132,9 @@
                         <td>{{ $sesion->acuerdos->first()->acuerdo ?? '—' }}</td>
                         <td>
                             @if($reporte)
-                            <a href="{{ route('reporte.ver', $reporte->id) }}" target="_blank" class="btn-secundario"><i class="bi bi-eye me-1"></i>Ver</a>
+                            <a href="{{ route('reporte.ver', $reporte->id) }}" target="_blank" class="btn-secundario">
+                                <i class="bi bi-eye me-1"></i> Ver
+                            </a>
                             @else
                             <span class="text-muted">Sin PDF</span>
                             @endif
@@ -142,7 +142,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="6" class="text-center text-muted py-3">
+                        <td colspan="7" class="text-center text-muted py-3">
                             Sin asesorías registradas para este alumno.
                         </td>
                     </tr>
@@ -154,6 +154,8 @@
 </div>
 
 <!-- Botón de regreso -->
-<a href="{{ route('alumnos') }}" class="btn-principal"><i class="bi bi-arrow-left me-1"></i>Regresar al listado</a>
+<a href="{{ route('alumnos') }}" class="btn-principal">
+    <i class="bi bi-arrow-left me-1"></i> Regresar al listado
+</a>
 
-        @endsection
+@endsection
