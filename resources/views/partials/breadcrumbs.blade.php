@@ -5,118 +5,141 @@ $breadcrumbs = [];
 
 // Mapeo de nombres de rutas a etiquetas amigables
 $routeLabels = [
-'admin.dashboard' => 'Inicio',
-'docente.dashboard' => 'Inicio',
-'alumno.dashboard' => 'Inicio',
-'grupos' => 'Grupos',
-'alumnos' => 'Alumnos',
-'agenda' => Auth::user()->rol == 'alumno' ? 'Solicitar' : 'Agendar',
-'registro' => 'Registro de asesorías',
-'historial' => 'Historial',
-'roles_permisos' => 'Roles y permisos',
-'gestion' => 'Gestión admin',
-'registro_alumnos' => 'Registro Alumnos',
-'registro_docente' => 'Registro Docentes',
-'expedienteAlumnos' => 'Expediente',
-'admin.asignaciones' => 'Asignaciones académicas',
+    'admin.dashboard' => 'Inicio',
+    'docente.dashboard' => 'Inicio',
+    'alumno.dashboard' => 'Inicio',
+    'grupos' => 'Grupos',
+    'alumnos' => 'Alumnos',
+    'agenda' => Auth::user()->rol == 'alumno' ? 'Solicitar' : 'Agendar',
+    'registro' => 'Registro de asesorías',
+    'historial' => 'Historial',
+    'roles_permisos' => 'Roles y permisos',
+    'gestion' => 'Gestión admin',
+    'registro_alumnos' => 'Registro Alumnos',
+    'registro_docente' => 'Registro Docentes',
+    'expedienteAlumnos' => 'Expediente',
+    'admin.asignaciones' => 'Asignaciones académicas',
+    'reporte.ver' => 'Expediente', // 👈 AGREGAR ESTO
 ];
 
 if (auth()->check()) {
-$routeLabels['agenda'] = auth()->user()->rol === 'alumno' ? 'Solicitar' : 'Agendar';
+    $routeLabels['agenda'] = auth()->user()->rol === 'alumno' ? 'Solicitar' : 'Agendar';
 }
 
-// Rutas que requieren parámetros (NUNCA deben tener enlace en breadcrumb)
-$rutasConParametros = [
-'reporte.ver',
-'grupos.seleccionar',
-'grupos.limpiar',
-'grupos.destroy',
-'alumnos.edit',
-'alumnos.update',
-'alumnos.destroy',
-'alumnos.store',
-'docentes.edit',
-'docentes.update',
-'docentes.destroy',
-'docentes.store',
-'asesoria.store',
-'asesoria.pdf',
-'agenda.store',
-'expedienteAlumnos',
-'usuarios.toggleBlock',
-'bitacora.limpiar',
-'bitacora.eliminar',
-'notificaciones.confirmar',
-'notificaciones.rechazar',
-'notificaciones.leer',
-'notificaciones.leerTodas',
-'admin.asignaciones.editar',
-'admin.asignaciones.materias',
-'admin.asignaciones.grupos',
-'admin.asignaciones.docentes',
-'admin.asignaciones.grupos-docente',
-'admin.asignaciones.store',
-'admin.asignaciones.update',
-'admin.asignaciones.destroy',
-'notificaciones.index',
-'notificaciones.leer',
-'notificaciones.leerTodas',
-'notificaciones.confirmar',
-'notificaciones.rechazar',
-'calendario.sesiones',
-'respaldo.listar',
-'respaldo.restaurar',
-'respaldo.generar',
-'respaldo.automatico.form',
-'respaldo.automatico.store',
-'respaldo.descargar',
+// ============================================================
+// 🆕 RUTAS QUE DEBEN TENER UN BREADCRUMB ESPECIAL
+// ============================================================
+$rutasEspeciales = [
+    'reporte.ver' => ['label' => 'Expediente', 'parent' => 'alumnos'],
+    'expedienteAlumnos' => ['label' => 'Expediente', 'parent' => 'alumnos'],
 ];
 
-// Filtrar rutas con parámetros del historial
-$navigationHistory = array_filter(
-$navigationHistory,
-fn($r) => !in_array($r, $rutasConParametros)
-);
-$navigationHistory = array_values($navigationHistory);
-
-// ===== LIMITAR BREADCRUMBS A 5 ELEMENTOS =====
-$maxBreadcrumbs = 4;
-
-// Construir breadcrumbs desde el historial de navegación
-if (!empty($navigationHistory)) {
-// Tomar solo los últimos $maxBreadcrumbs elementos (los más recientes)
-$historyToShow = array_slice($navigationHistory, -$maxBreadcrumbs);
-
-foreach ($historyToShow as $index => $navRoute) {
-$label = $routeLabels[$navRoute] ?? ucfirst(str_replace('_', ' ', $navRoute));
-
-// El último elemento es el actual (sin enlace)
-if ($index === count($historyToShow) - 1) {
-$breadcrumbs[] = ['label' => $label];
+// ============================================================
+// 🆕 SI ESTAMOS EN UNA RUTA ESPECIAL, REEMPLAZAR EL BREADCRUMB
+// ============================================================
+if (array_key_exists($routeName, $rutasEspeciales)) {
+    $especial = $rutasEspeciales[$routeName];
+    
+    // Limpiar el historial para esta ruta
+    $breadcrumbs = [
+        ['label' => 'Inicio', 'route' => 'reset.navigation'],
+        ['label' => 'Alumnos', 'route' => 'alumnos'],
+        ['label' => $especial['label']],
+    ];
 } else {
-$breadcrumbs[] = ['label' => $label, 'route' => $navRoute];
-}
-}
-} else {
-// Sin historial, mostrar solo la página actual
-$currentLabel = $routeLabels[$routeName] ?? ucfirst(str_replace('_', ' ', $routeName));
-$breadcrumbs = [['label' => $currentLabel]];
-}
+    // Rutas que requieren parámetros (NUNCA deben tener enlace en breadcrumb)
+    $rutasConParametros = [
+        'reporte.ver',
+        'grupos.seleccionar',
+        'grupos.limpiar',
+        'grupos.destroy',
+        'alumnos.edit',
+        'alumnos.update',
+        'alumnos.destroy',
+        'alumnos.store',
+        'docentes.edit',
+        'docentes.update',
+        'docentes.destroy',
+        'docentes.store',
+        'asesoria.store',
+        'asesoria.pdf',
+        'agenda.store',
+        'expedienteAlumnos',
+        'usuarios.toggleBlock',
+        'bitacora.limpiar',
+        'bitacora.eliminar',
+        'notificaciones.confirmar',
+        'notificaciones.rechazar',
+        'notificaciones.leer',
+        'notificaciones.leerTodas',
+        'admin.asignaciones.editar',
+        'admin.asignaciones.materias',
+        'admin.asignaciones.grupos',
+        'admin.asignaciones.docentes',
+        'admin.asignaciones.grupos-docente',
+        'admin.asignaciones.store',
+        'admin.asignaciones.update',
+        'admin.asignaciones.destroy',
+        'notificaciones.index',
+        'notificaciones.leer',
+        'notificaciones.leerTodas',
+        'notificaciones.confirmar',
+        'notificaciones.rechazar',
+        'calendario.sesiones',
+        'respaldo.listar',
+        'respaldo.restaurar',
+        'respaldo.generar',
+        'respaldo.automatico.form',
+        'respaldo.automatico.store',
+        'respaldo.descargar',
+    ];
 
-// Casos especiales para submenús de registros
-if ($routeName === 'registro_alumnos' || $routeName === 'registro_docente') {
-$hasRegistros = false;
-foreach ($breadcrumbs as $crumb) {
-if ($crumb['label'] === 'Registros') {
-$hasRegistros = true;
-break;
-}
-}
-if (!$hasRegistros) {
-$lastItem = array_pop($breadcrumbs);
-$breadcrumbs[] = ['label' => 'Registros'];
-$breadcrumbs[] = $lastItem;
-}
+    // Filtrar rutas con parámetros del historial
+    $navigationHistory = array_filter(
+        $navigationHistory,
+        fn($r) => !in_array($r, $rutasConParametros)
+    );
+    $navigationHistory = array_values($navigationHistory);
+
+    // ===== LIMITAR BREADCRUMBS A 5 ELEMENTOS =====
+    $maxBreadcrumbs = 4;
+
+    // Construir breadcrumbs desde el historial de navegación
+    if (!empty($navigationHistory)) {
+        // Tomar solo los últimos $maxBreadcrumbs elementos (los más recientes)
+        $historyToShow = array_slice($navigationHistory, -$maxBreadcrumbs);
+
+        foreach ($historyToShow as $index => $navRoute) {
+            $label = $routeLabels[$navRoute] ?? ucfirst(str_replace('_', ' ', $navRoute));
+
+            // El último elemento es el actual (sin enlace)
+            if ($index === count($historyToShow) - 1) {
+                $breadcrumbs[] = ['label' => $label];
+            } else {
+                $breadcrumbs[] = ['label' => $label, 'route' => $navRoute];
+            }
+        }
+    } else {
+        // Sin historial, mostrar solo la página actual
+        $currentLabel = $routeLabels[$routeName] ?? ucfirst(str_replace('_', ' ', $routeName));
+        $breadcrumbs = [['label' => $currentLabel]];
+    }
+
+    // Casos especiales para submenús de registros
+    if ($routeName === 'registro_alumnos' || $routeName === 'registro_docente') {
+        $hasRegistros = false;
+        foreach ($breadcrumbs as $crumb) {
+            if ($crumb['label'] === 'Registros') {
+                $hasRegistros = true;
+                break;
+            }
+        }
+        if (!$hasRegistros) {
+            $lastItem = array_pop($breadcrumbs);
+            $breadcrumbs[] = ['label' => 'Registros'];
+            $breadcrumbs[] = $lastItem;
+        }
+    }
 }
 @endphp
 
@@ -133,7 +156,7 @@ $breadcrumbs[] = $lastItem;
         <i class="bi bi-chevron-right"></i>
     </li>
     <li class="{{ isset($crumb['route']) ? '' : 'active' }}">
-        @if(isset($crumb['route']) && !in_array($crumb['route'], $rutasConParametros))
+        @if(isset($crumb['route']) && !in_array($crumb['route'], $rutasConParametros ?? []))
         <a href="{{ route($crumb['route']) }}">{{ $crumb['label'] }}</a>
         @else
         {{ $crumb['label'] }}
