@@ -64,7 +64,7 @@
                     </li>
                     <li class="perfil">
                         <a style="color: white;">
-                            {{ Auth::user()->nombres . ' ' . Auth::user()->apellido_paterno . ' ' . Auth::user()->apellido_materno }}
+                            {{ Auth::user()->nombres . ' ' . Auth::user()->apellido_paterno }}
                         </a>
                         <img src="{{ Auth::user()->foto_url }}" alt="Perfil" class="perfil-img">
                     </li>

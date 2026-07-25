@@ -309,6 +309,18 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 @endif
 
+@if(session('welcome'))
+<script>
+    Swal.fire({
+        icon: 'success',
+        title: '¡Bienvenido!',
+        text: '{{ session('welcome') }}',
+        confirmButtonColor: '#28a745',
+        confirmButtonText: 'Aceptar'
+    });
+</script>
+@endif
+
 @if(session('error'))
 <script>
     Swal.fire({

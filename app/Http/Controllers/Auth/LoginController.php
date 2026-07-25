@@ -60,7 +60,7 @@ class LoginController extends Controller
 
             session()->flash('success', $mensaje);
             
-            return redirect($dashboard)->cookie('jwt_token', $token, 60*24*7, null, null, false, false)->with('success', $mensaje);
+            return redirect($dashboard)->cookie('jwt_token', $token, 60*24*7, null, null, false, false)->with('welcome', $mensaje);
         }
 
         $attempts++;
